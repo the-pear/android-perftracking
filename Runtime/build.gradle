@@ -1,0 +1,107 @@
+buildscript {
+    repositories {
+        maven {
+            url ARTIFACTORY_RELEASE
+        }
+    }
+    dependencies {
+        classpath 'jp.co.rakuten.sdtd.plugin:artifactory:1.2.0'
+        classpath 'jp.co.rakuten.sdtd.plugin:javadoc:1.1.1'
+        classpath 'com.dicedmelon.gradle:jacoco-android:0.1.1'
+    }
+}
+
+// --- ANDROID --
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
+    buildToolsVersion ANDROID_BUILD_TOOLS_VERSION
+
+    defaultConfig {
+        minSdkVersion project.ANDROID_MIN_SDK_VERSION
+        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        versionName project.MODULE_VERSION
+        resValue 'string', 'perftracking__version', project.MODULE_VERSION
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    defaultConfig {
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+
+    testOptions {
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+            }
+        }
+    }
+
+    resourcePrefix 'perftracking_'
+}
+
+// --- DEPENDENCIES ---
+
+dependencies {
+    // --- COMPILE ---
+    /** Support Library **/
+    compile 'com.android.support:support-v4:23.1.1'
+    compile 'com.android.support:support-annotations:23.1.1'
+
+    // --- TESTING ---
+
+    // testing
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile 'org.skyscreamer:jsonassert:1.2.3'
+    testCompile 'junit:junit:4.12'
+    testCompile "org.robolectric:shadows-support-v4:3.1"
+    testCompile('org.robolectric:robolectric:3.1') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+}
+
+// --- JACOCO TEST COVERAGE ---
+
+apply plugin: 'jacoco-android'
+
+jacoco {
+    toolVersion "0.7.6.201602180812"
+}
+
+jacocoAndroidUnitTestReport {
+    excludes += ['**/AutoValue_*.*',
+                 '**/*JavascriptBridge.class']
+
+    csv.enabled false
+    html.enabled true
+    xml.enabled true
+}
+
+// -- JAVADOC --
+
+apply plugin: 'jp.co.rakuten.sdtd.javadoc'
+
+javadoc {
+    name = project.MODULE_NAME
+    version = project.MODULE_VERSION
+    title = project.MODULE_DESCRIPTION
+}
+
+
+// -- ARTIFACTORY --
+
+apply plugin: 'jp.co.rakuten.sdtd.artifactory'
+
+artifactory {
+    group = project.MODULE_GROUP
+    artifact = project.MODULE_NAME
+    version = project.MODULE_VERSION
+    description = project.MODULE_DESCRIPTION
+    sourceUrl = project.MODULE_REPOSITORY
+}
