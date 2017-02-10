@@ -1,0 +1,4 @@
+package jp.co.rakuten.sdtd.perf.stubs.com.android.volley;
+
+public class AuthFailureError extends Exception {
+}
