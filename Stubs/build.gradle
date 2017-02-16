@@ -28,7 +28,7 @@ apply plugin: 'jp.co.rakuten.sdtd.artifactory'
 
 artifactory {
     group = MODULE_GROUP
-    artifact = 'stubs'
+    artifact = MODULE_NAME
     version = MODULE_VERSION
     description = MODULE_DESCRIPTION
 }
