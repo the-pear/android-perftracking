@@ -16,21 +16,19 @@ public class TrackingManager {
     private TrackingManager() {
     }
 
-    public static TrackingManager getInstance(Context context, Config config) {
-        if (INSTANCE == null) {
-            Tracker.on(context, config);
-            INSTANCE = new TrackingManager();
-            return INSTANCE;
-        } else return INSTANCE;
+    public static void initialize(Context context, Config config) {
+        Tracker.on(context, config);
+        INSTANCE = new TrackingManager();
     }
 
     /**
      * Starts a new measurement.
      *
      * @param measurementId Measurement identifier.
+     * @return trackingId
      */
-    public void startMeasurement(String measurementId) {
-        Tracker.startCustom(measurementId);
+    public int startMeasurement(String measurementId) {
+        return Tracker.startCustom(measurementId);
     }
 
     /**
@@ -47,9 +45,10 @@ public class TrackingManager {
      *
      * @param id     Measurement identifier.
      * @param object Object associated with the measurement.
+     * @return trackingId
      */
-    public void startAggregated(String id, Object object) {
-        Tracker.startMethod(object, id);
+    public int startAggregated(String id, Object object) {
+        return Tracker.startMethod(object, id);
     }
 
     /**

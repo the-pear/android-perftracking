@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
+import jp.co.rakuten.sdtd.perf.core.Config;
 import jp.co.rakuten.sdtd.perf.runtime.Measurement;
 import jp.co.rakuten.sdtd.perf.runtime.StandardMetric;
 
@@ -19,6 +20,8 @@ public class RuntimeContentProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         // TODO Check Shared Preference flag for enabling Tracking
+        // Initialise Tracking Manager
+        TrackingManager.initialize(getContext(), new Config());
         Measurement.start(StandardMetric.LAUNCH.getValue());
         return false;
     }
