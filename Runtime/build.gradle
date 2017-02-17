@@ -52,7 +52,9 @@ dependencies {
     /** Support Library **/
     compile 'com.android.support:support-annotations:23.1.1'
     /** Core **/
-    compile 'jp.co.rakuten.sdtd.perf:core:1.0.0-SNAPSHOT'
+    compile ('jp.co.rakuten.sdtd.perf:core:1.0.0-SNAPSHOT'){
+        transitive = false;
+    }
 
     // --- TESTING ---
 
