@@ -4,7 +4,7 @@
     <application>
         <provider
             android:name="jp.co.rakuten.sdtd.perf.runtime.internal.RuntimeContentProvider"
-            android:authorities="jp.co.rakuten.sdtd.perf.runtime.internal.RuntimeContentProvider"
+            android:authorities="${applicationId}.RuntimeContentProvider"
             android:exported="false"
             android:initOrder="100" />
     </application>

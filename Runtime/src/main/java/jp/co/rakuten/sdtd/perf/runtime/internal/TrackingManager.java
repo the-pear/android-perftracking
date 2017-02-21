@@ -16,7 +16,7 @@ public class TrackingManager {
     private TrackingManager() {
     }
 
-    public static void initialize(Context context, Config config) {
+    static void initialize(Context context, Config config) {
         Tracker.on(context, config);
         INSTANCE = new TrackingManager();
     }
