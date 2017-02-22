@@ -26,7 +26,7 @@ buildscript {
 
 dependencies {
     /** Stubs **/
-    compile 'jp.co.rakuten.sdtd.perf:stubs:1.0.0-SNAPSHOT'
+    compile 'jp.co.rakuten.sdtd.perf:stubs:0.1.0-SNAPSHOT'
 
 }
 

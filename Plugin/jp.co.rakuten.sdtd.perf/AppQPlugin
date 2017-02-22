@@ -1,3 +1,0 @@
-class AppQPlugin implements Plugin {
-    //This is empty class for now
-}
