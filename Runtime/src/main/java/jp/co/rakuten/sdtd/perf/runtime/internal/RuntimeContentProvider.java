@@ -40,7 +40,7 @@ public class RuntimeContentProvider extends ContentProvider {
         if (mContext == null) return false;
         if (getLastConfiguration() != null) {
             double enablePercent = getLastConfiguration().getEnablePercent();
-            double randomNumber = new Random(100).nextDouble();
+            double randomNumber = new Random(System.currentTimeMillis()).nextInt(100);
             if (randomNumber > enablePercent) return false;
         }
         RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
@@ -67,7 +67,7 @@ public class RuntimeContentProvider extends ContentProvider {
         // Initialise Tracking Manager
         TrackingManager.initialize(mContext, new Config()); // TODO - How to create this Config object
         Measurement.start(StandardMetric.LAUNCH.getValue());
-        return true;
+        return false;
     }
 
     @Nullable
