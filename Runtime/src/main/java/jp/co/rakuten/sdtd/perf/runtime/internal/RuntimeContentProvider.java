@@ -32,23 +32,31 @@ import jp.co.rakuten.sdtd.perf.runtime.StandardMetric;
 public class RuntimeContentProvider extends ContentProvider {
     private static final String PREFS = "app_performance";
     private static final String CONFIG_KEY = "config_key";
-    private Context mContext;
 
     @Override
     public boolean onCreate() {
-        mContext = getContext();
-        if (mContext == null) return false;
+        if (getContext() == null) return false;
+        Config config = new Config();
+        config.app = BuildConfig.APPLICATION_ID;
+        config.version = BuildConfig.VERSION_NAME;
+        config.debug = BuildConfig.DEBUG;
+        // Load data from last configuration
         if (getLastConfiguration() != null) {
             double enablePercent = getLastConfiguration().getEnablePercent();
-            double randomNumber = new Random(System.currentTimeMillis()).nextInt(100);
+            double randomNumber = new Random(System.currentTimeMillis()).nextInt(101);
             if (randomNumber > enablePercent) return false;
+            else {
+                config.eventHubUrl = getLastConfiguration().getSendUrl(); // TODO - Decide how to initialise these two params
+                config.eventHubAuthorization = getLastConfiguration().getHeader().getAuthorization();
+            }
         }
+        // Get latest configuration
         RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
         queue.start();
         ConfigurationParam param = new ConfigurationParam.Builder()
                 .setAppId(BuildConfig.APPLICATION_ID)
                 .setAppVersion(BuildConfig.VERSION_NAME)
-                .setCountryCode(mContext.getResources().getConfiguration().locale.getCountry())
+                .setCountryCode(getContext().getResources().getConfiguration().locale.getCountry())
                 .setPlatform("android")
                 .setSdkVersion(String.valueOf(Build.VERSION.SDK_INT))
                 .build();
@@ -65,7 +73,7 @@ public class RuntimeContentProvider extends ContentProvider {
         }).queue(queue);
 
         // Initialise Tracking Manager
-        TrackingManager.initialize(mContext, new Config()); // TODO - How to create this Config object
+        TrackingManager.initialize(getContext(), config); // TODO all params of Config should be set
         Measurement.start(StandardMetric.LAUNCH.getValue());
         return false;
     }
@@ -99,12 +107,15 @@ public class RuntimeContentProvider extends ContentProvider {
     }
 
     private void saveConfiguration(ConfigurationResult result) {
-        mContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(CONFIG_KEY, new Gson().toJson(result)).apply();
+        if (getContext() != null)
+            getContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(CONFIG_KEY, new Gson().toJson(result)).apply();
     }
 
     @Nullable
     private ConfigurationResult getLastConfiguration() {
-        String result = mContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(CONFIG_KEY, null);
+        String result = null;
+        if (getContext() != null)
+            result = getContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(CONFIG_KEY, null);
         if (result != null) return new Gson().fromJson(result, ConfigurationResult.class);
         else return null;
     }
