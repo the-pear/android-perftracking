@@ -1,6 +1,7 @@
 package jp.co.rakuten.sdtd.perf.runtime.internal;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.android.volley.Response;
 import com.google.gson.Gson;
@@ -26,7 +27,14 @@ class ConfigurationRequest extends BaseRequest<ConfigurationResult> {
     }
 
     @Override
+    @Nullable
     protected ConfigurationResult parseResponse(String response) throws Exception {
-        return new Gson().fromJson(response, ConfigurationResult.class);
+        ConfigurationResult result = null;
+        try {
+            result = new Gson().fromJson(response, ConfigurationResult.class);
+        } catch (Exception e) {
+            Log.e(ConfigurationRequest.class.getSimpleName(), e.getMessage());
+        }
+        return result;
     }
 }

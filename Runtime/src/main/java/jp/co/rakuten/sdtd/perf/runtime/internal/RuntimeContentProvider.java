@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -36,18 +37,19 @@ public class RuntimeContentProvider extends ContentProvider {
     @Override
     public boolean onCreate() {
         if (getContext() == null) return false;
-        Config config = new Config();
-        config.app = BuildConfig.APPLICATION_ID;
-        config.version = BuildConfig.VERSION_NAME;
-        config.debug = BuildConfig.DEBUG;
         // Load data from last configuration
-        if (getLastConfiguration() != null) {
-            double enablePercent = getLastConfiguration().getEnablePercent();
+        ConfigurationResult lastConfig = getLastConfiguration();
+        Config config = null; // configuration for TrackingManager
+        if (lastConfig != null) {
+            double enablePercent = lastConfig.getEnablePercent();
             double randomNumber = new Random(System.currentTimeMillis()).nextInt(101);
-            if (randomNumber > enablePercent) return false;
-            else {
-                config.eventHubUrl = getLastConfiguration().getSendUrl(); // TODO - Decide how to initialise these two params
-                config.eventHubAuthorization = getLastConfiguration().getHeader().getAuthorization();
+            if (randomNumber <= enablePercent) {
+                config = new Config();
+                config.app = BuildConfig.APPLICATION_ID;
+                config.version = BuildConfig.VERSION_NAME;
+                config.debug = BuildConfig.DEBUG;
+                config.eventHubUrl = lastConfig.getSendUrl();
+                config.eventHubAuthorization = lastConfig.getHeader().getAuthorization();
             }
         }
         // Get latest configuration
@@ -63,17 +65,18 @@ public class RuntimeContentProvider extends ContentProvider {
         new ConfigurationRequest(param, new Response.Listener<ConfigurationResult>() {
             @Override
             public void onResponse(ConfigurationResult response) {
-                saveConfiguration(response);
+                saveConfiguration(response); // save latest configuration
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                Log.e(RuntimeContentProvider.class.getSimpleName(), error.getMessage());
             }
         }).queue(queue);
-
+        if (config == null)
+            return false; // TODO Config class should be a builder and have all the values set properly
         // Initialise Tracking Manager
-        TrackingManager.initialize(getContext(), config); // TODO all params of Config should be set
+        TrackingManager.initialize(getContext(), config);
         Measurement.start(StandardMetric.LAUNCH.getValue());
         return false;
     }
