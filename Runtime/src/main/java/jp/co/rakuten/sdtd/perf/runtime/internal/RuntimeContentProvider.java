@@ -73,11 +73,11 @@ public class RuntimeContentProvider extends ContentProvider {
                 Log.e(RuntimeContentProvider.class.getSimpleName(), error.getMessage());
             }
         }).queue(queue);
-        if (config == null)
-            return false; // TODO Config class should be a builder and have all the values set properly
-        // Initialise Tracking Manager
-        TrackingManager.initialize(getContext(), config);
-        Measurement.start(StandardMetric.LAUNCH.getValue());
+        if (config != null) {
+            // Initialise Tracking Manager
+            TrackingManager.initialize(getContext(), config); // TODO Config class should be a builder and have all the values set properly
+            Measurement.start(StandardMetric.LAUNCH.getValue());
+        }
         return false;
     }
 
