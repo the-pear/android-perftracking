@@ -48,7 +48,8 @@ public class TrackingManager {
      * @return trackingId
      */
     public int startAggregated(String id, Object object) {
-        return Tracker.startMethod(object, id);
+        throw new UnsupportedOperationException("Not Implemented");
+        //return Tracker.startMethod(object, id);
     }
 
     /**
@@ -57,7 +58,8 @@ public class TrackingManager {
      * @param trackingId Tracking ID returned from startMethod
      */
     public void endAggregated(int trackingId) {
-        Tracker.endMethod(trackingId);
+        throw new UnsupportedOperationException("Not Implemented");
+        //Tracker.endMethod(trackingId);
     }
 
     /**
