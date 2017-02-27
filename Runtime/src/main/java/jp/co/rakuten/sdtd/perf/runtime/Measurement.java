@@ -36,7 +36,7 @@ public final class Measurement {
      * @param id     Measurement identifier.
      * @param object Object associated with the measurement.
      * @return trackingId
-     * @see #endAggregated(int)
+     * @see #endAggregated
      */
     public static int startAggregated(String id, Object object) {
         return TrackingManager.INSTANCE.startAggregated(id, object);
@@ -45,10 +45,12 @@ public final class Measurement {
     /**
      * Ends a measurement.
      *
-     * @param trackingId Tracking ID
+     * @param id     Measurement identifier.
+     * @param object Object associated with the measurement. This must be the same
+     *               object that got passed to startAggregated().
      * @see #startAggregated(String, Object)
      */
-    public static void endAggregated(int trackingId) {
-        TrackingManager.INSTANCE.endAggregated(trackingId);
+    public static void endAggregated(String id, Object object) {
+        TrackingManager.INSTANCE.endAggregated(id, object);
     }
 }
