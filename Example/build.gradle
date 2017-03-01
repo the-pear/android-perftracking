@@ -34,7 +34,7 @@ dependencies {
 }
 
 
-apply plugin: 'jp.co.rakuten.sdtd.perf'
+/*apply plugin: 'jp.co.rakuten.sdtd.perf'
 
 buildscript {
     repositories {
@@ -48,4 +48,4 @@ buildscript {
     dependencies {
         classpath 'jp.co.rakuten.sdtd.perf:plugin:0.1.0-SNAPSHOT'
     }
-}
+}*/

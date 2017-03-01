@@ -37,6 +37,7 @@ dependencies {
     compile 'com.android.tools.build:gradle:2.2.2'
     compile 'jp.co.rakuten.sdtd.perf:stubs:0.1.0-SNAPSHOT'
     compile 'jp.co.rakuten.sdtd.perf:core:0.1.0-SNAPSHOT'
+    compile 'org.ow2.asm:asm-all:5.1'
 }
 
 
