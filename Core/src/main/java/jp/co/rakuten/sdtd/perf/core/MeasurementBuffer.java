@@ -12,7 +12,7 @@ public class MeasurementBuffer {
 	private final AtomicInteger _nextTrackingId = new AtomicInteger(1);
 	
 	public MeasurementBuffer() {
-		for (int i = 1; i < SIZE; i++) {
+		for (int i = 0; i < SIZE; i++) {
 			_buffer[i] = new Measurement();
 		}
 	}
