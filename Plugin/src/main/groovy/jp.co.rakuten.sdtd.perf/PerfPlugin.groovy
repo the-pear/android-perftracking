@@ -12,6 +12,6 @@ class PerfPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        //target.android.registerTransform(new PerfTrackingTransform())
+        project.android.registerTransform(new PerfTrackingTransform())
     }
 }

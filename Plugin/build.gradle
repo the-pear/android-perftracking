@@ -5,57 +5,49 @@ targetCompatibility = 1.7
 
 buildscript {
     repositories {
+        jcenter()
         mavenCentral()
         mavenLocal()
         maven {
-            url ARTIFACTORY_RELEASE_PUSH
-        }
-        maven {
-            url ARTIFACTORY_SNAPSHOT_PUSH
+            url ARTIFACTORY_RELEASE
         }
     }
     dependencies {
-        classpath 'jp.co.rakuten.sdtd.plugin:artifactory:1.1.0'
-        classpath 'jp.co.rakuten.sdtd.perf:stubs:0.1.0-SNAPSHOT'
-        classpath 'jp.co.rakuten.sdtd.perf:core:0.1.0-SNAPSHOT'
+        classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath 'jp.co.rakuten.sdtd.plugin:artifactory:1.3.0'
+
     }
 }
 
 dependencies {
+    repositories {
+        jcenter()
+        mavenCentral()
+        mavenLocal()
+        maven {
+            url ARTIFACTORY_RELEASE
+        }
+        maven {
+            url ARTIFACTORY_SNAPSHOT
+        }
+    }
+
     compile gradleApi()
     compile localGroovy()
+    compile 'com.android.tools.build:gradle:2.2.2'
+    compile 'jp.co.rakuten.sdtd.perf:stubs:0.1.0-SNAPSHOT'
+    compile 'jp.co.rakuten.sdtd.perf:core:0.1.0-SNAPSHOT'
 }
 
-// --- ARTIFACTORY ---
+
+// -- ARTIFACTORY --
 
 apply plugin: 'jp.co.rakuten.sdtd.artifactory'
 
 artifactory {
-    group = PLUGIN_GROUP
-    artifact = PLUGIN_NAME
-    version = PLUGIN_VERSION
-    description = PLUGIN_DESCRIPTION
-}
-
-apply plugin: 'maven'
-
-group = project.PLUGIN_GROUP
-version = PLUGIN_VERSION
-
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: ARTIFACTORY_RELEASE_PUSH) {
-                authentication(userName: ARTIFACTORY_USER, password: ARTIFACTORY_PSWD)
-            }
-            pom.groupId = project.PLUGIN_GROUP
-            pom.artifactId = PLUGIN_NAME
-            pom.version = PLUGIN_VERSION
-            pom.project {
-                name PLUGIN_DESCRIPTION
-                url project.PLUGIN_REPOSITORY
-            }
-        }
-    }
+    group = project.PLUGIN_GROUP
+    artifact = project.PLUGIN_NAME
+    version = project.PLUGIN_VERSION
+    description = project.PLUGIN_DESCRIPTION
+    sourceUrl = project.PLUGIN_REPOSITORY
 }
