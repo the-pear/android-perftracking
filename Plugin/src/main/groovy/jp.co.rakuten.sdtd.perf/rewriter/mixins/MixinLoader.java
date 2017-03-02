@@ -22,22 +22,22 @@ public class MixinLoader {
 		
 		AnnotationNode a;
 		
-		a = getAnnotation(cn, "Ljp/co/rakuten/sdtd/perf/runtime/annotations/MixClass;");
+		a = getAnnotation(cn, "Ljp/co/rakuten/sdtd/perf/core/annotations/MixClass;");
 		if (a != null) {
 			mixin.targetClass= ((Type)a.values.get(1)).getClassName();
 		}
 		
-		a = getAnnotation(cn, "Ljp/co/rakuten/sdtd/perf/runtime/annotations/MixSubclassOf;");
+		a = getAnnotation(cn, "Ljp/co/rakuten/sdtd/perf/core/annotations/MixSubclassOf;");
 		if (a != null) {
 			mixin.targetSubclassOf = ((Type)a.values.get(1)).getClassName();
 		}
 		
-		a = getAnnotation(cn, "Ljp/co/rakuten/sdtd/perf/runtime/annotations/MixImplementationOf;");
+		a = getAnnotation(cn, "Ljp/co/rakuten/sdtd/perf/core/annotations/MixImplementationOf;");
 		if (a != null) {
 			mixin.targetImplementationOf = ((Type)a.values.get(1)).getClassName();
 		}
 
-		a = getAnnotation(cn, "Ljp/co/rakuten/sdtd/perf/runtime/annotations/ChangeBaseTo;");
+		a = getAnnotation(cn, "Ljp/co/rakuten/sdtd/perf/core/annotations/ChangeBaseTo;");
 		if (a != null) {
 			mixin.changeBaseTo = ((Type)a.values.get(1)).getClassName().replace('.', '/');
 			
@@ -50,7 +50,7 @@ public class MixinLoader {
 			MethodNode mn = (MethodNode)o;
 			a = getAnnotation(mn);
 			if (a != null) {
-				if (a.desc.equals("Ljp/co/rakuten/sdtd/perf/runtime/annotations/ReplaceMethod;")) {
+				if (a.desc.equals("Ljp/co/rakuten/sdtd/perf/core/annotations/ReplaceMethod;")) {
 					mixin.methods.put(mn.name + mn.desc, new MixinMethod(mixin, mn, _log));
 				}
 			}
@@ -60,7 +60,7 @@ public class MixinLoader {
 			FieldNode fn = (FieldNode)o;
 			a = getAnnotation(fn);
 			if (a != null) {
-				if (a.desc.equals("Ljp/co/rakuten/sdtd/perf/runtime/annotations/AddField;")) {
+				if (a.desc.equals("Ljp/co/rakuten/sdtd/perf/core/annotations/AddField;")) {
 					mixin.fields.add(new MixinField(_log, fn));
 				}
 			}

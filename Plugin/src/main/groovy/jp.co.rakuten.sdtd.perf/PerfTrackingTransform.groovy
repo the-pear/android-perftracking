@@ -59,8 +59,8 @@ class PerfTrackingTransform extends Transform {
         rewriter.input = input.join(';')
         rewriter.outputJar = outputProvider.getContentLocation("classes", outputTypes, scopes, Format.JAR).toString()
         rewriter.tempJar = context.temporaryDir.toString() + '\\classes.jar'
-        //TODO: Need to check how to replace this with actual path
-        rewriter.classpath = 'C:\\Users\\petr.luner\\AppData\\Local\\Android\\sdk\\platforms\\android-23\\android.jar'
+        //rewriter.classpath = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+        rewriter.classpath = project.files(android.getBootClasspath().join(File.pathSeparator));
         rewriter.log.level = Log.INFO
 
         println rewriter.input
