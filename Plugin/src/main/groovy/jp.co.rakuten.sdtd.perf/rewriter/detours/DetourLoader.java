@@ -28,13 +28,13 @@ public class DetourLoader {
 			AnnotationNode a = getAnnotation(mn);
 			if (a != null) {
 				Detour detour = null;
-				if (a.desc.equals("Ljp/co/rakuten/sdtd/perf/runtime/annotations/DetourConstructorParameter;")) {
+				if (a.desc.equals("Ljp/co/rakuten/sdtd/perf/core/annotations/DetourConstructorParameter;")) {
 					detour = constructorParameterDetour(cn, mn, a);
 				}
-				else if (a.desc.equals("Ljp/co/rakuten/sdtd/perf/runtime/annotations/DetourCall;")) {
+				else if (a.desc.equals("Ljp/co/rakuten/sdtd/perf/core/annotations/DetourCall;")) {
 					detour = callDetour(cn, mn, a);
 				}
-				else if (a.desc.equals("Ljp/co/rakuten/sdtd/perf/runtime/annotations/DetourStaticCall;")) {
+				else if (a.desc.equals("Ljp/co/rakuten/sdtd/perf/core/annotations/DetourStaticCall;")) {
 					detour = staticCallDetour(cn, mn, a);
 				}
 				
