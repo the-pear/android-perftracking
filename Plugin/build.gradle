@@ -46,9 +46,9 @@ dependencies {
 apply plugin: 'jp.co.rakuten.sdtd.artifactory'
 
 artifactory {
-    group = project.PLUGIN_GROUP
-    artifact = project.PLUGIN_NAME
-    version = project.PLUGIN_VERSION
-    description = project.PLUGIN_DESCRIPTION
-    sourceUrl = project.PLUGIN_REPOSITORY
+    group = project.MODULE_GROUP
+    artifact = project.MODULE_NAME
+    version = project.MODULE_VERSION
+    description = project.MODULE_DESCRIPTION
+    sourceUrl = project.MODULE_REPOSITORY
 }
