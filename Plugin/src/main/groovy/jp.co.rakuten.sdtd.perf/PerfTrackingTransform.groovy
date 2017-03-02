@@ -1,17 +1,18 @@
 package jp.co.rakuten.sdtd.perf
 
-import com.android.build.api.transform.Format
-import com.android.build.api.transform.Context
-import com.android.build.api.transform.QualifiedContent
-import com.android.build.api.transform.Transform
-import com.android.build.api.transform.TransformException
-import com.android.build.api.transform.TransformInput
-import com.android.build.api.transform.TransformOutputProvider
-
-import jp.co.rakuten.sdtd.perf.rewriter.Rewriter
+import com.android.build.api.transform.*
 import jp.co.rakuten.sdtd.perf.rewriter.Log
+import jp.co.rakuten.sdtd.perf.rewriter.Rewriter
+import org.gradle.api.Project
 
 class PerfTrackingTransform extends Transform {
+
+    private final Project project
+
+    PerfTrackingTransform(Project project) {
+        this.project = project
+    }
+
     @Override
     String getName() {
         'PerfTracking'
