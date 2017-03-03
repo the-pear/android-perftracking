@@ -38,6 +38,7 @@ dependencies {
     compile 'jp.co.rakuten.sdtd.perf:stubs:0.1.0-SNAPSHOT'
     compile 'jp.co.rakuten.sdtd.perf:core:0.1.0-SNAPSHOT'
     compile 'org.ow2.asm:asm-all:5.1'
+    project.dependencies.compile 'jp.co.rakuten.sdtd.perf:runtime:0.1.0-SNAPSHOT'
 }
 
 
