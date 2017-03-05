@@ -13,5 +13,6 @@ class PerfPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         project.android.registerTransform(new PerfTrackingTransform(project))
+        project.dependencies.compile project.MODULE_GROUP+':runtime:'+project.MODULE_VERSION+'-SNAPSHOT'
     }
 }
