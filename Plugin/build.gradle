@@ -1,0 +1,54 @@
+apply plugin: 'groovy'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        mavenLocal()
+        maven {
+            url ARTIFACTORY_RELEASE
+        }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath 'jp.co.rakuten.sdtd.plugin:artifactory:1.3.0'
+
+    }
+}
+
+dependencies {
+    repositories {
+        jcenter()
+        mavenCentral()
+        mavenLocal()
+        maven {
+            url ARTIFACTORY_RELEASE
+        }
+        maven {
+            url ARTIFACTORY_SNAPSHOT
+        }
+    }
+
+    compile gradleApi()
+    compile localGroovy()
+    compile 'com.android.tools.build:gradle:2.2.2'
+    compile 'jp.co.rakuten.sdtd.perf:stubs:0.1.0-SNAPSHOT'
+    compile 'jp.co.rakuten.sdtd.perf:core:0.1.0-SNAPSHOT'
+    compile 'org.ow2.asm:asm-all:5.1'
+}
+
+
+// -- ARTIFACTORY --
+
+apply plugin: 'jp.co.rakuten.sdtd.artifactory'
+
+artifactory {
+    group = project.MODULE_GROUP
+    artifact = project.MODULE_NAME
+    version = project.MODULE_VERSION
+    description = project.MODULE_DESCRIPTION
+    sourceUrl = project.MODULE_REPOSITORY
+}

@@ -17,10 +17,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+
 }
 
 dependencies {
-    compile project(':Runtime')
 
     /** support-v4 **/
     compile 'com.android.support:support-v4:23.1.1'
@@ -32,3 +32,20 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
 }
+
+
+/*apply plugin: 'jp.co.rakuten.sdtd.perf'
+
+buildscript {
+    repositories {
+        maven {
+            url ARTIFACTORY_RELEASE
+        }
+        maven {
+            url ARTIFACTORY_SNAPSHOT
+        }
+    }
+    dependencies {
+        classpath 'jp.co.rakuten.sdtd.perf:plugin:0.1.0-SNAPSHOT'
+    }
+}*/

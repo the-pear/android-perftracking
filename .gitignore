@@ -4,7 +4,6 @@
 # built application files
 *.apk
 *.ap_
-classes/
 target/
 gen-external-apklibs/
 

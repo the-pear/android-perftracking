@@ -1,0 +1,23 @@
+package jp.co.rakuten.sdtd.perf.rewriter.mixins;
+
+import java.util.ArrayList;
+
+import org.objectweb.asm.ClassVisitor;
+
+public class Mixer {
+	
+	private final ArrayList<Mixin> _mixins = new ArrayList<Mixin>();
+	
+	public void add(Mixin mixin) {
+		_mixins.add(mixin);
+	}
+
+	public ClassVisitor getAdapter(final Class<?> clazz, ClassVisitor output) {
+		for (Mixin mixin: _mixins) {
+			if (mixin.match(clazz)) {
+				return mixin.rewrite(clazz, output);
+			}
+		}
+		return output;
+	}
+}
