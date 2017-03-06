@@ -62,7 +62,7 @@ class PerfTrackingTransform extends Transform {
         rewriter.input = input.join(File.pathSeparator)
         rewriter.outputJar = outputProvider.getContentLocation("classes", outputTypes, scopes, Format.JAR).toString()
         rewriter.tempJar   = "${context.temporaryDir}${File.separator}classes.jar"
-        rewriter.classpath = project.android.bootClasspath.toList()
+        rewriter.classpath = project.android.bootClasspath.join(File.pathSeparator)
         rewriter.log.level = Log.DEBUG
 
         println "INPUT:   $rewriter.input"
