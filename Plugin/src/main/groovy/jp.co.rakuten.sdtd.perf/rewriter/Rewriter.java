@@ -69,7 +69,7 @@ public class Rewriter {
             for (String name : temp.getClasses()) {
 
                 if (filter.canRewrite(name)) {
-                    log.debug("Rewriting class " + name);
+                    log.debug("Rewriting class: " + name);
 
                     try {
                         Class<?> clazz = provider.getClass(name);
@@ -79,10 +79,11 @@ public class Rewriter {
                         outputMaker.add(name, cw.toByteArray());
 
                     } catch (Throwable e) {
-                        log.error("Failed to rewrite " + name, e);
+                        log.error("Failed to rewrite class: " + name, e);
                         outputMaker.add(name, temp);
                     }
                 } else {
+                    log.debug("Adding class with no rewriting: " + name);
                     outputMaker.add(name, temp);
                 }
             }
