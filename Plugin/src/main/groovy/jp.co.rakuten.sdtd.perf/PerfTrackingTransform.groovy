@@ -1,6 +1,7 @@
 package jp.co.rakuten.sdtd.perf
 
 import com.android.build.api.transform.*
+import com.android.build.gradle.internal.pipeline.TransformManager
 import jp.co.rakuten.sdtd.perf.rewriter.Log
 import jp.co.rakuten.sdtd.perf.rewriter.Rewriter
 import org.gradle.api.Project
@@ -45,28 +46,29 @@ class PerfTrackingTransform extends Transform {
     }
 
     @Override
-    void transform(Context context, Collection<TransformInput> inputs, Collection<TransformInput> referencedInputs, TransformOutputProvider outputProvider, boolean isIncremental) throws IOException, TransformException, InterruptedException {
+    void transform(
+        Context context,
+        Collection<TransformInput> inputs,
+        Collection<TransformInput> referencedInputs,
+        TransformOutputProvider outputProvider,
+        boolean isIncremental
+    ) throws IOException, TransformException, InterruptedException {
         def input = []
         inputs.each {
-            it.jarInputs.each {
-                input << it.file.toString()
-            }
-            it.directoryInputs.each {
-                input << it.file.toString()
-            }
+            [it.jarInputs, it.directoryInputs]*.each { input << "$it.file" }
         }
 
         Rewriter rewriter = new Rewriter()
-        rewriter.input = input.join(';')
+        rewriter.input = input.join(File.pathSeparator)
         rewriter.outputJar = outputProvider.getContentLocation("classes", outputTypes, scopes, Format.JAR).toString()
-        rewriter.tempJar = context.temporaryDir.toString() + '\\classes.jar'
+        rewriter.tempJar   = "${context.temporaryDir}${File.separator}classes.jar"
         rewriter.classpath = project.android.bootClasspath.toList()
-        rewriter.log.level = Log.INFO
+        rewriter.log.level = Log.DEBUG
 
-        println rewriter.input
-        println rewriter.outputJar
-        println rewriter.tempJar
-        println rewriter.classpath
+        println "INPUT:   $rewriter.input"
+        println "OUTPUT:  $rewriter.outputJar"
+        println "TMP JAR: $rewriter.tempJar"
+        println "PATH:    $rewriter.classpath"
 
         rewriter.rewrite()
     }
