@@ -1,1 +1,5 @@
-include ':Stubs', ':Core', ':Runtime', ':Plugin' ,':Example'
+include ':Stubs'
+include ':Core'
+include ':Runtime'
+include ':Plugin'
+// DO NOT INCLUDE ':Example' HERE!

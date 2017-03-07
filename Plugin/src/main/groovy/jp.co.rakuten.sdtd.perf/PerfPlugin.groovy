@@ -13,9 +13,24 @@ class PerfPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        def android = project.extensions.findByType(AppExtension)
+        def info = new Properties()
+        info.load(PerfPlugin.class.classLoader.getResourceAsStream('info.properties'))
+
+        def version    = info.getProperty('version')
+        def runtime    = info.getProperty('runtime')
+        def repository = info.getProperty('repository')
+
+        def android    = project.extensions.findByType(AppExtension)
         android.registerTransform(new PerfTrackingTransform(project))
 
-        project.dependencies.compile project.MODULE_GROUP+':runtime:'+project.MODULE_VERSION+'-SNAPSHOT'
+        project.configure(project) {
+            repositories {
+                maven {
+                    url repository
+                }
+            }
+        }
+
+        project.dependencies.compile runtime
     }
 }

@@ -1,15 +1,39 @@
+/*
+ * The example gradle file below shows the 3 steps required for enabling performance
+ * tracking in your app. Nothing else is required.
+ */
+buildscript {
+    repositories {
+        jcenter()
+
+        // REQUIRED FOR APP PERFORMANCE TRACKING (1)
+        maven { url 'http://artifactory.raksdtd.com/artifactory/libs-release' }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.2'
+
+        // REQUIRED FOR APP PERFORMANCE TRACKING (2)
+        classpath 'jp.co.rakuten.sdtd.perf:plugin:latest.release'
+    }
+}
+
+repositories {
+    jcenter()
+}
+
 apply plugin: 'com.android.application'
+apply plugin: 'jp.co.rakuten.sdtd.perf' // REQUIRED FOR PERFORMANCE TRACKING (3)
 
 android {
-    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
-    buildToolsVersion project.ANDROID_BUILD_TOOLS_VERSION
+    compileSdkVersion 23
+    buildToolsVersion '23.0.2'
 
     defaultConfig {
         applicationId "jp.co.rakuten.sdtd.perf.example"
-        minSdkVersion Integer.parseInt(project.ANDROID_MIN_SDK_VERSION)
-        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        minSdkVersion 15
+        targetSdkVersion 23
         versionCode 1
-        versionName project.MODULE_VERSION
+        versionName '1.0.0'
         manifestPlaceholders = [HOCKEYAPP_APP_ID: "1f1f0f624c0349889fcf90cf27ea3723"]
     }
 
@@ -28,24 +52,5 @@ dependencies {
 
     // hockey app sdk
     compile 'net.hockeyapp.android:HockeySDK:4.0.1'
-
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
 }
 
-
-/*apply plugin: 'jp.co.rakuten.sdtd.perf'
-
-buildscript {
-    repositories {
-        maven {
-            url ARTIFACTORY_RELEASE
-        }
-        maven {
-            url ARTIFACTORY_SNAPSHOT
-        }
-    }
-    dependencies {
-        classpath 'jp.co.rakuten.sdtd.perf:plugin:0.1.0-SNAPSHOT'
-    }
-}*/
