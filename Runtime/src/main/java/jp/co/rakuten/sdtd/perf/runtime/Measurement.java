@@ -35,21 +35,21 @@ public final class Measurement {
      *
      * @param id     Measurement identifier.
      * @param object Object associated with the measurement.
-     * @see #endAggregated
+     * @see #endAggregated(String, Comparable)
      */
-    public static void startAggregated(String id, Object object) {
+    public static void startAggregated(String id, Comparable object) {
         TrackingManager.INSTANCE.startAggregated(id, object);
     }
 
     /**
-     * Ends a measurement.
+     * Ends a aggregated measurement.
      *
      * @param id     Measurement identifier.
      * @param object Object associated with the measurement. This must be the same
      *               object that got passed to startAggregated().
-     * @see #startAggregated(String, Object)
+     * @see #startAggregated(String, Comparable)
      */
-    public static void endAggregated(String id, Object object) {
+    public static void endAggregated(String id, Comparable object) {
         TrackingManager.INSTANCE.endAggregated(id, object);
     }
 }

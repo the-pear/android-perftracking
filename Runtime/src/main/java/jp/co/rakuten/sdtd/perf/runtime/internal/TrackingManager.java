@@ -18,7 +18,7 @@ import jp.co.rakuten.sdtd.perf.core.Tracker;
  */
 public class TrackingManager {
     public static TrackingManager INSTANCE = null;
-    private Map<AggregatedData, List<Integer>> hashmap;
+    private Map<AggregatedData, Integer> hashmap;
 
     private TrackingManager() {
         hashmap = new HashMap<>();
@@ -54,29 +54,23 @@ public class TrackingManager {
      * @param id     Measurement identifier.
      * @param object Object associated with the measurement.
      */
-    public void startAggregated(String id, Object object) {
+    public void startAggregated(String id, Comparable object) {
         AggregatedData key = new AggregatedData(id, object);
         if (!hashmap.containsKey(key))
-            hashmap.put(key, new ArrayList<Integer>(Tracker.startCustom(id)));
-        else {
-            List<Integer> data = hashmap.get(key);
-            data.add(Tracker.startCustom(id));
-            hashmap.put(key, data);
-        }
+            hashmap.put(key, Tracker.startCustom(id));
     }
 
     /**
-     * Ends a measurement.
+     * Ends a aggregated measurement.
      *
      * @param id     Measurement identifier.
      * @param object Object associated with the measurement.
      */
-    public void endAggregated(String id, Object object) {
+    public void endAggregated(String id, Comparable object) {
         AggregatedData key = new AggregatedData(id, object);
         if (hashmap.containsKey(key)) {
-            List<Integer> trackingIdList = hashmap.get(key);
-            Tracker.endCustom(trackingIdList.get(0));
-            trackingIdList.remove(0);
+            Tracker.endCustom(hashmap.get(key));
+            hashmap.remove(key);
         }
     }
 
@@ -91,9 +85,9 @@ public class TrackingManager {
 
     private class AggregatedData implements Comparable {
         private String measurementId;
-        private Object object;
+        private Comparable object;
 
-        private AggregatedData(String measurementId, Object object) {
+        private AggregatedData(String measurementId, Comparable object) {
             this.measurementId = measurementId;
             this.object = object;
         }
@@ -115,7 +109,7 @@ public class TrackingManager {
         public int compareTo(@NonNull Object another) {
             if (another instanceof AggregatedData) {
                 AggregatedData data = (AggregatedData) another;
-                return data.measurementId.compareTo(measurementId);
+                return data.measurementId.compareTo(measurementId) * 10000 + data.object.compareTo(object);
             }
             return -1;
         }
