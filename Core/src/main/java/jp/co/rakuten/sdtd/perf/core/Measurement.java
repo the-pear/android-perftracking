@@ -1,25 +1,25 @@
 package jp.co.rakuten.sdtd.perf.core;
 
 public class Measurement {
-	
+
 	public static final byte METRIC = 1;
 	public static final byte METHOD = 2;
 	public static final byte URL = 3;
 	public static final byte CUSTOM = 4;
-	
+
+	public static final long TIMEOUT = 30000000000L; // 30 s
+
 	public int trackingId;
 	public byte type;
-	public Metric metric;
 	public Object a;
 	public Object b;
 	public long startTime;
 	public long endTime;
-	
+
 	public void clear()
 	{
 		trackingId = 0;
 		type = 0;
-		metric = null;
 		a = null;
 		b = null;
 		startTime = 0;
