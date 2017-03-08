@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath 'jp.co.rakuten.sdtd.plugin:artifactory:1.2.0'
-        classpath 'jp.co.rakuten.sdtd.plugin:javadoc:1.1.1'
+        classpath 'jp.co.rakuten.sdtd.plugin:javadoc:1.2.1'
         classpath 'com.dicedmelon.gradle:jacoco-android:0.1.1'
     }
 }
@@ -46,19 +46,26 @@ android {
 }
 
 // --- DEPENDENCIES ---
+configurations { copyJar }
+
+task copyJar(type: Copy) {
+    from configurations.copyJar
+    into 'libs'
+}
+
+android.libraryVariants.all {
+    project.tasks["prepare${it.buildType.name.capitalize()}Dependencies"].dependsOn copyJar
+}
 
 dependencies {
     // --- COMPILE ---
-    /** Support Library **/
-    compile 'com.android.support:support-annotations:23.1.1'
-    /** Performance Core Module**/
-    compile ('jp.co.rakuten.sdtd.perf:core:1.0.0-SNAPSHOT'){
-        transitive = false;
-    }
-    compile 'jp.co.rakuten.api:core:1.0.1'
-    // --- TESTING ---
+    copyJar project(':Core')
 
-    // testing
+    compile files('libs/Core.jar')
+    compile 'com.android.support:support-annotations:23.1.1'
+    compile 'jp.co.rakuten.api:core:1.0.1'
+
+    // --- TESTING ---
     testCompile 'org.hamcrest:hamcrest-library:1.3'
     testCompile 'org.mockito:mockito-core:1.10.19'
     testCompile 'org.skyscreamer:jsonassert:1.2.3'

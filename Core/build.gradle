@@ -1,42 +1,8 @@
 apply plugin: 'java'
 
-dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-}
-
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
 
-buildscript {
-    repositories {
-        maven {
-            url ARTIFACTORY_RELEASE
-        }
-        maven {
-            url ARTIFACTORY_SNAPSHOT
-        }
-    }
-    dependencies {
-        classpath 'jp.co.rakuten.sdtd.plugin:artifactory:1.1.0'
-        classpath 'jp.co.rakuten.sdtd.plugin:javadoc:1.0.0'
-    }
-}
-
-// --- DEPENDENCIES ---
-
 dependencies {
-    /** Stubs **/
-    compile 'jp.co.rakuten.sdtd.perf:stubs:0.1.0-SNAPSHOT'
-
-}
-
-// --- ARTIFACTORY ---
-
-apply plugin: 'jp.co.rakuten.sdtd.artifactory'
-
-artifactory {
-    group = MODULE_GROUP
-    artifact = MODULE_NAME
-    version = MODULE_VERSION
-    description = MODULE_DESCRIPTION
+    compile project(':Stubs')
 }

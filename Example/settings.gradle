@@ -1,0 +1,7 @@
+includeBuild('..') {
+    dependencySubstitution {
+        substitute module('jp.co.rakuten.sdtd.perf:plugin')  with project(':Plugin')
+        substitute module('jp.co.rakuten.sdtd.perf:runtime') with project(':Runtime')
+    }
+}
+

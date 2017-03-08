@@ -15,8 +15,32 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.2'
         classpath 'jp.co.rakuten.sdtd.plugin:artifactory:1.3.0'
-
     }
+}
+
+// Quick-and-dirty way of adding both Stubs and Core without dealing with jars…
+sourceSets {
+    main {
+        java {
+            srcDirs += "$rootProject.projectDir/Stubs/src/main/java"
+            srcDirs += "$rootProject.projectDir/Core/src/main/java"
+        }
+    }
+}
+
+// Inject the version number into the resources
+import org.apache.tools.ant.filters.*
+afterEvaluate {
+    configure(allProcessResourcesTasks()) {
+        filter(ReplaceTokens, tokens: [
+            version:    project.MODULE_VERSION,
+            runtime:    "jp.co.rakuten.sdtd.perf:runtime:$project.MODULE_VERSION".toString(),
+            repository: project.ARTIFACTORY_RELEASE
+        ])
+    }
+}
+def allProcessResourcesTasks() {
+    sourceSets*.processResourcesTaskName.collect { tasks[it] }
 }
 
 dependencies {
@@ -35,11 +59,8 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
     compile 'com.android.tools.build:gradle:2.2.2'
-    compile 'jp.co.rakuten.sdtd.perf:stubs:0.1.0-SNAPSHOT'
-    compile 'jp.co.rakuten.sdtd.perf:core:0.1.0-SNAPSHOT'
     compile 'org.ow2.asm:asm-all:5.1'
 }
-
 
 // -- ARTIFACTORY --
 
