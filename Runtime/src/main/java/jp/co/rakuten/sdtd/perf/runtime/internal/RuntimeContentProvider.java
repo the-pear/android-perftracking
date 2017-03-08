@@ -31,6 +31,7 @@ import jp.co.rakuten.sdtd.perf.runtime.StandardMetric;
  */
 
 public class RuntimeContentProvider extends ContentProvider {
+    private static final String TAG = RuntimeContentProvider.class.getSimpleName();
     private static final String PREFS = "app_performance";
     private static final String CONFIG_KEY = "config_key";
 
@@ -70,7 +71,12 @@ public class RuntimeContentProvider extends ContentProvider {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(RuntimeContentProvider.class.getSimpleName(), error.getMessage());
+                Throwable throwable = error;
+                String message = error.getClass().getName();
+                while (throwable.getMessage() == null && throwable.getCause() != null)
+                    throwable = throwable.getCause();
+                if (throwable.getMessage() != null) message = throwable.getMessage();
+                Log.e(TAG, "Error: " + message);
             }
         }).queue(queue);
         if (config != null) {
