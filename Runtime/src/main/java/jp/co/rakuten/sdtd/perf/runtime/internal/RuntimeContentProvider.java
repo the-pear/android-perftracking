@@ -71,25 +71,12 @@ public class RuntimeContentProvider extends ContentProvider {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                if (error.getMessage() != null) {
-                    Log.e(TAG, "Error :" + error.getMessage());
-                } else {
-                    Throwable t = error.getCause();
-                    while (t != null) {
-                        if (t.getMessage() == null) {
-                            if (t.getCause() == null) {
-                                Log.e(TAG, "Error :" + error.getClass().getName());
-                                break;
-                            }
-                            t = t.getCause();
-                            continue;
-                        } else {
-                            Log.e(TAG, "Error :" + t.getMessage());
-                            break;
-                        }
-
-                    }
-                }
+                Throwable throwable = error;
+                String message = error.getClass().getName();
+                while (throwable.getMessage() == null && throwable.getCause() != null)
+                    throwable = throwable.getCause();
+                if (throwable.getMessage() != null) message = throwable.getMessage();
+                Log.e(TAG, "Error: " + message);
             }
         }).queue(queue);
         if (config != null) {
