@@ -12,22 +12,22 @@ public final class Measurement {
     /**
      * Starts a new measurement.
      *
-     * @param id Measurement identifier.
+     * @param measurementId Measurement identifier.
      * @return trackingId
-     * @see #end(int)
+     * @see #end(String)
      */
-    public static int start(String id) {
-        return TrackingManager.INSTANCE.startMeasurement(id);
+    public static void start(String measurementId) {
+        TrackingManager.INSTANCE.startMeasurement(measurementId);
     }
 
     /**
      * Ends a measurement.
      *
-     * @param trackingId Measurement identifier.
+     * @param measurementId Measurement identifier.
      * @see #start(String)
      */
-    public static void end(int trackingId) {
-        TrackingManager.INSTANCE.endMeasurement(trackingId);
+    public static void end(String measurementId) {
+        TrackingManager.INSTANCE.endMeasurement(measurementId);
     }
 
     /**
@@ -37,7 +37,7 @@ public final class Measurement {
      * @param object Object associated with the measurement.
      * @see #endAggregated(String, Comparable)
      */
-    public static void startAggregated(String id, Comparable object) {
+    public synchronized static void startAggregated(String id, Comparable object) {
         TrackingManager.INSTANCE.startAggregated(id, object);
     }
 
@@ -49,7 +49,7 @@ public final class Measurement {
      *               object that got passed to startAggregated().
      * @see #startAggregated(String, Comparable)
      */
-    public static void endAggregated(String id, Comparable object) {
+    public synchronized static void endAggregated(String id, Comparable object) {
         TrackingManager.INSTANCE.endAggregated(id, object);
     }
 }

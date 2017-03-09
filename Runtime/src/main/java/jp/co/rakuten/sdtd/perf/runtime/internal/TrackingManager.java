@@ -18,10 +18,12 @@ import jp.co.rakuten.sdtd.perf.core.Tracker;
  */
 public class TrackingManager {
     public static TrackingManager INSTANCE = null;
-    private Map<AggregatedData, Integer> hashmap;
+    private Map<AggregatedData, Integer> mAggregatedDataMap;
+    private Map<String, MeasurementData> mMeasurementDataMap;
 
     private TrackingManager() {
-        hashmap = new HashMap<>();
+        mAggregatedDataMap = new HashMap<>();
+        mMeasurementDataMap = new HashMap<>();
     }
 
     static void initialize(Context context, Config config) {
@@ -35,17 +37,24 @@ public class TrackingManager {
      * @param measurementId Measurement identifier.
      * @return trackingId
      */
-    public int startMeasurement(String measurementId) {
-        return Tracker.startCustom(measurementId);
+    public void startMeasurement(String measurementId) {
+        MeasurementData measurementData = mMeasurementDataMap.get(measurementId);
+        if (measurementData != null) return;
+        measurementData = new MeasurementData();
+        measurementData.trackingId = Tracker.startCustom(measurementId);
+        mMeasurementDataMap.put(measurementId, measurementData);
     }
 
     /**
      * Ends a measurement.
      *
-     * @param trackingId Tracking ID returned from startCustom
+     * @param measurementId Tracking ID returned from startCustom
      */
-    public void endMeasurement(int trackingId) {
-        Tracker.endCustom(trackingId);
+    public void endMeasurement(String measurementId) {
+        MeasurementData measurementData = mMeasurementDataMap.get(measurementId);
+        if (measurementData == null) return;
+        Tracker.endCustom(measurementData.trackingId);
+        mMeasurementDataMap.remove(measurementId);
     }
 
     /**
@@ -56,8 +65,8 @@ public class TrackingManager {
      */
     public void startAggregated(String id, Comparable object) {
         AggregatedData key = new AggregatedData(id, object);
-        if (!hashmap.containsKey(key))
-            hashmap.put(key, Tracker.startCustom(id));
+        if (!mAggregatedDataMap.containsKey(key))
+            mAggregatedDataMap.put(key, Tracker.startCustom(id));
     }
 
     /**
@@ -68,9 +77,9 @@ public class TrackingManager {
      */
     public void endAggregated(String id, Comparable object) {
         AggregatedData key = new AggregatedData(id, object);
-        if (hashmap.containsKey(key)) {
-            Tracker.endCustom(hashmap.get(key));
-            hashmap.remove(key);
+        if (mAggregatedDataMap.containsKey(key)) {
+            Tracker.endCustom(mAggregatedDataMap.get(key));
+            mAggregatedDataMap.remove(key);
         }
     }
 
@@ -81,6 +90,10 @@ public class TrackingManager {
      */
     public void startMetric(String metricId) {
         Tracker.startMetric(metricId);
+    }
+
+    private class MeasurementData {
+        private int trackingId;
     }
 
     private class AggregatedData implements Comparable {
