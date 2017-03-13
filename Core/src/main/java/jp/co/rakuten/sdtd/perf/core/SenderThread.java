@@ -2,7 +2,7 @@ package jp.co.rakuten.sdtd.perf.core;
 
 public class SenderThread extends Thread {
 	private static final int MIN_COUNT = 10;
-	private static final int SLEEP_INTERVAL = 10000;
+	private static final int SLEEP_INTERVAL_MILLISECONDS = 10000;
 
 	private final MeasurementBuffer _buffer;
 	private final Sender _sender;
@@ -32,7 +32,7 @@ public class SenderThread extends Thread {
 			}
 
 			try {
-				Thread.sleep(SLEEP_INTERVAL);
+				Thread.sleep(SLEEP_INTERVAL_MILLISECONDS);
 			}
 			catch (InterruptedException e) {
 			}
