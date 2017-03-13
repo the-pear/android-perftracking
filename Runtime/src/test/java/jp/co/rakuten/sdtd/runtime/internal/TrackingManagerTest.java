@@ -47,7 +47,7 @@ public class TrackingManagerTest {
         outerObject.startAggregated(measurementId, comparable);
         outerObject.startMeasurement(measurementId2);
 
-        Field field = outerObject.getClass().getDeclaredField("mAggregatedDataMap");
+        Field field = outerObject.getClass().getDeclaredField("mTrackingData");
         field.setAccessible(true);
         HashMap data = (HashMap)field.get(outerObject);
 

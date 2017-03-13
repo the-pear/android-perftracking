@@ -17,6 +17,7 @@ import jp.co.rakuten.sdtd.perf.core.Tracker;
 public class TrackingManager {
     public static TrackingManager INSTANCE = null;
     private Map<TrackingData, Integer> mTrackingData;
+    /* Max number of objects for @TrackingManager#mTrackingData */
     private static final int TRACKING_DATA_LIMIT = 100;
 
     private TrackingManager() {
