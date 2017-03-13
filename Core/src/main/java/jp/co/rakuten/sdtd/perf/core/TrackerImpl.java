@@ -1,13 +1,12 @@
 package jp.co.rakuten.sdtd.perf.core;
 
 import java.net.URL;
-import android.util.Log;
 
 public class TrackerImpl {
 	private final MeasurementBuffer _measurementBuffer;
-	private final boolean _debug;
+	private final Debug _debug;
 
-	public TrackerImpl(MeasurementBuffer measurementBuffer, boolean debug) {
+	public TrackerImpl(MeasurementBuffer measurementBuffer, Debug debug) {
 		_measurementBuffer = measurementBuffer;
 		_debug = debug;
 	}
@@ -65,7 +64,7 @@ public class TrackerImpl {
 		m.b = b;
 		m.startTime = System.nanoTime();
 
-		if (_debug) {
+		if (_debug != null) {
 			log("start", m);
 		}
 
@@ -79,7 +78,7 @@ public class TrackerImpl {
 			{
 				m.endTime = System.nanoTime();
 
-				if (_debug) {
+				if (_debug != null) {
 					log("end", m);
 				}
 			}
@@ -113,6 +112,6 @@ public class TrackerImpl {
 			s.append(",time=").append((m.endTime - m.startTime) / 1000000);
 		}
 
-		Log.d("PERF", s.toString());
+		_debug.log(s.toString());
 	}
 }

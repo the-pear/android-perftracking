@@ -7,9 +7,9 @@ public class Sender {
 	private final MeasurementBuffer _buffer;
 	private final MetricCalculator _metricCalculator;
 	private final EventWriter _writer;
-	private final boolean _debug;
+	private final Debug _debug;
 
-	public Sender(MeasurementBuffer buffer, MetricCalculator metricCalculator, EventWriter writer, boolean debug) {
+	public Sender(MeasurementBuffer buffer, MetricCalculator metricCalculator, EventWriter writer, Debug debug) {
 		_buffer = buffer;
 		_metricCalculator = metricCalculator;
 		_writer = writer;
@@ -38,8 +38,8 @@ public class Sender {
 					metricStartTime = m.startTime;
 					metricEndTime = m.endTime;
 
-					if (_debug) {
-						Log.d("PERF", "Metric " + metric.id + ": startTime=" + m.startTime + ", endTime=" + m.endTime + ", time=" + ((m.endTime - m.startTime) / 1000000) + ", urls=" + metric.urls);
+					if (_debug != null) {
+						_debug.log("Metric " + metric.id + ": startTime=" + m.startTime + ", endTime=" + m.endTime + ", time=" + ((m.endTime - m.startTime) / 1000000) + ", urls=" + metric.urls);
 					}
 
 					send(m, metric);
@@ -69,8 +69,8 @@ public class Sender {
 	}
 
 	private void send(Measurement m, Metric metric) {
-		if (_debug) {
-			Log.d("PERF", "Sending " + m.trackingId);
+		if (_debug != null) {
+			_debug.log("Sending " + m.trackingId);
 		}
 
 		_writer.write(m, metric);

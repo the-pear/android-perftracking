@@ -21,12 +21,13 @@ public class Tracker {
 	 * @param config Performance tracking configuration.
 	 */
 	public static void on(Context context, Config config) {
+		Debug debug = config.debug ? new Debug() : null;
 		MeasurementBuffer buffer = new MeasurementBuffer();
-		_tracker = new TrackerImpl(buffer, config.debug);
+		_tracker = new TrackerImpl(buffer, debug);
 		EnvironmentInfo envInfo = EnvironmentInfo.get(context);
 		EventWriter writer = new EventWriter(config, envInfo);
 		MetricCalculator metricCalculator = new MetricCalculator(buffer);
-		Sender sender = new Sender(buffer, metricCalculator, writer, config.debug);
+		Sender sender = new Sender(buffer, metricCalculator, writer, debug);
 		_senderThread = new SenderThread(buffer, sender);
 		_senderThread.start();
 	}
