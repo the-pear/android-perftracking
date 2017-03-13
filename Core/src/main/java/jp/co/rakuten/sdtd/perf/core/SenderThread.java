@@ -1,38 +1,40 @@
 package jp.co.rakuten.sdtd.perf.core;
 
-import java.io.IOException;
-
 public class SenderThread extends Thread {
-	private static final int POLL_INTERVAL = 5000;
-	
+	private static final int MIN_COUNT = 10;
+	private static final int SLEEP_INTERVAL_MILLISECONDS = 10000;
+
+	private final MeasurementBuffer _buffer;
 	private final Sender _sender;
-	private final SendTrigger _trigger;
-	
-	public SenderThread(Sender sender, SendTrigger trigger) {
+
+	public SenderThread(MeasurementBuffer buffer, Sender sender) {
+		_buffer = buffer;
 		_sender = sender;
-		_trigger = trigger;
 	}
-	
+
 	@Override
 	public void run() {
+		int index = 1;
+
 		while (true) {
-			if (_trigger.shouldSend()) {
-				
-				try {
-					_sender.send();
-					_trigger.sent();
-					
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			int idIndex = _buffer.nextTrackingId.get() % MeasurementBuffer.SIZE;
+			if (idIndex < 0) {
+				idIndex += MeasurementBuffer.SIZE;
 			}
-			else {
-				try {
-					Thread.sleep(POLL_INTERVAL);
-				} 
-				catch (InterruptedException e) {
-				}
+
+			int count = idIndex - index;
+			if (count < 0) {
+				count += MeasurementBuffer.SIZE;
+			}
+
+			if (count >= MIN_COUNT) {
+				index = _sender.send(index, idIndex);
+			}
+
+			try {
+				Thread.sleep(SLEEP_INTERVAL_MILLISECONDS);
+			}
+			catch (InterruptedException e) {
 			}
 		}
 	}
