@@ -1,9 +1,11 @@
-package jp.co.rakuten.sdtd.perf;
+package jp.co.rakuten.sdtd.runtime;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+
+import jp.co.rakuten.sdtd.perf.BuildConfig;
 
 import static org.junit.Assert.*;
 

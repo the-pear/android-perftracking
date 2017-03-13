@@ -37,7 +37,7 @@ public final class Measurement {
      * @param object Object associated with the measurement.
      * @see #endAggregated(String, Comparable)
      */
-    public synchronized static void startAggregated(String id, Comparable object) {
+    public static void startAggregated(String id, Comparable object) {
         TrackingManager.INSTANCE.startAggregated(id, object);
     }
 
@@ -49,7 +49,7 @@ public final class Measurement {
      *               object that got passed to startAggregated().
      * @see #startAggregated(String, Comparable)
      */
-    public synchronized static void endAggregated(String id, Comparable object) {
+    public static void endAggregated(String id, Comparable object) {
         TrackingManager.INSTANCE.endAggregated(id, object);
     }
 }

@@ -3,9 +3,7 @@ package jp.co.rakuten.sdtd.perf.runtime.internal;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import jp.co.rakuten.sdtd.perf.core.Config;
@@ -18,12 +16,11 @@ import jp.co.rakuten.sdtd.perf.core.Tracker;
  */
 public class TrackingManager {
     public static TrackingManager INSTANCE = null;
-    private Map<AggregatedData, Integer> mAggregatedDataMap;
-    private Map<String, MeasurementData> mMeasurementDataMap;
+    private Map<TrackingData, Integer> mTrackingData;
+    private static final int TRACKING_DATA_LIMIT = 100;
 
     private TrackingManager() {
-        mAggregatedDataMap = new HashMap<>();
-        mMeasurementDataMap = new HashMap<>();
+        mTrackingData = new HashMap<>(TRACKING_DATA_LIMIT);
     }
 
     static void initialize(Context context, Config config) {
@@ -37,12 +34,12 @@ public class TrackingManager {
      * @param measurementId Measurement identifier.
      * @return trackingId
      */
-    public void startMeasurement(String measurementId) {
-        MeasurementData measurementData = mMeasurementDataMap.get(measurementId);
-        if (measurementData != null) return;
-        measurementData = new MeasurementData();
-        measurementData.trackingId = Tracker.startCustom(measurementId);
-        mMeasurementDataMap.put(measurementId, measurementData);
+    public synchronized void startMeasurement(String measurementId) {
+        TrackingData trackingData = new TrackingData(measurementId, null);
+        if (mTrackingData.size() >= TRACKING_DATA_LIMIT)
+            mTrackingData.clear();
+        if(!mTrackingData.containsKey(trackingData))
+            mTrackingData.put(trackingData, Tracker.startCustom(measurementId));
     }
 
     /**
@@ -50,11 +47,12 @@ public class TrackingManager {
      *
      * @param measurementId Tracking ID returned from startCustom
      */
-    public void endMeasurement(String measurementId) {
-        MeasurementData measurementData = mMeasurementDataMap.get(measurementId);
-        if (measurementData == null) return;
-        Tracker.endCustom(measurementData.trackingId);
-        mMeasurementDataMap.remove(measurementId);
+    public synchronized void endMeasurement(String measurementId) {
+        TrackingData trackingData = new TrackingData(measurementId, null);
+        if (mTrackingData.containsKey(trackingData)) {
+            Tracker.endCustom(mTrackingData.get(trackingData));
+            mTrackingData.remove(trackingData);
+        }
     }
 
     /**
@@ -63,10 +61,12 @@ public class TrackingManager {
      * @param id     Measurement identifier.
      * @param object Object associated with the measurement.
      */
-    public void startAggregated(String id, Comparable object) {
-        AggregatedData key = new AggregatedData(id, object);
-        if (!mAggregatedDataMap.containsKey(key))
-            mAggregatedDataMap.put(key, Tracker.startCustom(id));
+    public synchronized void startAggregated(String id, Comparable object) {
+        TrackingData key = new TrackingData(id, object);
+        if (mTrackingData.size() >= TRACKING_DATA_LIMIT)
+            mTrackingData.clear();
+        if (!mTrackingData.containsKey(key))
+            mTrackingData.put(key, Tracker.startCustom(id));
     }
 
     /**
@@ -75,11 +75,11 @@ public class TrackingManager {
      * @param id     Measurement identifier.
      * @param object Object associated with the measurement.
      */
-    public void endAggregated(String id, Comparable object) {
-        AggregatedData key = new AggregatedData(id, object);
-        if (mAggregatedDataMap.containsKey(key)) {
-            Tracker.endCustom(mAggregatedDataMap.get(key));
-            mAggregatedDataMap.remove(key);
+    public synchronized void endAggregated(String id, Comparable object) {
+        TrackingData key = new TrackingData(id, object);
+        if (mTrackingData.containsKey(key)) {
+            Tracker.endCustom(mTrackingData.get(key));
+            mTrackingData.remove(key);
         }
     }
 
@@ -88,43 +88,59 @@ public class TrackingManager {
      *
      * @param metricId Metric ID, for example "launch", "search", "item"
      */
-    public void startMetric(String metricId) {
+    public synchronized void startMetric(String metricId) {
         Tracker.startMetric(metricId);
     }
 
-    private class MeasurementData {
-        private int trackingId;
-    }
-
-    private class AggregatedData implements Comparable {
+    private class TrackingData implements Comparable {
         private String measurementId;
         private Comparable object;
 
-        private AggregatedData(String measurementId, Comparable object) {
+        private TrackingData(String measurementId, Comparable object) {
             this.measurementId = measurementId;
             this.object = object;
         }
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof AggregatedData) {
-                AggregatedData data = (AggregatedData) o;
-                return data.measurementId.equals(measurementId) && data.object.equals(object);
+            if (o instanceof TrackingData) {
+                TrackingData data = (TrackingData) o;
+                return nullSafeEquateObjects(object, data.object) && measurementId.equals(data.measurementId);
             } else return false;
+        }
+
+        private boolean nullSafeEquateObjects(Comparable one, Comparable two) {
+            if (one != null && two != null)
+                return one.equals(two);
+            if (one == null && two == null)
+                return true;
+            return false;
         }
 
         @Override
         public int hashCode() {
-            return measurementId.hashCode() + object.hashCode();
+            if (object != null)
+                return measurementId.hashCode() + object.hashCode();
+            else
+                return measurementId.hashCode();
         }
 
         @Override
         public int compareTo(@NonNull Object another) {
-            if (another instanceof AggregatedData) {
-                AggregatedData data = (AggregatedData) another;
-                return data.measurementId.compareTo(measurementId) * 10000 + data.object.compareTo(object);
+            if (another instanceof TrackingData) {
+                TrackingData data = (TrackingData) another;
+                return nullSafeCompareObjects(this.object, data.object) + data.measurementId.compareTo(measurementId) * 10000;
             }
             return -1;
+        }
+
+
+        private int nullSafeCompareObjects(Comparable one, Comparable two) {
+            if (one == null ^ two == null)
+                return (one == null) ? -1 : 1;
+            if (one == null && two == null)
+                return 0;
+            return one.compareTo(two);
         }
     }
 }
