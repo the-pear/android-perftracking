@@ -2,12 +2,14 @@ package jp.co.rakuten.sdtd.perf.runtime.internal;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import jp.co.rakuten.sdtd.perf.core.Config;
 import jp.co.rakuten.sdtd.perf.core.Tracker;
+import jp.co.rakuten.sdtd.perf.runtime.Measurement;
 
 /**
  * TrackingManager
@@ -15,6 +17,7 @@ import jp.co.rakuten.sdtd.perf.core.Tracker;
  * @author RMSDK team(prj-rmsdk@mail.rakuten.com)
  */
 public class TrackingManager {
+    private static final String TAG = TrackingManager.class.getSimpleName();
     public static TrackingManager INSTANCE = null;
     private Map<TrackingData, Integer> mTrackingData;
     /* Max number of objects for @TrackingManager#mTrackingData */
@@ -39,8 +42,10 @@ public class TrackingManager {
         TrackingData trackingData = new TrackingData(measurementId, null);
         if (mTrackingData.size() >= TRACKING_DATA_LIMIT)
             mTrackingData.clear();
-        if(!mTrackingData.containsKey(trackingData))
+        if (!mTrackingData.containsKey(trackingData))
             mTrackingData.put(trackingData, Tracker.startCustom(measurementId));
+        else
+            Log.d(TAG, "Measurement already started");
     }
 
     /**
@@ -53,7 +58,8 @@ public class TrackingManager {
         if (mTrackingData.containsKey(trackingData)) {
             Tracker.endCustom(mTrackingData.get(trackingData));
             mTrackingData.remove(trackingData);
-        }
+        } else
+            Log.d(TAG, "Measurement not found");
     }
 
     /**
@@ -68,6 +74,8 @@ public class TrackingManager {
             mTrackingData.clear();
         if (!mTrackingData.containsKey(key))
             mTrackingData.put(key, Tracker.startCustom(id));
+        else
+            Log.d(TAG, "Aggregated Measurement already started");
     }
 
     /**
@@ -81,7 +89,8 @@ public class TrackingManager {
         if (mTrackingData.containsKey(key)) {
             Tracker.endCustom(mTrackingData.get(key));
             mTrackingData.remove(key);
-        }
+        } else
+            Log.d(TAG, "Aggregated Measurement not found");
     }
 
     /**
