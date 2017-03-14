@@ -21,7 +21,7 @@ public class TrackingManager {
     private static final int TRACKING_DATA_LIMIT = 100;
 
     private TrackingManager() {
-        mTrackingData = new HashMap<>(TRACKING_DATA_LIMIT);
+        mTrackingData = new HashMap<>();
     }
 
     static void initialize(Context context, Config config) {
