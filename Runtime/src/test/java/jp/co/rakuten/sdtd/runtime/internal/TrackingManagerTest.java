@@ -23,7 +23,7 @@ import jp.co.rakuten.sdtd.perf.runtime.internal.TrackingManager;
  * @author RMSDK team(prj-rmsdk@mail.rakuten.com)
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(manifest = "src/test/AndroidManifest.xml", sdk = 21, constants = BuildConfig.class)
+@Config(sdk = 21, constants = BuildConfig.class)
 public class TrackingManagerTest {
 
     @Test

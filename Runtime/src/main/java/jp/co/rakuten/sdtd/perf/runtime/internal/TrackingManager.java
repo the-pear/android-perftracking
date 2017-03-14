@@ -89,7 +89,7 @@ public class TrackingManager {
      *
      * @param metricId Metric ID, for example "launch", "search", "item"
      */
-    public synchronized void startMetric(String metricId) {
+    public void startMetric(String metricId) {
         Tracker.startMetric(metricId);
     }
 
