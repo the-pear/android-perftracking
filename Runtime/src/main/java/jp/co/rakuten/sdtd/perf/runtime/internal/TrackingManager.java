@@ -106,8 +106,12 @@ public class TrackingManager {
         public boolean equals(Object o) {
             if (o instanceof TrackingData) {
                 TrackingData data = (TrackingData) o;
-                return nullSafeEquateObjects(object, data.object) && measurementId.equals(data.measurementId);
-            } else return false;
+                if (measurementId.equals(data.measurementId))
+                    return nullSafeEquateObjects(object, data.object);
+                else
+                    return false;
+            } else
+                return false;
         }
 
         private boolean nullSafeEquateObjects(Comparable one, Comparable two) {
@@ -130,7 +134,10 @@ public class TrackingManager {
         public int compareTo(@NonNull Object another) {
             if (another instanceof TrackingData) {
                 TrackingData data = (TrackingData) another;
-                return nullSafeCompareObjects(this.object, data.object) + data.measurementId.compareTo(measurementId) * 10000;
+                if (measurementId.compareTo(data.measurementId) == 0)
+                    return nullSafeCompareObjects(object, data.object);
+                else
+                    return measurementId.compareTo(data.measurementId);
             }
             return -1;
         }

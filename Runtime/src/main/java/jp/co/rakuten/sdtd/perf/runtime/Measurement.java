@@ -1,5 +1,7 @@
 package jp.co.rakuten.sdtd.perf.runtime;
 
+import android.text.TextUtils;
+
 import jp.co.rakuten.sdtd.perf.runtime.internal.TrackingManager;
 
 /**
@@ -17,7 +19,9 @@ public final class Measurement {
      * @see #end(String)
      */
     public static void start(String measurementId) {
-        TrackingManager.INSTANCE.startMeasurement(measurementId);
+        if (TextUtils.isEmpty(measurementId))
+            throw new IllegalArgumentException("Illegal Arguments");
+            TrackingManager.INSTANCE.startMeasurement(measurementId);
     }
 
     /**
@@ -27,7 +31,9 @@ public final class Measurement {
      * @see #start(String)
      */
     public static void end(String measurementId) {
-        TrackingManager.INSTANCE.endMeasurement(measurementId);
+        if (TextUtils.isEmpty(measurementId))
+            throw new IllegalArgumentException("Illegal Argument");
+            TrackingManager.INSTANCE.endMeasurement(measurementId);
     }
 
     /**
@@ -38,7 +44,9 @@ public final class Measurement {
      * @see #endAggregated(String, Comparable)
      */
     public static void startAggregated(String id, Comparable object) {
-        TrackingManager.INSTANCE.startAggregated(id, object);
+        if (TextUtils.isEmpty(id) || object == null)
+            throw new IllegalArgumentException("Illegal Arguments");
+            TrackingManager.INSTANCE.startAggregated(id, object);
     }
 
     /**
@@ -50,6 +58,8 @@ public final class Measurement {
      * @see #startAggregated(String, Comparable)
      */
     public static void endAggregated(String id, Comparable object) {
-        TrackingManager.INSTANCE.endAggregated(id, object);
+        if (TextUtils.isEmpty(id) || object == null)
+            throw new IllegalArgumentException("Illegal Arguments");
+            TrackingManager.INSTANCE.endAggregated(id, object);
     }
 }
