@@ -1,5 +1,8 @@
 package jp.co.rakuten.sdtd.perf.runtime;
 
+import android.text.TextUtils;
+import android.util.Log;
+
 import jp.co.rakuten.sdtd.perf.runtime.internal.TrackingManager;
 
 /**
@@ -9,25 +12,37 @@ import jp.co.rakuten.sdtd.perf.runtime.internal.TrackingManager;
  */
 
 public final class Measurement {
+
+    private static final String TAG = Measurement.class.getSimpleName();
     /**
      * Starts a new measurement.
      *
-     * @param id Measurement identifier.
+     * @param measurementId Measurement identifier.
      * @return trackingId
-     * @see #end(int)
+     * @see #end(String)
      */
-    public static int start(String id) {
-        return TrackingManager.INSTANCE.startMeasurement(id);
+    public static void start(String measurementId) {
+        if (TextUtils.isEmpty(measurementId))
+            throw new IllegalArgumentException("Illegal Arguments");
+        if (TrackingManager.INSTANCE != null)
+            TrackingManager.INSTANCE.startMeasurement(measurementId);
+        else
+            Log.d(TAG,"Tracking manager not initialized");
     }
 
     /**
      * Ends a measurement.
      *
-     * @param trackingId Measurement identifier.
+     * @param measurementId Measurement identifier.
      * @see #start(String)
      */
-    public static void end(int trackingId) {
-        TrackingManager.INSTANCE.endMeasurement(trackingId);
+    public static void end(String measurementId) {
+        if (TextUtils.isEmpty(measurementId))
+            throw new IllegalArgumentException("Illegal Argument");
+        if (TrackingManager.INSTANCE != null)
+            TrackingManager.INSTANCE.endMeasurement(measurementId);
+        else
+            Log.d(TAG,"Tracking manager not initialized");
     }
 
     /**
@@ -35,20 +50,32 @@ public final class Measurement {
      *
      * @param id     Measurement identifier.
      * @param object Object associated with the measurement.
-     * @return trackingId
-     * @see #endAggregated(int)
+     * @see #endAggregated(String, Comparable)
      */
-    public static int startAggregated(String id, Object object) {
-        return TrackingManager.INSTANCE.startAggregated(id, object);
+    public static void startAggregated(String id, Comparable object) {
+        if (TextUtils.isEmpty(id) || object == null)
+            throw new IllegalArgumentException("Illegal Arguments");
+        if (TrackingManager.INSTANCE != null)
+            TrackingManager.INSTANCE.startAggregated(id, object);
+        else
+            Log.d(TAG,"Tracking manager not initialized");
     }
 
     /**
-     * Ends a measurement.
+     * Ends a aggregated measurement.
      *
-     * @param trackingId Tracking ID
-     * @see #startAggregated(String, Object)
+     * @param id     Measurement identifier.
+     * @param object Object associated with the measurement. This must be the same
+     *               object that got passed to startAggregated().
+     * @see #startAggregated(String, Comparable)
      */
-    public static void endAggregated(int trackingId) {
-        TrackingManager.INSTANCE.endAggregated(trackingId);
+    public static void endAggregated(String id, Comparable object) {
+        if (TextUtils.isEmpty(id) || object == null)
+            throw new IllegalArgumentException("Illegal Arguments");
+        if (TrackingManager.INSTANCE != null)
+            TrackingManager.INSTANCE.endAggregated(id, object);
+        else
+            Log.d(TAG,"Tracking manager not initialized");
     }
+
 }
