@@ -51,7 +51,9 @@ public class MetricCalculator {
                 continue;
             }
 
-            metricEndTime = endTime;
+            if (endTime > metricEndTime) {
+                metricEndTime = endTime;
+            }
 
             if (m.type == Measurement.URL) {
                 urls++;
