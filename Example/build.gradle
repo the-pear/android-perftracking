@@ -8,12 +8,13 @@ buildscript {
 
         // REQUIRED FOR APP PERFORMANCE TRACKING (1)
         maven { url 'http://artifactory.raksdtd.com/artifactory/libs-release' }
+        maven { url 'http://artifactory.raksdtd.com/artifactory/libs-snapshot' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.2'
 
         // REQUIRED FOR APP PERFORMANCE TRACKING (2)
-        classpath 'jp.co.rakuten.sdtd.perf:plugin:latest.release'
+        classpath 'jp.co.rakuten.sdtd.perf:plugin:0.1.0-SNAPSHOT'
     }
 }
 
@@ -27,6 +28,7 @@ apply plugin: 'jp.co.rakuten.sdtd.perf' // REQUIRED FOR PERFORMANCE TRACKING (3)
 android {
     compileSdkVersion 23
     buildToolsVersion '23.0.2'
+    dataBinding.enabled = true
 
     defaultConfig {
         applicationId "jp.co.rakuten.sdtd.perf.example"
