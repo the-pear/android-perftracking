@@ -36,7 +36,6 @@ public class TrackingManager {
      * Starts a new measurement.
      *
      * @param measurementId Measurement identifier.
-     * @return trackingId
      */
     public synchronized void startMeasurement(String measurementId) {
         TrackingData trackingData = new TrackingData(measurementId, null);
@@ -51,7 +50,7 @@ public class TrackingManager {
     /**
      * Ends a measurement.
      *
-     * @param measurementId Tracking ID returned from startCustom
+     * @param measurementId Measurement identifier.
      */
     public synchronized void endMeasurement(String measurementId) {
         TrackingData trackingData = new TrackingData(measurementId, null);

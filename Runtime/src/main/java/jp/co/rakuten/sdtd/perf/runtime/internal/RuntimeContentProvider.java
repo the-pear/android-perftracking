@@ -21,7 +21,7 @@ import java.util.Random;
 
 import jp.co.rakuten.sdtd.perf.BuildConfig;
 import jp.co.rakuten.sdtd.perf.core.Config;
-import jp.co.rakuten.sdtd.perf.runtime.Measurement;
+import jp.co.rakuten.sdtd.perf.runtime.Metric;
 import jp.co.rakuten.sdtd.perf.runtime.StandardMetric;
 
 /**
@@ -82,7 +82,7 @@ public class RuntimeContentProvider extends ContentProvider {
         if (config != null) {
             // Initialise Tracking Manager
             TrackingManager.initialize(getContext(), config); // TODO Config class should be a builder and have all the values set properly
-            Measurement.start(StandardMetric.LAUNCH.getValue());
+            Metric.start(StandardMetric.LAUNCH.getValue());
         }
         return false;
     }
