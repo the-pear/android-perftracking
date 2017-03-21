@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -11,174 +12,139 @@ import android.util.Log;
 
 public class EventWriter {
 
-	private final Config _config;
-	private final EnvironmentInfo _envInfo;
-	private final String _brokerProperties;
-	private HttpsURLConnection _conn;
-	private BufferedWriter _writer;
-	private int _measurements;
+    private final Config _config;
+    private final EnvironmentInfo _envInfo;
+    private HttpsURLConnection _conn;
+    private BufferedWriter _writer;
+    private int _measurementCount;
 
-	public EventWriter(Config config, EnvironmentInfo envInfo) {
-		_config = config;
-		_envInfo = envInfo;
-		_brokerProperties = "{\"PartitionKey\": \"" + config.app + "/" + config.version + "\"}";
-	}
+    public EventWriter(Config config, EnvironmentInfo envInfo) {
+        _config = config;
+        _envInfo = envInfo;
+    }
 
-	public void begin() {
-		try {
-			_conn = (HttpsURLConnection) ((new URL (_config.eventHubUrl).openConnection()));
-			_conn.setRequestMethod("POST");
-			_conn.setRequestProperty("Authorization", _config.eventHubAuthorization);
-			_conn.setRequestProperty("Content-Type", "application/atom+xml;type=entry;charset=utf-8");
-			_conn.setRequestProperty("BrokerProperties", _brokerProperties);
-			_conn.setUseCaches(false);
-			_conn.setDoInput(false);
-			_conn.setDoOutput(true);
-			//conn.setConnectTimeout(10000);
-			_conn.connect();
+    public void begin() {
+        try {
+            _conn = (HttpsURLConnection) ((new URL(_config.eventHubUrl).openConnection()));
+            _conn.setRequestMethod("POST");
+            for (Map.Entry<String, String> entry : _config.header.entrySet())
+                _conn.setRequestProperty(entry.getKey(), entry.getValue());
+            _conn.setUseCaches(false);
+            _conn.setDoInput(false);
+            _conn.setDoOutput(true);
+            //conn.setConnectTimeout(10000);
+            _conn.connect();
 
-			_writer = new BufferedWriter(new OutputStreamWriter(_conn.getOutputStream()));
-			_writer.append("{\"app\":\"").append(_config.app)
-					.append("\",\"version\":\"").append(_config.version);
+            _writer = new BufferedWriter(new OutputStreamWriter(_conn.getOutputStream()));
+            _writer.append("{\"app\":\"").append(_config.app)
+                    .append("\",\"version\":\"").append(_config.version);
 
-			if (_envInfo.device != null)
-			{
-				_writer.append("\",\"device\":\"").append(_envInfo.device);
-			}
+            if (_envInfo.device != null) {
+                _writer.append("\",\"device\":\"").append(_envInfo.device);
+            }
 
-			if (_envInfo.country != null)
-			{
-				_writer.append("\",\"country\":\"").append(_envInfo.country);
-			}
+            if (_envInfo.country != null) {
+                _writer.append("\",\"country\":\"").append(_envInfo.country);
+            }
 
-			if (_envInfo.network != null)
-			{
-				_writer.append("\",\"network\":\"").append(_envInfo.network);
-			}
+            if (_envInfo.network != null) {
+                _writer.append("\",\"network\":\"").append(_envInfo.network);
+            }
 
-			_writer.append("\",\"measurements\":[");
+            _writer.append("\",\"measurements\":[");
 
-			_measurements = 0;
-		}
-		catch (Exception e) {
-			if (_config.debug) {
-				Log.d("PERF", e.toString());
-			}
-			disconnect();
-		}
-	}
+            _measurementCount = 0;
+        } catch (Exception e) {
+            if (_config.debug) {
+                Log.d("PERF", e.toString());
+            }
+            disconnect();
+        }
+    }
 
-	public void write(Metric metric) {
-		if (_writer != null) {
-			try {
-				if (_measurements > 0) {
-					_writer.append(',');
-				}
+    public void write(Measurement m, Metric metric) {
+        try {
+            if (_writer != null) {
+                if (_measurementCount > 0) {
+                    _writer.append(',');
+                }
 
-				_writer
-						.append("{\"metric\":\"").append(metric.id)
-						.append("\",\"urls\":").append(Integer.toString(metric.urls))
-						.append(",\"time\":").append(Integer.toString((int)((metric.endTime - metric.startTime) / 1000000)))
-						.append('}');
+                switch (m.type) {
+                    case Measurement.METRIC:
+                        metric = (Metric) m.a;
+                        _writer
+                                .append("{\"metric\":\"").append(metric.id)
+                                .append("\",\"urls\":").append(Integer.toString(metric.urls));
+                        break;
 
-				_measurements++;
-			}
-			catch (Exception e) {
-				if (_config.debug) {
-					Log.d("PERF", e.toString());
-				}
-				disconnect();
-			}
-		}
-	}
+                    case Measurement.METHOD:
+                        _writer.append("{\"method\":\"").append((String) m.a).append('.').append((String) m.b).append('"');
+                        break;
 
-	public void write(Measurement m, String metricId) {
-		if (_writer != null) {
-			try {
-				if (_measurements > 0) {
-					_writer.append(',');
-				}
+                    case Measurement.URL:
+                        URL url = (URL) m.a;
+                        _writer.append("{\"url\":\"").append(url.getProtocol()).append("://").append(url.getAuthority()).append(url.getPath()).append('"');
+                        if (m.b != null) {
+                            _writer.append(",\"verb\":\"").append((String) m.b).append('"');
+                        }
+                        break;
 
-				switch (m.type) {
-					case Measurement.METHOD:
-						_writer.append("{\"method\":\"").append((String)m.a).append('.').append((String)m.b).append('"');
-						break;
+                    case Measurement.CUSTOM:
+                        _writer.append("{\"custom\":\"").append((String) m.a).append('"');
+                        break;
 
-					case Measurement.URL:
-						_writer.append("{\"url\":\"");
+                    default:
+                        return;
+                }
 
-						if (m.a instanceof URL) {
-							URL url = (URL)m.a;
-							_writer.append(url.getProtocol()).append("://").append(url.getAuthority()).append(url.getPath());
-						}
-						else {
-							String url = (String)m.a;
-							int q = url.indexOf('?');
-							if (q > 0) {
-								url = url.substring(0, q);
-							}
-							_writer.append(url);
-						}
+                if (m.type != Measurement.METRIC) {
+                    if (metric != null) {
+                        _writer.append(",\"metric\":\"").append(metric.id).append('"');
+                    }
+                }
 
-						_writer.append('"');
+                int time = (int) ((m.endTime - m.startTime) / 1000000);
+                if (time == 0) {
+                    time = 1;    // round to 1ms
+                }
 
-						if (m.b != null) {
-							_writer.append(",\"verb\":\"").append((String)m.b).append('"');
-						}
-						break;
+                _writer.append(",\"time\":").append(Integer.toString(time)).append('}');
 
-					case Measurement.CUSTOM:
-						_writer.append("{\"custom\":\"").append((String)m.a).append('"');
-						break;
+                _measurementCount++;
+            }
+        } catch (Exception e) {
+            if (_config.debug) {
+                Log.d("PERF", e.toString());
+            }
+            disconnect();
+        }
+    }
 
-					default:
-						return;
-				}
+    public void end() {
+        try {
+            if (_writer != null) {
+                _writer.append("]}");
+                _writer.close();
 
-				if (metricId != null) {
-					_writer.append(",\"metric\":\"").append(metricId).append('"');
-				}
+                int result = _conn.getResponseCode();
+                if (result != 201) {
+                    throw new IOException("Failed to send event with status " + result);
+                }
+            }
+        } catch (Exception e) {
+            if (_config.debug) {
+                Log.d("PERF", e.toString());
+            }
+        } finally {
+            disconnect();
+        }
+    }
 
-				_writer.append(",\"time\":").append(Integer.toString((int)((m.endTime - m.startTime) / 1000000))).append('}');
-
-				_measurements++;
-			}
-			catch (Exception e) {
-				if (_config.debug) {
-					Log.d("PERF", e.toString());
-				}
-				disconnect();
-			}
-		}
-	}
-
-	public void end() {
-		try {
-			if (_writer != null) {
-				_writer.append("]}");
-				_writer.close();
-
-				int result = _conn.getResponseCode();
-				if (result != 201) {
-					throw new IOException("Failed to send event with status " + result);
-				}
-			}
-		}
-		catch (Exception e) {
-			if (_config.debug) {
-				Log.d("PERF", e.toString());
-			}
-		}
-		finally {
-			disconnect();
-		}
-	}
-
-	private void disconnect() {
-		if (_conn != null) {
-			_conn.disconnect();
-		}
-		_conn = null;
-		_writer = null;
-	}
+    private void disconnect() {
+        if (_conn != null) {
+            _conn.disconnect();
+        }
+        _conn = null;
+        _writer = null;
+    }
 }

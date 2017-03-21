@@ -17,6 +17,10 @@
             android:name="net.hockeyapp.android.appIdentifier"
             android:value="${HOCKEYAPP_APP_ID}" />
 
+        <meta-data
+            android:name="jp.co.rakuten.sdtd.perf.debug"
+            android:value="false" />
+
     </application>
 
 </manifest>
