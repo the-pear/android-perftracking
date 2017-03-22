@@ -28,28 +28,20 @@ public class MainActivity extends Activity {
             public void onClick(View view) {
                 final String originalText = (String) activityMainBinding.testAggregatedMeasurement.getText();
                 activityMainBinding.testAggregatedMeasurement.setText("RUNNING");
-                final Comparable comparable = new Comparable() {
-                    @Override
-                    public int compareTo(Object o) {
-                        return 0;
-                    }
-                };
-                final Comparable comparable1 = new Comparable() {
-                    @Override
-                    public int compareTo(Object o) {
-                        return 0;
-                    }
-                };
-                Measurement.startAggregated("testAggregatedMeasurement",comparable);
-                Measurement.startAggregated("testAggregatedMeasurement",comparable1);
+
+                final String imageUrl1 = "imageUrl1";
+                final String imageUrl2 = "imageUrl2";
+
+                Measurement.startAggregated("testAggregatedMeasurement",imageUrl1);
+                Measurement.startAggregated("testAggregatedMeasurement",imageUrl2);
 
                 new Thread(new Runnable() {
                     @Override
                     public void run () {
                         try {
                             Thread.sleep(1000);
-                            Measurement.endAggregated("testAggregatedMeasurement",comparable);
-                            Measurement.endAggregated("testAggregatedMeasurement",comparable1);
+                            Measurement.endAggregated("testAggregatedMeasurement",imageUrl1);
+                            Measurement.endAggregated("testAggregatedMeasurement",imageUrl2);
                         } catch (InterruptedException e) {
                             Thread.interrupted();
                         }
