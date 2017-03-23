@@ -14,14 +14,14 @@ import jp.co.rakuten.sdtd.perf.core.base.SupportV4FragmentBase;
 @MixSubclassOf(Fragment.class)
 @ChangeBaseTo(SupportV4FragmentBase.class)
 public class SupportV4FragmentMixin extends SupportV4FragmentBase {
-	
+
 	@ReplaceMethod
-    protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		if (!jp_co_rakuten_sdtd_perf_onCreate_tracking) {
 			jp_co_rakuten_sdtd_perf_onCreate_tracking = true;
-			
+
 			int id = Tracker.startMethod(this, "onCreate");
-			
+
 			try {
 				onCreate(savedInstanceState);
 			}
@@ -33,24 +33,5 @@ public class SupportV4FragmentMixin extends SupportV4FragmentBase {
 		else {
 			onCreate(savedInstanceState);
 		}
-    }
-	
-	@ReplaceMethod
-	protected View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		if (!jp_co_rakuten_sdtd_perf_onCreateView_tracking) {
-			jp_co_rakuten_sdtd_perf_onCreateView_tracking = true;
-			
-			int id = Tracker.startMethod(this, "onCreateView");
-			
-			try {
-				return onCreateView(inflater, container, savedInstanceState);
-			}
-			finally {
-				Tracker.endMethod(id);
-				jp_co_rakuten_sdtd_perf_onCreateView_tracking = false;
-			}
-		}
-		
-		return onCreateView(inflater, container, savedInstanceState);
 	}
 }

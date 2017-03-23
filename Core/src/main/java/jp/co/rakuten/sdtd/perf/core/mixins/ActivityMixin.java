@@ -11,14 +11,14 @@ import jp.co.rakuten.sdtd.perf.core.base.ActivityBase;
 @MixSubclassOf(Activity.class)
 @ChangeBaseTo(ActivityBase.class)
 public class ActivityMixin extends ActivityBase {
-	
+
 	@ReplaceMethod
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		if (!jp_co_rakuten_sdtd_perf_onCreate_tracking) {
 			jp_co_rakuten_sdtd_perf_onCreate_tracking = true;
 
 			int id = Tracker.startMethod(this, "onCreate");
-			
+
 			try {
 				onCreate(savedInstanceState);
 			}
@@ -30,5 +30,11 @@ public class ActivityMixin extends ActivityBase {
 		else {
 			onCreate(savedInstanceState);
 		}
+	}
+
+	@ReplaceMethod
+	public void onBackPressed () {
+		Tracker.endMetric();
+		onBackPressed();
 	}
 }

@@ -1,62 +1,147 @@
 package jp.co.rakuten.sdtd.perf.core;
 
-import java.net.URL;
-
 public class TrackerImpl {
 	private final MeasurementBuffer _measurementBuffer;
+	private final Current _current;
 	private final Debug _debug;
 
-	public TrackerImpl(MeasurementBuffer measurementBuffer, Debug debug) {
+	public TrackerImpl(MeasurementBuffer measurementBuffer, Current current, Debug debug) {
 		_measurementBuffer = measurementBuffer;
+		_current = current;
 		_debug = debug;
 	}
 
 	public void startMetric(String metricId) {
+		_current.metric.set(null);
+
 		Metric metric = new Metric();
 		metric.id = metricId;
-		startMeasurement(Measurement.METRIC, metric, null);
+
+		Measurement m = startMeasurement(Measurement.METRIC, metric, null);
+		if (m != null)
+		{
+			metric.startTime = m.startTime;
+			metric.endTime = m.startTime;
+			_current.metric.set(metric);
+
+			if (_debug != null) {
+				_debug.log("METRIC_START", metric);
+			}
+		}
+	}
+
+	public void prolongMetric() {
+		Metric metric = _current.metric.get();
+
+		if (metric != null) {
+			long now = System.nanoTime();
+
+			if (now - metric.startTime > Metric.MAX_TIME) {
+				_current.metric.compareAndSet(metric, null);
+				return;
+			}
+
+			metric.endTime = now;
+
+			if (_debug != null) {
+				_debug.log("METRIC_PROLONG", metric);
+			}
+		}
+	}
+
+	public void endMetric() {
+		if (_debug != null) {
+			Metric metric = _current.metric.get();
+			if (metric != null) {
+				_debug.log("METRIC_END", metric);
+			}
+		}
+
+		_current.metric.set(null);
 	}
 
 	public int startMethod(Object object, String method) {
-		if ((object == null) || (method == null)) {
-			return 0;
-		}
+		if ((object != null) && (method != null)) {
+			Measurement m = startMeasurement(Measurement.METHOD, object.getClass().getName(), method);
+			if (m != null) {
 
-		return startMeasurement(Measurement.METHOD, object.getClass().getName(), method);
+				if (_debug != null) {
+					_debug.log("METHOD_START", m, null);
+				}
+
+				return m.trackingId;
+			}
+		}
+		return 0;
 	}
 
 	public void endMethod(int trackingId) {
 		endMeasurement(trackingId);
+
+		if (_debug != null) {
+			Measurement m = _measurementBuffer.getByTrackingId(trackingId);
+			if (m != null) {
+				_debug.log("METHOD_END", m, null);
+			}
+		}
 	}
 
-	public int startUrl(URL url, String verb) {
-		if (url == null) {
-			return 0;
-		}
+	public int startUrl(Object url, String verb) {
+		if (url != null) {
+			Measurement m = startMeasurement(Measurement.URL, url, verb);
+			if (m != null) {
 
-		return startMeasurement(Measurement.URL, url, verb);
+				if (_debug != null) {
+					_debug.log("URL_START", m, null);
+				}
+
+				return m.trackingId;
+			}
+		}
+		return 0;
 	}
 
 	public void endUrl(int trackingId) {
 		endMeasurement(trackingId);
+
+		if (_debug != null) {
+			Measurement m = _measurementBuffer.getByTrackingId(trackingId);
+			if (m != null) {
+				_debug.log("URL_END", m, null);
+			}
+		}
 	}
 
 	public int startCustom(String measurementId) {
-		if (measurementId == null) {
-			return 0;
-		}
+		if (measurementId != null) {
+			Measurement m = startMeasurement(Measurement.CUSTOM, measurementId, null);
+			if (m != null) {
 
-		return startMeasurement(Measurement.CUSTOM, measurementId, null);
+				if (_debug != null) {
+					_debug.log("CUSTOM_START", m, null);
+				}
+
+				return m.trackingId;
+			}
+		}
+		return 0;
 	}
 
 	public void endCustom(int trackingId) {
 		endMeasurement(trackingId);
+
+		if (_debug != null) {
+			Measurement m = _measurementBuffer.getByTrackingId(trackingId);
+			if (m != null) {
+				_debug.log("CUSTOM_END", m, null);
+			}
+		}
 	}
 
-	private int startMeasurement(byte type, Object a, Object b) {
+	private Measurement startMeasurement(byte type, Object a, Object b) {
 		Measurement m = _measurementBuffer.next();
 		if (m == null) {
-			return 0;
+			return null;
 		}
 
 		m.type = type;
@@ -64,11 +149,7 @@ public class TrackerImpl {
 		m.b = b;
 		m.startTime = System.nanoTime();
 
-		if (_debug != null) {
-			log("start", m);
-		}
-
-		return m.trackingId;
+		return m;
 	}
 
 	private void endMeasurement(int trackingId) {
@@ -77,41 +158,7 @@ public class TrackerImpl {
 			if (m != null)
 			{
 				m.endTime = System.nanoTime();
-
-				if (_debug != null) {
-					log("end", m);
-				}
 			}
 		}
-	}
-
-	private void log(String action, Measurement m) {
-		StringBuilder s = new StringBuilder();
-
-		s.append(action).append(": ");
-		s.append("trackingId=").append(m.trackingId);
-		s.append(",type=").append(m.type);
-
-		if (m.type == Measurement.METRIC) {
-			s.append(",metric=").append(((Metric)m.a).id);
-		}
-		else {
-			if (m.a != null) {
-				s.append(",a=").append(m.a);
-			}
-
-			if (m.b != null) {
-				s.append(",b=").append(m.b);
-			}
-		}
-
-		s.append(",startTime=").append(m.startTime);
-		s.append(",endTime=").append(m.endTime);
-
-		if (m.endTime > m.startTime) {
-			s.append(",time=").append((m.endTime - m.startTime) / 1000000);
-		}
-
-		_debug.log(s.toString());
 	}
 }

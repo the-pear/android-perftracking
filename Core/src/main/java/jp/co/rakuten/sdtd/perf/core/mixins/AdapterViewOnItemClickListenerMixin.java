@@ -12,12 +12,14 @@ public class AdapterViewOnItemClickListenerMixin {
 
 	@ReplaceMethod
 	public void onItemClick(AdapterView<?> parent, View view, int position, long itemId) {
-		int id = Tracker.startUI(view, "onItemClick");
+		Tracker.endMetric();
+
+		int id = Tracker.startMethod(this, "onItemClick");
 		try {
 			onItemClick(parent, view, position, itemId);
 		}
 		finally {
-			Tracker.endUI(id);
+			Tracker.endMethod(id);
 		}
 	}
 }

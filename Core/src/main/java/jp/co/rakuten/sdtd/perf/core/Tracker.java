@@ -1,6 +1,7 @@
 package jp.co.rakuten.sdtd.perf.core;
 
 import java.net.URL;
+
 import android.content.Context;
 import android.view.View;
 
@@ -23,11 +24,11 @@ public class Tracker {
 	public static void on(Context context, Config config) {
 		Debug debug = config.debug ? new Debug() : null;
 		MeasurementBuffer buffer = new MeasurementBuffer();
-		_tracker = new TrackerImpl(buffer, debug);
+		Current current = new Current();
+		_tracker = new TrackerImpl(buffer, current, debug);
 		EnvironmentInfo envInfo = EnvironmentInfo.get(context);
 		EventWriter writer = new EventWriter(config, envInfo);
-		MetricCalculator metricCalculator = new MetricCalculator(buffer);
-		Sender sender = new Sender(buffer, metricCalculator, writer, debug);
+		Sender sender = new Sender(buffer, current, writer, debug);
 		_senderThread = new SenderThread(buffer, sender);
 		_senderThread.start();
 	}
@@ -49,6 +50,26 @@ public class Tracker {
 		TrackerImpl t = _tracker;
 		if (t != null) {
 			t.startMetric(metricId);
+		}
+	}
+
+	/**
+	 * Prolongs current metric.
+	 */
+	public static void prolongMetric() {
+		TrackerImpl t = _tracker;
+		if (t != null) {
+			t.prolongMetric();
+		}
+	}
+
+	/**
+	 * Terminates current metric.
+	 */
+	public static void endMetric() {
+		TrackerImpl t = _tracker;
+		if (t != null) {
+			t.endMetric();
 		}
 	}
 
@@ -86,6 +107,17 @@ public class Tracker {
 	}
 
 	/**
+	 * Starts URL measurement.
+	 * @param url String
+	 * @param verb Verb, for example GET, POST, DELETE, or null
+	 * @return Tracking ID
+	 */
+	public static int startUrl(String url, String verb) {
+		TrackerImpl t = _tracker;
+		return t != null ? t.startUrl(url, verb) : 0;
+	}
+
+	/**
 	 * Ends URL measurement.
 	 * @param trackingId Tracking ID returned from startUrl
 	 */
@@ -115,18 +147,5 @@ public class Tracker {
 		if (t != null) {
 			t.endCustom(trackingId);
 		}
-	}
-
-	// These methods are likely to be removed
-
-	public static int startUI(View view, String event) {
-		return 0;
-		//return _tracker != null ? _tracker.uiEventStart(view, event) : 0;
-	}
-
-	public static void endUI(int id) {
-		//	if (_tracker != null) {
-		//		_tracker.end(id);
-		//	}
 	}
 }
