@@ -117,7 +117,7 @@ public class EventWriter {
 							if (q > 0) {
 								url = url.substring(0, q);
 							}
-							_writer.append((String)m.a);
+							_writer.append(url);
 						}
 
 						_writer.append('"');
