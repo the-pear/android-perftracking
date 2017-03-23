@@ -135,11 +135,11 @@ public class EventWriter {
 						return;
 				}
 
-				_writer.append(",\"time\":").append(Integer.toString((int)((m.endTime - m.startTime) / 1000000))).append('}');
-
 				if (metricId != null) {
 					_writer.append(",\"metric\":\"").append(metricId).append('"');
 				}
+
+				_writer.append(",\"time\":").append(Integer.toString((int)((m.endTime - m.startTime) / 1000000))).append('}');
 
 				_measurements++;
 			}
