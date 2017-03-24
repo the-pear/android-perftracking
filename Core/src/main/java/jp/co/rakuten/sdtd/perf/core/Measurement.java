@@ -7,7 +7,7 @@ public class Measurement {
 	public static final byte URL = 3;
 	public static final byte CUSTOM = 4;
 
-	public static final long TIMEOUT = 30000000000L; // 30 s
+	public static final long MAX_TIME = 30000000000L; // 30 s
 
 	public int trackingId;
 	public byte type;

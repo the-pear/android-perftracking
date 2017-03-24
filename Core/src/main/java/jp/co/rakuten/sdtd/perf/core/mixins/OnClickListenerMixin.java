@@ -11,12 +11,14 @@ public class OnClickListenerMixin {
 
 	@ReplaceMethod
 	public void onClick(View view) {
-		int id = Tracker.startUI(view, "onClick");
+		Tracker.endMetric();
+
+		int id = Tracker.startMethod(this, "onClick");
 		try {
 			onClick(view);
 		}
 		finally {
-			Tracker.endUI(id);
+			Tracker.endMethod(id);
 		}
 	}
 }
