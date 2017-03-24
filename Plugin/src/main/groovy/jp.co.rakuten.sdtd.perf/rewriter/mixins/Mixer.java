@@ -15,7 +15,7 @@ public class Mixer {
 	public ClassVisitor getAdapter(final Class<?> clazz, ClassVisitor output) {
 		for (Mixin mixin: _mixins) {
 			if (mixin.match(clazz)) {
-				return mixin.rewrite(clazz, output);
+				output = mixin.rewrite(clazz, output);
 			}
 		}
 		return output;
