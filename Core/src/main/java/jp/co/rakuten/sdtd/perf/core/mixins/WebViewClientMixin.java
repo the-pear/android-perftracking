@@ -23,6 +23,7 @@ public class WebViewClientMixin extends WebViewClientBase {
     @ReplaceMethod
     public void onPageFinished (WebView view, String url) {
         Tracker.prolongMetric();
+        Tracker.endMetric();
         Tracker.endUrl(jp_co_rakuten_sdtd_perf_page_trackingId);
         jp_co_rakuten_sdtd_perf_page_trackingId = 0;
         onPageFinished(view, url);
