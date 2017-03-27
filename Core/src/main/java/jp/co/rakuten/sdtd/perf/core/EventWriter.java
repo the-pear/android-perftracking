@@ -16,7 +16,7 @@ public class EventWriter {
     private final EnvironmentInfo _envInfo;
     private HttpsURLConnection _conn;
     private BufferedWriter _writer;
-    private int _measurementCount;
+    private int _measurements;
 
     public EventWriter(Config config, EnvironmentInfo envInfo) {
         _config = config;
@@ -53,7 +53,7 @@ public class EventWriter {
 
             _writer.append("\",\"measurements\":[");
 
-            _measurementCount = 0;
+            _measurements = 0;
         } catch (Exception e) {
             if (_config.debug) {
                 Log.d("PERF", e.toString());
@@ -62,28 +62,58 @@ public class EventWriter {
         }
     }
 
-    public void write(Measurement m, Metric metric) {
-        try {
-            if (_writer != null) {
-                if (_measurementCount > 0) {
+    public void write(Metric metric) {
+        if (_writer != null) {
+            try {
+                if (_measurements > 0) {
+                    _writer.append(',');
+                }
+
+                _writer
+                        .append("{\"metric\":\"").append(metric.id)
+                        .append("\",\"urls\":").append(Integer.toString(metric.urls))
+                        .append(",\"time\":").append(Integer.toString((int) ((metric.endTime - metric.startTime) / 1000000)))
+                        .append('}');
+
+                _measurements++;
+            } catch (Exception e) {
+                if (_config.debug) {
+                    Log.d("PERF", e.toString());
+                }
+                disconnect();
+            }
+        }
+    }
+
+    public void write(Measurement m, String metricId) {
+        if (_writer != null) {
+            try {
+                if (_measurements > 0) {
                     _writer.append(',');
                 }
 
                 switch (m.type) {
-                    case Measurement.METRIC:
-                        metric = (Metric) m.a;
-                        _writer
-                                .append("{\"metric\":\"").append(metric.id)
-                                .append("\",\"urls\":").append(Integer.toString(metric.urls));
-                        break;
-
                     case Measurement.METHOD:
                         _writer.append("{\"method\":\"").append((String) m.a).append('.').append((String) m.b).append('"');
                         break;
 
                     case Measurement.URL:
-                        URL url = (URL) m.a;
-                        _writer.append("{\"url\":\"").append(url.getProtocol()).append("://").append(url.getAuthority()).append(url.getPath()).append('"');
+                        _writer.append("{\"url\":\"");
+
+                        if (m.a instanceof URL) {
+                            URL url = (URL) m.a;
+                            _writer.append(url.getProtocol()).append("://").append(url.getAuthority()).append(url.getPath());
+                        } else {
+                            String url = (String) m.a;
+                            int q = url.indexOf('?');
+                            if (q > 0) {
+                                url = url.substring(0, q);
+                            }
+                            _writer.append(url);
+                        }
+
+                        _writer.append('"');
+
                         if (m.b != null) {
                             _writer.append(",\"verb\":\"").append((String) m.b).append('"');
                         }
@@ -97,26 +127,19 @@ public class EventWriter {
                         return;
                 }
 
-                if (m.type != Measurement.METRIC) {
-                    if (metric != null) {
-                        _writer.append(",\"metric\":\"").append(metric.id).append('"');
-                    }
+                if (metricId != null) {
+                    _writer.append(",\"metric\":\"").append(metricId).append('"');
                 }
 
-                int time = (int) ((m.endTime - m.startTime) / 1000000);
-                if (time == 0) {
-                    time = 1;    // round to 1ms
+                _writer.append(",\"time\":").append(Integer.toString((int) ((m.endTime - m.startTime) / 1000000))).append('}');
+
+                _measurements++;
+            } catch (Exception e) {
+                if (_config.debug) {
+                    Log.d("PERF", e.toString());
                 }
-
-                _writer.append(",\"time\":").append(Integer.toString(time)).append('}');
-
-                _measurementCount++;
+                disconnect();
             }
-        } catch (Exception e) {
-            if (_config.debug) {
-                Log.d("PERF", e.toString());
-            }
-            disconnect();
         }
     }
 
