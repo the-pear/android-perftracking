@@ -2,9 +2,6 @@ package jp.co.rakuten.sdtd.perf.core.mixins;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import jp.co.rakuten.sdtd.perf.core.Tracker;
 import jp.co.rakuten.sdtd.perf.core.annotations.ChangeBaseTo;
 import jp.co.rakuten.sdtd.perf.core.annotations.MixSubclassOf;
