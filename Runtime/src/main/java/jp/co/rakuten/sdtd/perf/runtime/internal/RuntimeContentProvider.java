@@ -47,7 +47,7 @@ public class RuntimeContentProvider extends ContentProvider {
         Config config = null; // configuration for TrackingManager
         if (lastConfig != null) {
             double enablePercent = lastConfig.getEnablePercent();
-            double randomNumber = new Random(System.currentTimeMillis()).nextInt(101);
+            double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
             if (randomNumber <= enablePercent) {
                 config = new Config();
                 config.app = getContext().getPackageName();
