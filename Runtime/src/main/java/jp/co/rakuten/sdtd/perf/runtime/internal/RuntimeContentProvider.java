@@ -3,9 +3,12 @@ package jp.co.rakuten.sdtd.perf.runtime.internal;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -17,6 +20,7 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.NoCache;
 import com.google.gson.Gson;
 
+import java.lang.reflect.Field;
 import java.util.Random;
 
 import jp.co.rakuten.sdtd.perf.BuildConfig;
@@ -43,42 +47,65 @@ public class RuntimeContentProvider extends ContentProvider {
         Config config = null; // configuration for TrackingManager
         if (lastConfig != null) {
             double enablePercent = lastConfig.getEnablePercent();
-            double randomNumber = new Random(System.currentTimeMillis()).nextInt(101);
+            double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
             if (randomNumber <= enablePercent) {
                 config = new Config();
-                config.app = BuildConfig.APPLICATION_ID;
-                config.version = BuildConfig.VERSION_NAME;
-                config.debug = BuildConfig.DEBUG;
+                config.app = getContext().getPackageName();
+                try {
+                    config.version = getContext().getPackageManager()
+                            .getPackageInfo(getContext().getPackageName(), 0).versionName;
+                } catch (PackageManager.NameNotFoundException e) {
+                    Log.d(TAG, e.getMessage());
+                }
+                try {
+                    ApplicationInfo ai = getContext().getPackageManager().getApplicationInfo(getContext().getPackageName(), PackageManager.GET_META_DATA);
+                    Bundle bundle = ai.metaData;
+                    config.debug = bundle.getBoolean("jp.co.rakuten.sdtd.perf.debug");
+                } catch (PackageManager.NameNotFoundException e) {
+                    Log.d(TAG, "Failed to load meta-data, NameNotFound: " + e.getMessage());
+                    config.debug = false;
+                } catch (NullPointerException e) {
+                    Log.d(TAG, "Failed to load meta-data, NullPointer: " + e.getMessage());
+                    config.debug = false;
+                }
                 config.eventHubUrl = lastConfig.getSendUrl();
-                config.eventHubAuthorization = lastConfig.getHeader().getAuthorization();
+                config.header = lastConfig.getHeader();
             }
         }
         // Get latest configuration
         RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
         queue.start();
-        ConfigurationParam param = new ConfigurationParam.Builder()
-                .setAppId(BuildConfig.APPLICATION_ID)
-                .setAppVersion(BuildConfig.VERSION_NAME)
-                .setCountryCode(getContext().getResources().getConfiguration().locale.getCountry())
-                .setPlatform("android")
-                .setSdkVersion(String.valueOf(Build.VERSION.SDK_INT))
-                .build();
-        new ConfigurationRequest(param, new Response.Listener<ConfigurationResult>() {
-            @Override
-            public void onResponse(ConfigurationResult response) {
-                saveConfiguration(response); // save latest configuration
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Throwable throwable = error;
-                String message = error.getClass().getName();
-                while (throwable.getMessage() == null && throwable.getCause() != null)
-                    throwable = throwable.getCause();
-                if (throwable.getMessage() != null) message = throwable.getMessage();
-                Log.e(TAG, "Error: " + message);
-            }
-        }).queue(queue);
+        ConfigurationParam param = null;
+        try {
+            param = new ConfigurationParam.Builder()
+                    .setAppId(getContext().getPackageName())
+                    .setAppVersion(getContext().getPackageManager()
+                            .getPackageInfo(getContext().getPackageName(), 0).versionName)
+                    .setCountryCode(getContext().getResources().getConfiguration().locale.getCountry())
+                    .setPlatform("android")
+                    .setSdkVersion(String.valueOf(Build.VERSION.SDK_INT))
+                    .build();
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.d(TAG, e.getMessage());
+        }
+        if (param != null) {
+            new ConfigurationRequest(param, new Response.Listener<ConfigurationResult>() {
+                @Override
+                public void onResponse(ConfigurationResult response) {
+                    saveConfiguration(response); // save latest configuration
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Throwable throwable = error;
+                    String message = error.getClass().getName();
+                    while (throwable.getMessage() == null && throwable.getCause() != null)
+                        throwable = throwable.getCause();
+                    if (throwable.getMessage() != null) message = throwable.getMessage();
+                    Log.d(TAG, "Error: " + message);
+                }
+            }).queue(queue);
+        }
         if (config != null) {
             // Initialise Tracking Manager
             TrackingManager.initialize(getContext(), config); // TODO Config class should be a builder and have all the values set properly

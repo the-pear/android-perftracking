@@ -13,7 +13,7 @@ import jp.co.rakuten.api.core.BaseRequest;
  */
 
 class ConfigurationRequest extends BaseRequest<ConfigurationResult> {
-    private static final String DOMAIN_URL_DEV = "http://perf-config-api-dev-japaneast.azurewebsites.net";
+    private static final String DOMAIN_URL_DEV = "https://perf-config-api-dev-japaneast.azurewebsites.net";
     private static final String PATH_API_VERSION = "/api/v1";
 
     ConfigurationRequest(ConfigurationParam param, @Nullable Response.Listener<ConfigurationResult> listener, @Nullable Response.ErrorListener errorListener) {
@@ -21,7 +21,7 @@ class ConfigurationRequest extends BaseRequest<ConfigurationResult> {
         setMethod(Method.GET);
         setHeader("Ocp-Apim-Subscription-Key", "subscriptionKey");// TODO Inject subscriptionKey from gradle
         setDomain(DOMAIN_URL_DEV); // TODO Have domain for prod and staging as well and inject from gradle
-        setUrlPath(PATH_API_VERSION + "platform" + param.getPlatform() + "app" + param.getAppId() + "version" + param.getAppVersion());
+        setUrlPath(PATH_API_VERSION + "/platform/" + param.getPlatform() + "/app/" + param.getAppId() + "/version/" + param.getAppVersion() +"/");
         setQueryParam("sdk", param.getSdkVersion());
         setQueryParam("country", param.getCountryCode());
     }
