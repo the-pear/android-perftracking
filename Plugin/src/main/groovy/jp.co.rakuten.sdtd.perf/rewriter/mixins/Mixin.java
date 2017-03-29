@@ -69,9 +69,11 @@ public class Mixin {
 			
 			@Override
 			public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-				final MixinMethod method = methods.get(name + desc);
-				if (method != null) {
-					return method.rewrite(_className, output, access, name, desc, signature, exceptions);
+				if ((access & Opcodes.ACC_NATIVE) == 0) {
+					final MixinMethod method = methods.get(name + desc);
+					if (method != null) {
+						return method.rewrite(_className, output, access, name, desc, signature, exceptions);
+					}
 				}
 				return super.visitMethod(access, name, desc, signature, exceptions);
 			}
