@@ -2,8 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="jp.co.rakuten.sdtd.perf.example">
 
-    <application>
+    <uses-permission android:name="android.permission.INTERNET" />
 
+    <application android:theme="@style/Theme.AppCompat">
+        
         <activity
             android:name="jp.co.rakuten.sdtd.perf.example.MainActivity"
             android:label="@string/perftracking_app_name">
