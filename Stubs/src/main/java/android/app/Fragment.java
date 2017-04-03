@@ -50,6 +50,12 @@ public class Fragment {
     public void onHiddenChanged (boolean hidden) {
     }
 
+    public void onInflate (AttributeSet attrs, Bundle savedInstanceState) {
+    }
+
+    public void onInflate (Activity activity, AttributeSet attrs, Bundle savedInstanceState) {
+    }
+
     public void onInflate (Context context, AttributeSet attrs, Bundle savedInstanceState) {
     }
 }

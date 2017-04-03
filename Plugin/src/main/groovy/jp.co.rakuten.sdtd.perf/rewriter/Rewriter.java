@@ -3,11 +3,13 @@ package jp.co.rakuten.sdtd.perf.rewriter;
 import java.io.File;
 
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.tree.ClassNode;
 
 import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassFilter;
 import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassJar;
 import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassJarMaker;
 import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassProvider;
+import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassTrimmer;
 import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassWriter;
 import jp.co.rakuten.sdtd.perf.rewriter.detours.Detour;
 import jp.co.rakuten.sdtd.perf.rewriter.detours.DetourLoader;
@@ -22,6 +24,7 @@ public class Rewriter {
     public String tempJar;
     public String classpath;
     public String exclude;
+    public String compileSdkVersion;
     public final Log log;
 
     public Rewriter() {
@@ -41,6 +44,7 @@ public class Rewriter {
 
         ClassJar temp = new ClassJar(new File(tempJar));
         ClassProvider provider = new ClassProvider(classpath + File.pathSeparator + tempJar);
+        ClassTrimmer trimmer = new ClassTrimmer(compileSdkVersion, provider, log);
 
         DetourLoader detourLoader = new DetourLoader(log);
         Detourer detourer = new Detourer();
@@ -51,24 +55,37 @@ public class Rewriter {
         for (String name : temp.getClasses()) {
             if (name.startsWith("jp.co.rakuten.sdtd.perf.core.detours.")) {
                 log.debug("Found detours " + name);
-                for (Detour detour : detourLoader.load(temp.getClassNode(name))) {
-                    detourer.add(detour);
+                ClassNode cn = trimmer.trim(temp.getClassNode(name));
+                if (cn != null) {
+                    for (Detour detour : detourLoader.load(cn)) {
+                        detourer.add(detour);
+                    }
                 }
             } else if (name.startsWith("jp.co.rakuten.sdtd.perf.core.mixins.")) {
                 log.debug("Found mixin " + name);
-                mixer.add(mixinLoader.loadMixin(temp.getClassNode(name)));
+                ClassNode cn = trimmer.trim(temp.getClassNode(name));
+                if (cn != null) {
+                    mixer.add(mixinLoader.loadMixin(cn));
+                }
             }
         }
 
         ClassJarMaker outputMaker = new ClassJarMaker(new File(outputJar));
         try {
             ClassFilter filter = new ClassFilter();
-            filter.exclude("jp.co.rakuten.sdtd.perf.core");
             filter.exclude(exclude);
 
             for (String name : temp.getClasses()) {
 
-                if (filter.canRewrite(name)) {
+                if (name.startsWith("jp.co.rakuten.sdtd.perf.core")) {
+                    ClassNode cn = trimmer.trim(temp.getClassNode(name));
+                    if (cn != null) {
+                        ClassWriter cw = new ClassWriter(provider, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+                        cn.accept(cw);
+                        outputMaker.add(name, cw.toByteArray());
+                    }
+                }
+                else if (filter.canRewrite(name)) {
                     log.debug("Rewriting class: " + name);
 
                     try {
@@ -82,7 +99,8 @@ public class Rewriter {
                         log.error("Failed to rewrite class: " + name, e);
                         outputMaker.add(name, temp);
                     }
-                } else {
+                }
+                else {
                     log.debug("Adding class with no rewriting: " + name);
                     outputMaker.add(name, temp);
                 }
