@@ -4,10 +4,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import jp.co.rakuten.sdtd.perf.core.Tracker;
 import jp.co.rakuten.sdtd.perf.core.annotations.ChangeBaseTo;
+import jp.co.rakuten.sdtd.perf.core.annotations.Exists;
 import jp.co.rakuten.sdtd.perf.core.annotations.MixSubclassOf;
 import jp.co.rakuten.sdtd.perf.core.annotations.ReplaceMethod;
 import jp.co.rakuten.sdtd.perf.core.base.SupportV4FragmentBase;
 
+@Exists(Fragment.class)
 @MixSubclassOf(Fragment.class)
 @ChangeBaseTo(SupportV4FragmentBase.class)
 public class SupportV4FragmentMixin extends SupportV4FragmentBase {

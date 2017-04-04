@@ -10,9 +10,11 @@ import com.android.volley.Request;
 import com.android.volley.toolbox.HurlStack;
 
 import jp.co.rakuten.sdtd.perf.core.Tracker;
+import jp.co.rakuten.sdtd.perf.core.annotations.Exists;
 import jp.co.rakuten.sdtd.perf.core.annotations.MixClass;
 import jp.co.rakuten.sdtd.perf.core.annotations.ReplaceMethod;
 
+@Exists(HurlStack.class)
 @MixClass(HurlStack.class)
 public class VolleyHurlStackMixin {
 

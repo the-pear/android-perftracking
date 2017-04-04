@@ -9,7 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import jp.co.rakuten.sdtd.perf.core.Tracker;
+import jp.co.rakuten.sdtd.perf.core.annotations.Exists;
+import jp.co.rakuten.sdtd.perf.core.annotations.MaxCompileSdkVersion;
+import jp.co.rakuten.sdtd.perf.core.annotations.MinCompileSdkVersion;
 
+@Exists(Fragment.class)
 public class SupportV4FragmentBase extends Fragment {
 
 	public boolean jp_co_rakuten_sdtd_perf_onCreate_tracking = false;
@@ -79,6 +83,14 @@ public class SupportV4FragmentBase extends Fragment {
 		super.onHiddenChanged(hidden);
 	}
 
+	@MinCompileSdkVersion(22)
+	@MaxCompileSdkVersion(22)
+	public void onInflate (Activity activity, AttributeSet attrs, Bundle savedInstanceState) {
+		Tracker.prolongMetric();
+		super.onInflate(activity, attrs, savedInstanceState);
+	}
+
+	@MinCompileSdkVersion(23)
 	public void onInflate (Context context, AttributeSet attrs, Bundle savedInstanceState) {
 		Tracker.prolongMetric();
 		super.onInflate(context, attrs, savedInstanceState);
