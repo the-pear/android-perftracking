@@ -2,6 +2,7 @@ package jp.co.rakuten.sdtd.perf.rewriter;
 
 import java.io.File;
 
+import org.gradle.api.logging.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.tree.ClassNode;
@@ -28,16 +29,16 @@ public class Rewriter {
     public String classpath;
     public String exclude;
     public String compileSdkVersion;
-    public final Log log;
+    public final Logger _log;
 
-    public Rewriter() {
-        log = new Log();
+    public Rewriter(Logger log) {
+        _log = log;
+        //_log = Logging.getLogger(Rewriter.class.getName());
     }
 
     public void rewrite() {
-
-        System.out.println(input);
-        log.debug("Populating temp JAR");
+        _log.debug(input);
+        _log.debug("Populating temp JAR");
         ClassJarMaker tempMaker = new ClassJarMaker(new File(tempJar));
         try {
             tempMaker.populate(input);
@@ -47,20 +48,20 @@ public class Rewriter {
 
         ClassJar temp = new ClassJar(new File(tempJar));
         ClassProvider provider = new ClassProvider(classpath + File.pathSeparator + tempJar);
-        ClassTrimmer trimmer = new ClassTrimmer(compileSdkVersion, provider, log);
+        ClassTrimmer trimmer = new ClassTrimmer(compileSdkVersion, provider, _log);
 
-        DetourLoader detourLoader = new DetourLoader(log);
+        DetourLoader detourLoader = new DetourLoader(_log);
         Detourer detourer = new Detourer(provider);
 
-        MixinLoader mixinLoader = new MixinLoader(log);
+        MixinLoader mixinLoader = new MixinLoader(_log);
         Mixer mixer = new Mixer();
 
         BaseLoader baseLoader = new BaseLoader();
-        Rebaser rebaser = new Rebaser(temp, provider, log);
+        Rebaser rebaser = new Rebaser(temp, provider, _log);
 
         for (String name : temp.getClasses()) {
             if (name.startsWith("jp.co.rakuten.sdtd.perf.core.detours.")) {
-                log.debug("Found detours " + name);
+                _log.debug("Found detours " + name);
                 ClassNode cn = trimmer.trim(temp.getClassNode(name));
                 if (cn != null) {
                     for (Detour detour : detourLoader.load(cn)) {
@@ -69,14 +70,14 @@ public class Rewriter {
                 }
             }
             else if (name.startsWith("jp.co.rakuten.sdtd.perf.core.mixins.")) {
-                log.debug("Found mixin " + name);
+                _log.debug("Found mixin " + name);
                 ClassNode cn = trimmer.trim(temp.getClassNode(name));
                 if (cn != null) {
                     mixer.add(mixinLoader.loadMixin(cn));
                 }
             }
             else if (name.startsWith("jp.co.rakuten.sdtd.perf.core.base.")) {
-                log.debug("Found base " + name);
+                _log.debug("Found base " + name);
                 ClassNode cn = trimmer.trim(temp.getClassNode(name));
                 if (cn != null) {
                     rebaser.add(baseLoader.loadBase(cn));
@@ -88,13 +89,13 @@ public class Rewriter {
         try {
             ClassFilter filter = new ClassFilter();
             filter.exclude(exclude);
-
+            _log.info("Rewriting classes of : " + temp.getJarFile().getName());
             for (String name : temp.getClasses()) {
                 if (name.startsWith("jp.co.rakuten.sdtd.perf.core.base.")) {
-                    log.debug("Removing base " + name + " from build");
+                    _log.debug("Removing base " + name + " from build");
                 }
                 else if (name.startsWith("jp.co.rakuten.sdtd.perf.core.mixins.")) {
-                    log.debug("Removing mixin " + name + " from build");
+                    _log.debug("Removing mixin " + name + " from build");
                 }
                 else if (name.startsWith("jp.co.rakuten.sdtd.perf.core")) {
                     ClassNode cn = trimmer.trim(temp.getClassNode(name));
@@ -105,7 +106,7 @@ public class Rewriter {
                     }
                 }
                 else if (filter.canRewrite(name)) {
-                    log.debug("Rewriting class: " + name);
+                    _log.debug("Rewriting class: " + name);
 
                     try {
                         Class<?> clazz = provider.getClass(name);
@@ -119,12 +120,12 @@ public class Rewriter {
                         outputMaker.add(name, cw.toByteArray());
 
                     } catch (Throwable e) {
-                        log.error("Failed to rewrite class: " + name, e);
+                        _log.error("Failed to rewrite class: " + name, e);
                         outputMaker.add(name, temp);
                     }
                 }
                 else {
-                    log.debug("Adding class with no rewriting: " + name);
+                    _log.debug("Adding class with no rewriting: " + name);
                     outputMaker.add(name, temp);
                 }
             }

@@ -40,6 +40,8 @@ public class ClassJar {
 		return _classes;
 	}
 
+	public JarFile getJarFile() { return _jar; }
+
 	public InputStream getInputStream(String name) {
 		try {
 			JarEntry entry = _entries.get(name);

@@ -1,18 +1,17 @@
 package jp.co.rakuten.sdtd.perf.rewriter.mixins;
 
+import org.gradle.api.logging.Logger;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
-import jp.co.rakuten.sdtd.perf.rewriter.Log;
-
 public class MixinLoader {
 	
-	private final Log _log;
+	private final Logger _log;
 	
-	public MixinLoader(Log log) {
+	public MixinLoader(Logger log) {
 		_log = log;
 	}
 	

@@ -2,9 +2,9 @@ package jp.co.rakuten.sdtd.perf.rewriter.base;
 
 import java.util.HashMap;
 
+import org.gradle.api.logging.Logger;
 import org.objectweb.asm.ClassVisitor;
 
-import jp.co.rakuten.sdtd.perf.rewriter.Log;
 import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassJar;
 import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassJarMaker;
 import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassProvider;
@@ -13,9 +13,9 @@ public class Rebaser {
     private final ClassJar _jar;
     private final HashMap<String, Base> _bases = new HashMap<String, Base>();
     private final ClassProvider _provider;
-    private final Log _log;
+    private final Logger _log;
 
-    public Rebaser(ClassJar jar, ClassProvider provider, Log log) {
+    public Rebaser(ClassJar jar, ClassProvider provider, Logger log) {
         _jar = jar;
         _provider = provider;
         _log = log;

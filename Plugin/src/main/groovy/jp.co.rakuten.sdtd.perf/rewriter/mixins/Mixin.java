@@ -3,11 +3,10 @@ package jp.co.rakuten.sdtd.perf.rewriter.mixins;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.gradle.api.logging.Logger;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-
-import jp.co.rakuten.sdtd.perf.rewriter.Log;
 
 public class Mixin {
 	
@@ -18,9 +17,9 @@ public class Mixin {
 	public final HashMap<String, MixinMethod> methods = new HashMap<String, MixinMethod>();
 	public final ArrayList<MixinField> fields = new ArrayList<MixinField>(); 
 
-	private final Log _log;
+	private final Logger _log;
 	
-	public Mixin(Log log) {
+	public Mixin(Logger log) {
 		_log = log;
 	}
 	
