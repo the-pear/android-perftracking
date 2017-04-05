@@ -42,11 +42,7 @@ public class MixinMethod {
 			@Override
 			public void visitFieldInsn(int opcode, String owner, String name, String desc) {
 				if (_mixin.mixinClass.equals(owner)) {
-					for (MixinField f : _mixin.fields) {
-						if (f.name.equals(name)) {
-							owner = className;
-						}
-					}
+					owner = className;
 				}
 				super.visitFieldInsn(opcode, owner, name, desc);
 			}

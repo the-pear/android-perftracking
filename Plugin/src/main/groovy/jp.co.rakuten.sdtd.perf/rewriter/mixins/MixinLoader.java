@@ -37,15 +37,6 @@ public class MixinLoader {
 			mixin.targetImplementationOf = ((Type)a.values.get(1)).getClassName();
 		}
 
-		a = getAnnotation(cn, "Ljp/co/rakuten/sdtd/perf/core/annotations/ChangeBaseTo;");
-		if (a != null) {
-			mixin.changeBaseTo = ((Type)a.values.get(1)).getClassName().replace('.', '/');
-			
-			if (mixin.targetSubclassOf != null) {
-				mixin.changeBaseFrom = mixin.targetSubclassOf.replace('.', '/');
-			}
-		}
-		
 		for (Object o : cn.methods) {
 			MethodNode mn = (MethodNode)o;
 			a = getAnnotation(mn);

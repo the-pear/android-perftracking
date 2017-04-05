@@ -10,7 +10,12 @@ import org.objectweb.asm.Opcodes;
 import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassProvider;
 
 public class Detourer {
-	
+	private final ClassProvider _provider;
+
+	public Detourer(ClassProvider provider) {
+		_provider = provider;
+	}
+
 	private final HashMap<String, ArrayList<Detour>> _detours = new HashMap<String, ArrayList<Detour>>();
 	
 		public void add(Detour detour) {
@@ -25,7 +30,7 @@ public class Detourer {
 		list.add(detour);
 	}
 	
-	public ClassVisitor getAdapter(Class<?> clazz, final ClassProvider provider, ClassVisitor output) {
+	public ClassVisitor rewrite(Class<?> clazz, ClassVisitor output) {
 		return new ClassVisitor(Opcodes.ASM5, output) {
 			
 			@Override
@@ -38,7 +43,7 @@ public class Detourer {
 					public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
 						ArrayList<Detour> list = _detours.get(name + desc);
 						if (list != null) {
-							Class<?> ownerClass = provider.getClass(owner.replace('/', '.'));
+							Class<?> ownerClass = _provider.getClass(owner.replace('/', '.'));
 							for (Detour detour : list) {
 								if (detour.matchOwner(owner, ownerClass)) {
 									detour.rewrite(mv, opcode, owner, ownerClass, name, desc, itf);

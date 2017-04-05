@@ -64,4 +64,8 @@ public class ClassJar {
 		getClassReader(name).accept(cn, 0);
 		return cn;
 	}
+
+	public boolean hasClass(String name) {
+		return _entries.containsKey(name);
+	}
 }

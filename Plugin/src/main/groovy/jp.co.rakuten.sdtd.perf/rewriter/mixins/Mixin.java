@@ -15,9 +15,7 @@ public class Mixin {
 	public String targetClass;
 	public String targetSubclassOf;
 	public String targetImplementationOf;
-	public String changeBaseFrom;
-	public String changeBaseTo;
-	public final HashMap<String, MixinMethod> methods = new HashMap<String, MixinMethod>(); 
+	public final HashMap<String, MixinMethod> methods = new HashMap<String, MixinMethod>();
 	public final ArrayList<MixinField> fields = new ArrayList<MixinField>(); 
 
 	private final Log _log;
@@ -57,12 +55,6 @@ public class Mixin {
 			
 			@Override
 			public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-				if ((changeBaseFrom != null) && (changeBaseTo != null)) {
-					if (changeBaseFrom.equals(superName)) {
-						_log.debug("Changing base from " + superName + " to " + changeBaseTo);
-						superName = changeBaseTo;
-					}
-				}
 				super.visit(version, access, name, signature, superName, interfaces);
 				_className = name;
 			}
