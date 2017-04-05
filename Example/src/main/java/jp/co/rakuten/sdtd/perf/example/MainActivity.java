@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 
 import java.io.BufferedInputStream;
@@ -29,6 +30,7 @@ import jp.co.rakuten.sdtd.perf.runtime.StandardMetric;
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding activityMainBinding = null;
+    private static final String TAG = MainActivity.class.getSimpleName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,7 +134,14 @@ public class MainActivity extends AppCompatActivity {
                             });
                         }
                         catch (Exception e) {
-                            throw new RuntimeException(e);
+                            Log.d(TAG,"Network error");
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run () {
+                                    activityMainBinding.testNetwork.setText(originalText);
+                                    showDialog("No Network Connection.");
+                                }
+                            });
                         }
                     }
                 }).start();
