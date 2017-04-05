@@ -3,7 +3,6 @@ package jp.co.rakuten.sdtd.perf.core.mixins;
 import android.os.Bundle;
 import android.app.Fragment;
 import jp.co.rakuten.sdtd.perf.core.Tracker;
-import jp.co.rakuten.sdtd.perf.core.annotations.ChangeBaseTo;
 import jp.co.rakuten.sdtd.perf.core.annotations.MinCompileSdkVersion;
 import jp.co.rakuten.sdtd.perf.core.annotations.MixSubclassOf;
 import jp.co.rakuten.sdtd.perf.core.annotations.ReplaceMethod;
@@ -11,7 +10,6 @@ import jp.co.rakuten.sdtd.perf.core.base.FragmentBase;
 
 @MinCompileSdkVersion(11)
 @MixSubclassOf(Fragment.class)
-@ChangeBaseTo(FragmentBase.class)
 public class FragmentMixin extends FragmentBase {
 
     @ReplaceMethod

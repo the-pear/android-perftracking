@@ -4,13 +4,11 @@ import android.graphics.Bitmap;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import jp.co.rakuten.sdtd.perf.core.Tracker;
-import jp.co.rakuten.sdtd.perf.core.annotations.ChangeBaseTo;
 import jp.co.rakuten.sdtd.perf.core.annotations.MixSubclassOf;
 import jp.co.rakuten.sdtd.perf.core.annotations.ReplaceMethod;
 import jp.co.rakuten.sdtd.perf.core.base.WebViewClientBase;
 
 @MixSubclassOf(WebViewClient.class)
-@ChangeBaseTo(WebViewClientBase.class)
 public class WebViewClientMixin extends WebViewClientBase {
 
     @ReplaceMethod

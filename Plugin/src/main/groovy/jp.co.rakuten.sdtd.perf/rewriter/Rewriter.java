@@ -3,8 +3,11 @@ package jp.co.rakuten.sdtd.perf.rewriter;
 import java.io.File;
 
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.tree.ClassNode;
 
+import jp.co.rakuten.sdtd.perf.rewriter.base.BaseLoader;
+import jp.co.rakuten.sdtd.perf.rewriter.base.Rebaser;
 import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassFilter;
 import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassJar;
 import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassJarMaker;
@@ -47,10 +50,13 @@ public class Rewriter {
         ClassTrimmer trimmer = new ClassTrimmer(compileSdkVersion, provider, log);
 
         DetourLoader detourLoader = new DetourLoader(log);
-        Detourer detourer = new Detourer();
+        Detourer detourer = new Detourer(provider);
 
         MixinLoader mixinLoader = new MixinLoader(log);
         Mixer mixer = new Mixer();
+
+        BaseLoader baseLoader = new BaseLoader();
+        Rebaser rebaser = new Rebaser(temp, provider, log);
 
         for (String name : temp.getClasses()) {
             if (name.startsWith("jp.co.rakuten.sdtd.perf.core.detours.")) {
@@ -61,11 +67,19 @@ public class Rewriter {
                         detourer.add(detour);
                     }
                 }
-            } else if (name.startsWith("jp.co.rakuten.sdtd.perf.core.mixins.")) {
+            }
+            else if (name.startsWith("jp.co.rakuten.sdtd.perf.core.mixins.")) {
                 log.debug("Found mixin " + name);
                 ClassNode cn = trimmer.trim(temp.getClassNode(name));
                 if (cn != null) {
                     mixer.add(mixinLoader.loadMixin(cn));
+                }
+            }
+            else if (name.startsWith("jp.co.rakuten.sdtd.perf.core.base.")) {
+                log.debug("Found base " + name);
+                ClassNode cn = trimmer.trim(temp.getClassNode(name));
+                if (cn != null) {
+                    rebaser.add(baseLoader.loadBase(cn));
                 }
             }
         }
@@ -76,8 +90,13 @@ public class Rewriter {
             filter.exclude(exclude);
 
             for (String name : temp.getClasses()) {
-
-                if (name.startsWith("jp.co.rakuten.sdtd.perf.core")) {
+                if (name.startsWith("jp.co.rakuten.sdtd.perf.core.base.")) {
+                    log.debug("Removing base " + name + " from build");
+                }
+                else if (name.startsWith("jp.co.rakuten.sdtd.perf.core.mixins.")) {
+                    log.debug("Removing mixin " + name + " from build");
+                }
+                else if (name.startsWith("jp.co.rakuten.sdtd.perf.core")) {
                     ClassNode cn = trimmer.trim(temp.getClassNode(name));
                     if (cn != null) {
                         ClassWriter cw = new ClassWriter(provider, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
@@ -92,7 +111,11 @@ public class Rewriter {
                         Class<?> clazz = provider.getClass(name);
                         ClassReader cr = temp.getClassReader(name);
                         ClassWriter cw = new ClassWriter(provider, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-                        cr.accept(detourer.getAdapter(clazz, provider, mixer.getAdapter(clazz, cw)), 0);
+                        ClassVisitor output = cw;
+                        output = mixer.rewrite(clazz, output);
+                        output = rebaser.rewrite(clazz, output);
+                        output = detourer.rewrite(clazz, output);
+                        cr.accept(output, 0);
                         outputMaker.add(name, cw.toByteArray());
 
                     } catch (Throwable e) {
