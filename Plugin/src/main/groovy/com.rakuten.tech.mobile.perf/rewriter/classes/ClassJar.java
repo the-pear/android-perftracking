@@ -40,6 +40,8 @@ public class ClassJar {
 		return _classes;
 	}
 
+	public JarFile getJarFile() { return _jar; }
+
 	public InputStream getInputStream(String name) {
 		try {
 			JarEntry entry = _entries.get(name);
@@ -63,5 +65,9 @@ public class ClassJar {
 		ClassNode cn = new ClassNode();
 		getClassReader(name).accept(cn, 0);
 		return cn;
+	}
+
+	public boolean hasClass(String name) {
+		return _entries.containsKey(name);
 	}
 }

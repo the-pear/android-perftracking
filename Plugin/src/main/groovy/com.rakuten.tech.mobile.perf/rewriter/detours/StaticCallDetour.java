@@ -1,18 +1,17 @@
 package com.rakuten.tech.mobile.perf.rewriter.detours;
 
+import org.gradle.api.logging.Logger;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-import com.rakuten.tech.mobile.perf.rewriter.Log;
-
 public class StaticCallDetour extends Detour {
 	
-	private final Log _log;
+	private final Logger _log;
 
 	public String owner;
 	public String detourOwner;
 	
-	public StaticCallDetour(Log log) {
+	public StaticCallDetour(Logger log) {
 		_log = log;
 	}
 	

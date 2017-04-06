@@ -3,11 +3,11 @@ package com.rakuten.tech.mobile.perf.rewriter.mixins;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.gradle.api.logging.Logger;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-import com.rakuten.tech.mobile.perf.rewriter.Log;
 
 public class Mixin {
 	
@@ -15,14 +15,12 @@ public class Mixin {
 	public String targetClass;
 	public String targetSubclassOf;
 	public String targetImplementationOf;
-	public String changeBaseFrom;
-	public String changeBaseTo;
-	public final HashMap<String, MixinMethod> methods = new HashMap<String, MixinMethod>(); 
+	public final HashMap<String, MixinMethod> methods = new HashMap<String, MixinMethod>();
 	public final ArrayList<MixinField> fields = new ArrayList<MixinField>(); 
 
-	private final Log _log;
+	private final Logger _log;
 	
-	public Mixin(Log log) {
+	public Mixin(Logger log) {
 		_log = log;
 	}
 	
@@ -57,12 +55,6 @@ public class Mixin {
 			
 			@Override
 			public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-				if ((changeBaseFrom != null) && (changeBaseTo != null)) {
-					if (changeBaseFrom.equals(superName)) {
-						_log.debug("Changing base from " + superName + " to " + changeBaseTo);
-						superName = changeBaseTo;
-					}
-				}
 				super.visit(version, access, name, signature, superName, interfaces);
 				_className = name;
 			}

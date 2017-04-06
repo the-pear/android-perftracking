@@ -3,20 +3,20 @@ package com.rakuten.tech.mobile.perf.rewriter.classes;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gradle.api.logging.Logger;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
-import com.rakuten.tech.mobile.perf.rewriter.Log;
 
 public class ClassTrimmer {
 
     private final ClassProvider _provider;
-    private final Log _log;
+    private final Logger _log;
     private final int _compileSdkVersion;
 
-    public ClassTrimmer(String compileSdkVersion, ClassProvider provider, Log log) {
+    public ClassTrimmer(String compileSdkVersion, ClassProvider provider, Logger log) {
         _provider = provider;
         _log = log;
         _compileSdkVersion = parseCompileSdkVersion(compileSdkVersion);

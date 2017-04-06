@@ -5,11 +5,9 @@ import android.os.Bundle;
 import com.rakuten.tech.mobile.perf.core.annotations.ReplaceMethod;
 import com.rakuten.tech.mobile.perf.core.base.ActivityBase;
 import com.rakuten.tech.mobile.perf.core.Tracker;
-import com.rakuten.tech.mobile.perf.core.annotations.ChangeBaseTo;
 import com.rakuten.tech.mobile.perf.core.annotations.MixSubclassOf;
 
 @MixSubclassOf(Activity.class)
-@ChangeBaseTo(ActivityBase.class)
 public class ActivityMixin extends ActivityBase {
 
 	@ReplaceMethod

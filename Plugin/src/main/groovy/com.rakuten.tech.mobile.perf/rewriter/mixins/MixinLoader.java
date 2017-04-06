@@ -1,18 +1,17 @@
 package com.rakuten.tech.mobile.perf.rewriter.mixins;
 
+import org.gradle.api.logging.Logger;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
-import com.rakuten.tech.mobile.perf.rewriter.Log;
-
 public class MixinLoader {
 	
-	private final Log _log;
+	private final Logger _log;
 	
-	public MixinLoader(Log log) {
+	public MixinLoader(Logger log) {
 		_log = log;
 	}
 	
@@ -37,15 +36,6 @@ public class MixinLoader {
 			mixin.targetImplementationOf = ((Type)a.values.get(1)).getClassName();
 		}
 
-		a = getAnnotation(cn, "Lcom/tech/tech/mobile/perf/core/annotations/ChangeBaseTo;");
-		if (a != null) {
-			mixin.changeBaseTo = ((Type)a.values.get(1)).getClassName().replace('.', '/');
-			
-			if (mixin.targetSubclassOf != null) {
-				mixin.changeBaseFrom = mixin.targetSubclassOf.replace('.', '/');
-			}
-		}
-		
 		for (Object o : cn.methods) {
 			MethodNode mn = (MethodNode)o;
 			a = getAnnotation(mn);

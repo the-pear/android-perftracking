@@ -133,10 +133,10 @@ public class MainActivity extends AppCompatActivity {
                             });
                         }
                         catch (Exception e) {
-                            Log.d(TAG,"Network error");
+                            Log.d(TAG, "Network error");
                             handler.post(new Runnable() {
                                 @Override
-                                public void run () {
+                                public void run() {
                                     activityMainBinding.testNetwork.setText(originalText);
                                     showDialog("No Network Connection.");
                                 }

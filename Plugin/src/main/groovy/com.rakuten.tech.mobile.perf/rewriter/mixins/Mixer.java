@@ -12,7 +12,7 @@ public class Mixer {
 		_mixins.add(mixin);
 	}
 
-	public ClassVisitor getAdapter(final Class<?> clazz, ClassVisitor output) {
+	public ClassVisitor rewrite(final Class<?> clazz, ClassVisitor output) {
 		for (Mixin mixin: _mixins) {
 			if (mixin.match(clazz)) {
 				output = mixin.rewrite(clazz, output);
