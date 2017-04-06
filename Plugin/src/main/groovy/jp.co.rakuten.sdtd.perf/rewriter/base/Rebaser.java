@@ -26,21 +26,42 @@ public class Rebaser {
     }
 
     public ClassVisitor rewrite(Class<?> clazz, ClassVisitor output) {
+        Base base = null;
         Class<?> s = clazz.getSuperclass();
+
         if (s != null) {
-            if (!_jar.hasClass(s.getName())) {
-                while (s != null) {
-                    Base base = _bases.get(s.getName());
-                    if (base != null) {
-                        Materialization m = new Materialization(base, base.materializations.size() + 1, _provider, _log);
-                        base.materializations.add(m);
-                        return m.rewrite(clazz, output);
+            base = _bases.get(s.getName());
+            if (base == null) {
+                if (!_jar.hasClass(s.getName())) {
+                    for (s = s.getSuperclass(); s != null; s = s.getSuperclass()) {
+                        base = _bases.get(s.getName());
+                        if (base != null) {
+                            break;
+                        }
                     }
-                    s = s.getSuperclass();
                 }
             }
         }
-        return output;
+
+        if (base == null) {
+            return output;
+        }
+
+        Materialization materialization = null;
+
+        for (Materialization m : base.materializations) {
+            if (m.superName.equals(clazz.getSuperclass().getName())) {
+                materialization = m;
+                break;
+            }
+        }
+
+        if (materialization == null) {
+            materialization = new Materialization(base, base.materializations.size() + 1, _provider, _log);
+            base.materializations.add(materialization);
+        }
+
+        return materialization.rewrite(clazz, output);
     }
 
     public void materialize(ClassJarMaker jarMaker) {
