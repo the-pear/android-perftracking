@@ -6,7 +6,7 @@
         android:id="@+id/activity_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="jp.co.rakuten.sdtd.perf.example.MainActivity">
+        tools:context="com.rakuten.tech.mobile.perf.example.MainActivity">
 
         <Button
             android:id="@+id/test_measurement"

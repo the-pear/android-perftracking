@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="jp.co.rakuten.sdtd.perf.example">
+    package="com.rakuten.tech.mobile.perf.example">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application android:theme="@style/Theme.AppCompat">
         
         <activity
-            android:name="jp.co.rakuten.sdtd.perf.example.MainActivity"
+            android:name="com.rakuten.tech.mobile.perf.example.MainActivity"
             android:label="@string/perftracking_app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,7 +20,7 @@
             android:value="${HOCKEYAPP_APP_ID}" />
 
         <meta-data
-            android:name="jp.co.rakuten.sdtd.perf.debug"
+            android:name="com.rakuten.tech.mobile.perf.debug"
             android:value="false" />
 
     </application>

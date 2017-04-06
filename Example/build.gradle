@@ -14,7 +14,7 @@ buildscript {
         classpath 'com.android.tools.build:gradle:2.2.2'
 
         // REQUIRED FOR APP PERFORMANCE TRACKING (2)
-        classpath 'jp.co.rakuten.sdtd.perf:plugin:0.1.0-SNAPSHOT'
+        classpath 'com.rakuten.tech.mobile.perf:plugin:0.1.0-SNAPSHOT'
     }
 }
 
@@ -23,7 +23,7 @@ repositories {
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'jp.co.rakuten.sdtd.perf' // REQUIRED FOR PERFORMANCE TRACKING (3)
+apply plugin: 'com.rakuten.tech.mobile.perf' // REQUIRED FOR PERFORMANCE TRACKING (3)
 
 android {
     compileSdkVersion 23
@@ -31,7 +31,7 @@ android {
     dataBinding.enabled = true
 
     defaultConfig {
-        applicationId "jp.co.rakuten.sdtd.perf.example"
+        applicationId "com.rakuten.tech.mobile.perf.example"
         minSdkVersion project.ANDROID_MIN_SDK_VERSION
         targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
         versionCode Integer.parseInt(project.TEST_UI_VERSION_CODE)

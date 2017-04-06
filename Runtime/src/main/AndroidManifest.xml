@@ -1,9 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="jp.co.rakuten.sdtd.perf">
+    package="com.rakuten.tech.mobile.perf">
 
     <application>
         <provider
-            android:name="jp.co.rakuten.sdtd.perf.runtime.internal.RuntimeContentProvider"
+            android:name="com.rakuten.tech.mobile.perf.runtime.internal.RuntimeContentProvider"
             android:authorities="${applicationId}.RuntimeContentProvider"
             android:exported="false"
             android:initOrder="100" />
