@@ -2,6 +2,7 @@ package jp.co.rakuten.sdtd.perf.rewriter.mixins;
 
 import org.gradle.api.logging.Logger;
 import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.MethodNode;
@@ -22,7 +23,9 @@ public class MixinMethod {
 
 	public MethodVisitor rewrite(final String className, ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions) {
 		_log.debug("Mixing method " + className + "." + name + desc);
-		
+
+		final String varPrefix = "L" + _mixin.mixinClass;
+
 		MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
 		_mn.accept(new MethodVisitor(Opcodes.ASM5, mv) {
 			
@@ -44,6 +47,17 @@ public class MixinMethod {
 					owner = className;
 				}
 				super.visitFieldInsn(opcode, owner, name, desc);
+			}
+
+			@Override
+			public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
+				if ((desc != null) && desc.startsWith(varPrefix)) {
+					desc = "L" + className + desc.substring(varPrefix.length());
+				}
+				if ((signature != null) && signature.startsWith(varPrefix)) {
+					signature = "L" + className + signature.substring(varPrefix.length());
+				}
+				super.visitLocalVariable(name, desc, signature, start, end, index);
 			}
 		});
 		
