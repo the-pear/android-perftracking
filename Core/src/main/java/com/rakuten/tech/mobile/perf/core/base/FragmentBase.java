@@ -15,7 +15,7 @@ import com.rakuten.tech.mobile.perf.core.annotations.MaxCompileSdkVersion;
 @MinCompileSdkVersion(11)
 public class FragmentBase extends Fragment {
 
-    public boolean jp_co_rakuten_sdtd_perf_onCreate_tracking = false;
+    public boolean com_rakuten_tech_mobile_perf_onCreate_tracking = false;
 
     public void onAttach (Activity activity) {
         Tracker.prolongMetric();

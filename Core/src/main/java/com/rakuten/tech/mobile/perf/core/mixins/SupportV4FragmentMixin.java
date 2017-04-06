@@ -14,8 +14,8 @@ public class SupportV4FragmentMixin extends SupportV4FragmentBase {
 
 	@ReplaceMethod
 	public void onCreate(Bundle savedInstanceState) {
-		if (!jp_co_rakuten_sdtd_perf_onCreate_tracking) {
-			jp_co_rakuten_sdtd_perf_onCreate_tracking = true;
+		if (!com_rakuten_tech_mobile_perf_onCreate_tracking) {
+			com_rakuten_tech_mobile_perf_onCreate_tracking = true;
 
 			int id = Tracker.startMethod(this, "onCreate");
 
@@ -24,7 +24,7 @@ public class SupportV4FragmentMixin extends SupportV4FragmentBase {
 			}
 			finally {
 				Tracker.endMethod(id);
-				jp_co_rakuten_sdtd_perf_onCreate_tracking = false;
+				com_rakuten_tech_mobile_perf_onCreate_tracking = false;
 			}
 		}
 		else {

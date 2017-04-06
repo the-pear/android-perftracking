@@ -21,17 +21,17 @@ public class MixinLoader {
 		
 		AnnotationNode a;
 		
-		a = getAnnotation(cn, "Lcom/tech/tech/mobile/perf/core/annotations/MixClass;");
+		a = getAnnotation(cn, "Lcom/rakuten/tech/mobile/perf/core/annotations/MixClass;");
 		if (a != null) {
 			mixin.targetClass= ((Type)a.values.get(1)).getClassName();
 		}
 		
-		a = getAnnotation(cn, "Lcom/tech/tech/mobile/perf/core/annotations/MixSubclassOf;");
+		a = getAnnotation(cn, "Lcom/rakuten/tech/mobile/perf/core/annotations/MixSubclassOf;");
 		if (a != null) {
 			mixin.targetSubclassOf = ((Type)a.values.get(1)).getClassName();
 		}
 		
-		a = getAnnotation(cn, "Lcom/tech/tech/mobile/perf/core/annotations/MixImplementationOf;");
+		a = getAnnotation(cn, "Lcom/rakuten/tech/mobile/perf/core/annotations/MixImplementationOf;");
 		if (a != null) {
 			mixin.targetImplementationOf = ((Type)a.values.get(1)).getClassName();
 		}
@@ -40,7 +40,7 @@ public class MixinLoader {
 			MethodNode mn = (MethodNode)o;
 			a = getAnnotation(mn);
 			if (a != null) {
-				if (a.desc.equals("Lcom/tech/tech/mobile/perf/core/annotations/ReplaceMethod;")) {
+				if (a.desc.equals("Lcom/rakuten/tech/mobile/perf/core/annotations/ReplaceMethod;")) {
 					mixin.methods.put(mn.name + mn.desc, new MixinMethod(mixin, mn, _log));
 				}
 			}
@@ -50,7 +50,7 @@ public class MixinLoader {
 			FieldNode fn = (FieldNode)o;
 			a = getAnnotation(fn);
 			if (a != null) {
-				if (a.desc.equals("Lcom/tech/tech/mobile/perf/core/annotations/AddField;")) {
+				if (a.desc.equals("Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;")) {
 					mixin.fields.add(new MixinField(_log, fn));
 				}
 			}
