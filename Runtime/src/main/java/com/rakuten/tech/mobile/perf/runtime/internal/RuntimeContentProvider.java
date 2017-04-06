@@ -73,6 +73,30 @@ public class RuntimeContentProvider extends ContentProvider {
         RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
         queue.start();
         ConfigurationParam param = null;
+        String domainUrl = null;
+        try {
+            ApplicationInfo ai = getContext().getPackageManager().getApplicationInfo(getContext().getPackageName(), PackageManager.GET_META_DATA);
+            Bundle bundle = ai.metaData;
+            domainUrl = bundle.getString("com.rakuten.tech.mobile.perf.DomainUrl");
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.d(TAG, "Failed to load meta-data, NameNotFound: " + e.getMessage());
+            throw new IllegalStateException("Domain Url has to set as metadata in mainfest");
+        } catch (NullPointerException e) {
+            Log.d(TAG, "Failed to load meta-data, NullPointer: " + e.getMessage());
+            throw new IllegalStateException("Domain Url cannot be null");
+        }
+        String subscriptionKey = null;
+        try {
+            ApplicationInfo ai = getContext().getPackageManager().getApplicationInfo(getContext().getPackageName(), PackageManager.GET_META_DATA);
+            Bundle bundle = ai.metaData;
+            subscriptionKey = bundle.getString("com.rakuten.tech.mobile.perf.SubscriptionKey");
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.d(TAG, "Failed to load meta-data, NameNotFound: " + e.getMessage());
+            throw new IllegalStateException("SubscriptionKey has to set as metadata in mainfest");
+        } catch (NullPointerException e) {
+            Log.d(TAG, "Failed to load meta-data, NullPointer: " + e.getMessage());
+            throw new IllegalStateException("SubscriptionKey cannot be null");
+        }
         try {
             param = new ConfigurationParam.Builder()
                     .setAppId(getContext().getPackageName())
@@ -86,7 +110,7 @@ public class RuntimeContentProvider extends ContentProvider {
             Log.d(TAG, e.getMessage());
         }
         if (param != null) {
-            new ConfigurationRequest(param, new Response.Listener<ConfigurationResult>() {
+            new ConfigurationRequest(domainUrl, subscriptionKey, param, new Response.Listener<ConfigurationResult>() {
                 @Override
                 public void onResponse(ConfigurationResult response) {
                     saveConfiguration(response); // save latest configuration

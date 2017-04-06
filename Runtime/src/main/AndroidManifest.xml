@@ -7,5 +7,7 @@
             android:authorities="${applicationId}.RuntimeContentProvider"
             android:exported="false"
             android:initOrder="100" />
+        <meta-data android:name="com.rakuten.tech.mobile.perf.DomainUrl"
+            android:value="https://perf-config-api-dev-japaneast.azurewebsites.net" />
     </application>
 </manifest>
