@@ -1,11 +1,10 @@
 package jp.co.rakuten.sdtd.perf.rewriter.mixins;
 
+import org.gradle.api.logging.Logger;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.MethodNode;
-
-import jp.co.rakuten.sdtd.perf.rewriter.Log;
 
 public class MixinMethod {
 
@@ -13,16 +12,16 @@ public class MixinMethod {
 	
 	private final Mixin _mixin;
 	private final MethodNode _mn;
-	private final Log _log;
+	private final Logger _log;
 	
-	public MixinMethod(Mixin mixin, MethodNode mn, Log log) {
+	public MixinMethod(Mixin mixin, MethodNode mn, Logger log) {
 		_mixin = mixin;
 		_mn = mn;
 		_log = log;
 	}
 
 	public MethodVisitor rewrite(final String className, ClassVisitor cv, int access, String name, String desc, String signature, String[] exceptions) {
-		_log.info("Mixing method " + className + "." + name + desc);
+		_log.debug("Mixing method " + className + "." + name + desc);
 		
 		MethodVisitor mv = cv.visitMethod(access, name, desc, signature, exceptions);
 		_mn.accept(new MethodVisitor(Opcodes.ASM5, mv) {

@@ -2,6 +2,7 @@ package jp.co.rakuten.sdtd.perf.rewriter.detours;
 
 import java.util.ArrayList;
 
+import org.gradle.api.logging.Logger;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.AnnotationNode;
@@ -9,13 +10,11 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
-import jp.co.rakuten.sdtd.perf.rewriter.Log;
-
 public class DetourLoader {
 	
-	private final Log _log;
+	private final Logger _log;
 	
-	public DetourLoader(Log log) {
+	public DetourLoader(Logger log) {
 		_log = log;
 	}
 	

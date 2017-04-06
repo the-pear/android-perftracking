@@ -1,9 +1,9 @@
 package jp.co.rakuten.sdtd.perf.rewriter.base;
 
+import org.gradle.api.logging.Logger;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;
 
-import jp.co.rakuten.sdtd.perf.rewriter.Log;
 import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassJarMaker;
 import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassProvider;
 import jp.co.rakuten.sdtd.perf.rewriter.classes.ClassWriter;
@@ -16,9 +16,9 @@ public class Materialization {
     public String internalSuperName;
 
     private final ClassProvider _provider;
-    private final Log _log;
+    private final Logger _log;
 
-    public Materialization(Base base, int index, ClassProvider provider, Log log)
+    public Materialization(Base base, int index, ClassProvider provider, Logger log)
     {
         this.base = base;
         this.index = index;
