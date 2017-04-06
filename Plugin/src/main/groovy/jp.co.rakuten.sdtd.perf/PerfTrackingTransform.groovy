@@ -1,10 +1,10 @@
 package jp.co.rakuten.sdtd.perf
 
 import com.android.build.api.transform.*
-import com.android.build.gradle.internal.pipeline.TransformManager
-import jp.co.rakuten.sdtd.perf.rewriter.Log
 import jp.co.rakuten.sdtd.perf.rewriter.Rewriter
 import org.gradle.api.Project
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 
 class PerfTrackingTransform extends Transform {
 
@@ -58,18 +58,18 @@ class PerfTrackingTransform extends Transform {
             [it.jarInputs, it.directoryInputs]*.each { input << "$it.file" }
         }
 
-        Rewriter rewriter = new Rewriter()
+        Logger log = Logging.getLogger(Rewriter.class.getName())
+        Rewriter rewriter = new Rewriter(log)
         rewriter.input = input.join(File.pathSeparator)
         rewriter.outputJar = outputProvider.getContentLocation("classes", outputTypes, scopes, Format.JAR).toString()
         rewriter.tempJar   = "${context.temporaryDir}${File.separator}classes.jar"
         rewriter.classpath = project.android.bootClasspath.join(File.pathSeparator)
         rewriter.compileSdkVersion = project.android.compileSdkVersion
-        rewriter.log.level = Log.DEBUG
 
-        println "INPUT:   $rewriter.input"
-        println "OUTPUT:  $rewriter.outputJar"
-        println "TMP JAR: $rewriter.tempJar"
-        println "PATH:    $rewriter.classpath"
+        log.debug("INPUT:  $rewriter.input")
+        log.debug("OUTPUT:  $rewriter.outputJar")
+        log.debug("TMP JAR:  $rewriter.tempJar")
+        log.debug("PATH:  $rewriter.classpath")
 
         rewriter.rewrite()
     }

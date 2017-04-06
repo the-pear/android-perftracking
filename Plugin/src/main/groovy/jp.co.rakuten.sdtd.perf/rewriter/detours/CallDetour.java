@@ -1,19 +1,18 @@
 package jp.co.rakuten.sdtd.perf.rewriter.detours;
 
+import org.gradle.api.logging.Logger;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-import jp.co.rakuten.sdtd.perf.rewriter.Log;
-
 public class CallDetour extends Detour {
 	
-	private final Log _log;
+	private final Logger _log;
 
 	public String owner;
 	public String detourOwner;
 	public String detourDesc;
 	
-	public CallDetour(Log log) {
+	public CallDetour(Logger log) {
 		_log = log;
 	}
 	
@@ -29,7 +28,7 @@ public class CallDetour extends Detour {
 	
 	@Override
 	public void rewrite(MethodVisitor mv, int opcode, String owner, Class<?> ownerClass, String name, String desc, boolean itf) {
-		_log.info("Detouring " + owner + "." + name + desc);
+		_log.debug("Detouring " + owner + "." + name + desc);
 		mv.visitMethodInsn(Opcodes.INVOKESTATIC, detourOwner, name, detourDesc, false);
 	}
 }

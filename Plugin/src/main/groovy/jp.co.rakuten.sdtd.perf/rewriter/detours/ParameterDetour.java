@@ -1,20 +1,19 @@
 package jp.co.rakuten.sdtd.perf.rewriter.detours;
 
+import org.gradle.api.logging.Logger;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-import jp.co.rakuten.sdtd.perf.rewriter.Log;
-
 public class ParameterDetour extends Detour {
 	
-	private final Log _log;
+	private final Logger _log;
 
 	public String owner;
 	public String detourOwner;
 	public String detourName;
 	public String detourDesc;
 	
-	public ParameterDetour(Log log) {
+	public ParameterDetour(Logger log) {
 		_log = log;
 	}
 	

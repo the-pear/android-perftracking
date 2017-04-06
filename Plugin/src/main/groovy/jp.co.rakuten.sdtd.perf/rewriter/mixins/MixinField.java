@@ -1,17 +1,16 @@
 package jp.co.rakuten.sdtd.perf.rewriter.mixins;
 
+import org.gradle.api.logging.Logger;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.tree.FieldNode;
 
-import jp.co.rakuten.sdtd.perf.rewriter.Log;
-
 public class MixinField {
 	
-	private final Log _log;
+	private final Logger _log;
 	private final FieldNode _fn;
 	public final String name;
 	
-	public MixinField(Log log, FieldNode fn) {
+	public MixinField(Logger log, FieldNode fn) {
 		_log = log;
 		_fn = fn;
 		name = fn.name;
