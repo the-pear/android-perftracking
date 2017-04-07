@@ -59,7 +59,7 @@ public class Rewriter {
         Rebaser rebaser = new Rebaser(temp, provider, _log);
 
         for (String name : temp.getClasses()) {
-            if (name.startsWith("com.rakuten.tech.mobile.core.detours.")) {
+            if (name.startsWith("com.rakuten.tech.mobile.perf.core.detours.")) {
                 _log.debug("Found detours " + name);
                 ClassNode cn = trimmer.trim(temp.getClassNode(name));
                 if (cn != null) {
@@ -68,7 +68,7 @@ public class Rewriter {
                     }
                 }
             }
-            else if (name.startsWith("com.rakuten.tech.mobile.core.mixins.")) {
+            else if (name.startsWith("com.rakuten.tech.mobile.perf.core.mixins.")) {
                 _log.debug("Found mixin " + name);
                 ClassNode cn = trimmer.trim(temp.getClassNode(name));
                 if (cn != null) {
