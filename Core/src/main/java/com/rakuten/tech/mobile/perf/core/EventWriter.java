@@ -56,7 +56,7 @@ public class EventWriter {
             _measurements = 0;
         } catch (Exception e) {
             if (_config.debug) {
-                Log.d("PERF", e.toString());
+                Log.d("Performance Tracking", e.toString());
             }
             disconnect();
         }
@@ -78,7 +78,7 @@ public class EventWriter {
                 _measurements++;
             } catch (Exception e) {
                 if (_config.debug) {
-                    Log.d("PERF", e.toString());
+                    Log.d("Performance Tracking", e.toString());
                 }
                 disconnect();
             }
@@ -136,7 +136,7 @@ public class EventWriter {
                 _measurements++;
             } catch (Exception e) {
                 if (_config.debug) {
-                    Log.d("PERF", e.toString());
+                    Log.d("Performance Tracking", e.toString());
                 }
                 disconnect();
             }
@@ -156,7 +156,7 @@ public class EventWriter {
             }
         } catch (Exception e) {
             if (_config.debug) {
-                Log.d("PERF", e.toString());
+                Log.d("Performance Tracking", e.toString());
             }
         } finally {
             disconnect();
