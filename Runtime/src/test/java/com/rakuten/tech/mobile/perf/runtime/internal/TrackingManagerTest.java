@@ -1,22 +1,19 @@
-package com.rakuten.tech.mobile.runtime.internal;
+package com.rakuten.tech.mobile.perf.runtime.internal;
 
 import junit.framework.Assert;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.Map;
 
 //import com.rakuten.tech.mobile.perf.BuildConfig;
-import com.rakuten.tech.mobile.perf.runtime.internal.TrackingManager;
+
 
 /**
  * Test {@link com.rakuten.tech.mobile.perf.runtime.internal.TrackingManager} class.
