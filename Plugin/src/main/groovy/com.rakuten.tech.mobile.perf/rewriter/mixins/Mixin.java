@@ -67,6 +67,7 @@ public class Mixin {
 						return method.rewrite(_className, output, access, name, desc, signature, exceptions);
 					}
 				}
+				_log.debug("Native method excluded from rewriting " + name);
 				return super.visitMethod(access, name, desc, signature, exceptions);
 			}
 			
