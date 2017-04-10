@@ -88,6 +88,7 @@ public class Rewriter {
         try {
             ClassFilter filter = new ClassFilter();
             filter.exclude(exclude);
+
             _log.info("Rewriting classes of : " + temp.getJarFile().getName());
             for (String name : temp.getClasses()) {
 
@@ -129,7 +130,10 @@ public class Rewriter {
                     outputMaker.add(name, temp);
                 }
             }
-        } finally {
+
+            rebaser.materialize(outputMaker);
+        }
+        finally {
             outputMaker.Close();
         }
     }
