@@ -28,7 +28,6 @@ import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
 
 /**
  * RuntimeContentProvider - a custom high-priority ContentProvider, to start tracking early in the process launch phase.
- *
  */
 
 public class RuntimeContentProvider extends ContentProvider {
@@ -84,20 +83,13 @@ public class RuntimeContentProvider extends ContentProvider {
             Log.d(TAG, e.getMessage());
         }
 
-        String domainUrl = null;
-        try {
-            domainUrl = getMetaData("com.rakuten.tech.mobile.perf.DomainUrl");
-        } catch (PackageManager.NameNotFoundException e) {}
+        String subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
 
-        String subscriptionKey = null;
-        try {
-            subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.d(TAG,e.getMessage());
-        }
+        if (subscriptionKey == null)
+            Log.d(TAG, "Cannot read metadata `com.rakuten.tech.mobile.perf.SubscriptionKey` from manifest, automated performance tracking will not work.");
 
         if (param != null) {
-            new ConfigurationRequest(domainUrl,
+            new ConfigurationRequest(getMetaData("com.rakuten.tech.mobile.perf.DomainUrl"),
                     subscriptionKey,
                     param, new Response.Listener<ConfigurationResult>() {
                 @Override
@@ -166,10 +158,16 @@ public class RuntimeContentProvider extends ContentProvider {
         else return null;
     }
 
-    private String getMetaData(String key) throws PackageManager.NameNotFoundException {
-            ApplicationInfo ai = getContext().getPackageManager().getApplicationInfo(getContext().getPackageName(), PackageManager.GET_META_DATA);
+    private String getMetaData(String key) {
+        ApplicationInfo ai = null;
+        try {
+            ai = getContext().getPackageManager().getApplicationInfo(getContext().getPackageName(), PackageManager.GET_META_DATA);
             Bundle bundle = ai.metaData;
             return bundle.getString(key);
+        } catch (PackageManager.NameNotFoundException e) {
+            return null;
+        }
+
     }
 
 }
