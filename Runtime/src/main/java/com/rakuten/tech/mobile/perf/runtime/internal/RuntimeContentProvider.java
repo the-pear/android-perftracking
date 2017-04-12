@@ -28,7 +28,6 @@ import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
 
 /**
  * RuntimeContentProvider - a custom high-priority ContentProvider, to start tracking early in the process launch phase.
- *
  */
 
 public class RuntimeContentProvider extends ContentProvider {
@@ -59,10 +58,8 @@ public class RuntimeContentProvider extends ContentProvider {
                     Bundle bundle = ai.metaData;
                     config.debug = bundle.getBoolean("com.rakuten.tech.mobile.perf.debug");
                 } catch (PackageManager.NameNotFoundException e) {
-                    Log.d(TAG, "Failed to load meta-data, NameNotFound: " + e.getMessage());
                     config.debug = false;
                 } catch (NullPointerException e) {
-                    Log.d(TAG, "Failed to load meta-data, NullPointer: " + e.getMessage());
                     config.debug = false;
                 }
                 config.eventHubUrl = lastConfig.getSendUrl();
@@ -85,8 +82,16 @@ public class RuntimeContentProvider extends ContentProvider {
         } catch (PackageManager.NameNotFoundException e) {
             Log.d(TAG, e.getMessage());
         }
+
+        String subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
+
+        if (subscriptionKey == null)
+            Log.d(TAG, "Cannot read metadata `com.rakuten.tech.mobile.perf.SubscriptionKey` from manifest, automated performance tracking will not work.");
+
         if (param != null) {
-            new ConfigurationRequest(param, new Response.Listener<ConfigurationResult>() {
+            new ConfigurationRequest(getMetaData("com.rakuten.tech.mobile.perf.DomainUrl"),
+                    subscriptionKey,
+                    param, new Response.Listener<ConfigurationResult>() {
                 @Override
                 public void onResponse(ConfigurationResult response) {
                     saveConfiguration(response); // save latest configuration
@@ -152,4 +157,17 @@ public class RuntimeContentProvider extends ContentProvider {
         if (result != null) return new Gson().fromJson(result, ConfigurationResult.class);
         else return null;
     }
+
+    private String getMetaData(String key) {
+        ApplicationInfo ai = null;
+        try {
+            ai = getContext().getPackageManager().getApplicationInfo(getContext().getPackageName(), PackageManager.GET_META_DATA);
+            Bundle bundle = ai.metaData;
+            return bundle.getString(key);
+        } catch (PackageManager.NameNotFoundException e) {
+            return null;
+        }
+
+    }
+
 }
