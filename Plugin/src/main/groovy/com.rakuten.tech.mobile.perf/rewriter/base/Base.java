@@ -8,6 +8,7 @@ public class Base {
     public String name;
     public String internalName;
     public String superName;
+    public String internalSuperName;
     public ClassNode cn;
     public final ArrayList<Materialization> materializations = new ArrayList<Materialization>();
 }

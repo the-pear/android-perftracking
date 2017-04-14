@@ -13,6 +13,12 @@ public class Fragment {
     public void onAttach (Activity activity) {
     }
 
+    public void onAttach (Context context) {
+    }
+
+    public void onAttachFragment(Fragment childFragment) {
+    }
+
     public void onCreate (Bundle savedInstanceState) {
     }
 
