@@ -1,0 +1,8 @@
+{
+  "app": "app",
+  "country": "test-land",
+  "device": "test-device",
+  "measurements": [],
+  "network": "test-network",
+  "version": "test-version"
+}

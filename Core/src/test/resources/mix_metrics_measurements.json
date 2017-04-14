@@ -1,0 +1,19 @@
+{
+  "app": "app",
+  "country": "test-land",
+  "device": "test-device",
+  "measurements": [
+    {
+      "metric": "test-metric",
+      "time": 999,
+      "urls": 999
+    },
+    {
+      "method": "TestClass.testMethod",
+      "metric": "test-metric",
+      "time": 999
+    }
+  ],
+  "network": "test-network",
+  "version": "test-version"
+}
