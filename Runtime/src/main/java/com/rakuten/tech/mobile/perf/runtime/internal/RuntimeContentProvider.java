@@ -37,24 +37,27 @@ public class RuntimeContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        if (getContext() == null) return false;
+        Context context = getContext();
+        if (context == null) return false;
+        PackageManager packageManager = context.getPackageManager();
+        String packageName = context.getPackageName();
         // Load data from last configuration
-        ConfigurationResult lastConfig = getLastConfiguration();
+        ConfigurationResult lastConfig = getLastConfiguration(context);
         Config config = null; // configuration for TrackingManager
         if (lastConfig != null) {
             double enablePercent = lastConfig.getEnablePercent();
             double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
             if (randomNumber <= enablePercent) {
                 config = new Config();
-                config.app = getContext().getPackageName();
+                config.app = packageName;
                 try {
-                    config.version = getContext().getPackageManager()
-                            .getPackageInfo(getContext().getPackageName(), 0).versionName;
+                    config.version = packageManager
+                            .getPackageInfo(packageName, 0).versionName;
                 } catch (PackageManager.NameNotFoundException e) {
                     Log.d(TAG, e.getMessage());
                 }
                 try {
-                    ApplicationInfo ai = getContext().getPackageManager().getApplicationInfo(getContext().getPackageName(), PackageManager.GET_META_DATA);
+                    ApplicationInfo ai = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
                     Bundle bundle = ai.metaData;
                     config.debug = bundle.getBoolean("com.rakuten.tech.mobile.perf.debug");
                 } catch (PackageManager.NameNotFoundException e) {
@@ -72,10 +75,10 @@ public class RuntimeContentProvider extends ContentProvider {
         ConfigurationParam param = null;
         try {
             param = new ConfigurationParam.Builder()
-                    .setAppId(getContext().getPackageName())
-                    .setAppVersion(getContext().getPackageManager()
-                            .getPackageInfo(getContext().getPackageName(), 0).versionName)
-                    .setCountryCode(getContext().getResources().getConfiguration().locale.getCountry())
+                    .setAppId(packageName)
+                    .setAppVersion(packageManager
+                            .getPackageInfo(packageName, 0).versionName)
+                    .setCountryCode(context.getResources().getConfiguration().locale.getCountry())
                     .setPlatform("android")
                     .setSdkVersion(String.valueOf(Build.VERSION.SDK_INT))
                     .build();
@@ -150,10 +153,10 @@ public class RuntimeContentProvider extends ContentProvider {
     }
 
     @Nullable
-    private ConfigurationResult getLastConfiguration() {
+    private ConfigurationResult getLastConfiguration(Context context) {
         String result = null;
-        if (getContext() != null)
-            result = getContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(CONFIG_KEY, null);
+        if (context != null)
+            result = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(CONFIG_KEY, null);
         if (result != null) return new Gson().fromJson(result, ConfigurationResult.class);
         else return null;
     }
