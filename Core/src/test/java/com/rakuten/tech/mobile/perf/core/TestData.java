@@ -5,19 +5,20 @@ import org.junit.rules.ExternalResource;
 import java.io.InputStream;
 import java.util.Scanner;
 
-class TestResourceFile extends ExternalResource {
+class TestData extends ExternalResource {
 
     private final String fileName;
     private Scanner scanner;
     String content = "";
 
-    TestResourceFile(String resourceFileName) {
+    TestData(String resourceFileName) {
         this.fileName = resourceFileName;
     }
 
-    @Override protected void before() throws Throwable {
+    @Override protected void before() {
         ClassLoader classLoader = this.getClass().getClassLoader();
         InputStream stream = classLoader.getResourceAsStream(fileName);
+        if (stream == null) return;
         scanner = new Scanner(stream);
         StringBuilder sb = new StringBuilder();
         while (scanner.hasNext()) sb.append(scanner.next());

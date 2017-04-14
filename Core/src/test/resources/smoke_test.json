@@ -1,0 +1,41 @@
+{
+  "app": "app",
+  "country": "test-land",
+  "device": "test-device",
+  "measurements": [
+    {
+      "metric": "test-metric",
+      "time": 999,
+      "urls": 999
+    },
+    {
+      "metric": "test-metric",
+      "time": 999,
+      "urls": 999
+    },
+    {
+      "method": "TestClass.testMethod",
+      "metric": "test-metric",
+      "time": 999
+    },
+    {
+      "url": "https://rakuten.co.jp/some/path",
+      "metric": "test-metric",
+      "time": 999,
+      "verb": "VERB"
+    },
+    {
+      "custom": "custom-measurement",
+      "metric": "test-metric",
+      "time": 999
+    },
+    {
+      "url": "https://amazon.co.jp/other/path",
+      "metric": "test-metric",
+      "time": 100,
+      "verb": "BERV"
+    }
+  ],
+  "network": "test-network",
+  "version": "test-version"
+}

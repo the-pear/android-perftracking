@@ -50,7 +50,26 @@ public class EventWriterSpec {
         assertThat(writer).isNotNull();
     }
 
-    @Test public void shouldOpenConnectionOnBegin() throws IOException {
+    // creation & init
+
+    @Test public void shouldOpenConnectionOnBegin() {
+        writer = new EventWriter(config, envInfo, null);
+
+        writer.begin();
+
+        // Verify no exception
+    }
+
+    @Test public void shouldDisconnectOnFailure() throws IOException {
+        when(conn.getOutputStream()).thenThrow(new IOException());
+
+        writer.begin();
+
+        verify(conn).disconnect();
+    }
+
+    @Test public void shouldFailSilentlyOnBadUrl() throws IOException {
+
         writer.begin();
         verify(url).openConnection();
         verify(conn).getOutputStream();
@@ -66,7 +85,9 @@ public class EventWriterSpec {
         verify(conn).setDoOutput(true);
     }
 
-    @Rule public TestResourceFile emptyJson = new TestResourceFile("no_measurement.json");
+    // writing
+
+    @Rule public TestData emptyJson = new TestData("no_measurement.json");
     @Test public void shouldWriteConfigAndEnvInfo() throws IOException, JSONException {
         writer.begin();
         writer.end();
@@ -75,7 +96,20 @@ public class EventWriterSpec {
         JSONAssert.assertEquals(emptyJson.content, writtenJson, true);
     }
 
-    @Rule public TestResourceFile singleMetric = new TestResourceFile("single_metric.json");
+    @Rule public TestData emptyNoEnvJson = new TestData("no_measurement_no_env.json");
+    @Test public void shouldHandleNullsInEnvInfo() throws IOException, JSONException {
+        envInfo.country = null;
+        envInfo.device = null;
+        envInfo.network = null;
+
+        writer.begin();
+        writer.end();
+
+        String writtenJson = extractWrittenString(outputStream);
+        JSONAssert.assertEquals(emptyNoEnvJson.content, writtenJson, true);
+    }
+
+    @Rule public TestData metricJson = new TestData("metric.json");
     @Test public void shouldWriteSingleMetric() throws IOException, JSONException {
         Metric metric = new Metric();
         metric.startTime = 0L;
@@ -88,11 +122,10 @@ public class EventWriterSpec {
         writer.end();
 
         String writtenString = extractWrittenString(outputStream);
-        JSONAssert.assertEquals(singleMetric.content, writtenString, true);
+        JSONAssert.assertEquals(metricJson.content, writtenString, true);
     }
 
-    @Rule public TestResourceFile singleMethodMeasurement =
-            new TestResourceFile("single_method_measurement.json");
+    @Rule public TestData methodMeasurementJson = new TestData("method_measurement.json");
     @Test public void shouldWriteSingleMethodMeasurement() throws JSONException, IOException {
         Measurement measurement = new Measurement();
         measurement.type = Measurement.METHOD;
@@ -106,17 +139,168 @@ public class EventWriterSpec {
         writer.end();
 
         String writtenString = extractWrittenString(outputStream);
-        JSONAssert.assertEquals(singleMethodMeasurement.content, writtenString, true);
+        JSONAssert.assertEquals(methodMeasurementJson.content, writtenString, true);
     }
 
-    @Rule public TestResourceFile mixMetricsAndMeasuremnts =
-            new TestResourceFile("mix_metrics_measurements.json");
-    @Test public void shouldWriteAMixOfMetricsAndMeasurements() throws IOException, JSONException {
+    @Rule public TestData urlMeasurementJson = new TestData("url_measurement.json");
+    @Test public void shouldWriteUrlObjectMeasurement() throws JSONException, IOException {
+        Measurement measurement = new Measurement();
+        measurement.type = Measurement.URL;
+        measurement.a = new URL("https://rakuten.co.jp/some/path?and=some&url=params");
+        measurement.b = "VERB";
+        measurement.startTime = 0L;
+        measurement.endTime = 999 * 1000000L;
+
+        writer.begin();
+        writer.write(measurement, "test-metric");
+        writer.end();
+
+        String writtenString = extractWrittenString(outputStream);
+        JSONAssert.assertEquals(urlMeasurementJson.content, writtenString, true);
+    }
+
+    @Test public void shouldWriteUrlStringMeasurement() throws JSONException, IOException {
+        Measurement measurement = new Measurement();
+        measurement.type = Measurement.URL;
+        measurement.a = "https://rakuten.co.jp/some/path?and=some&url=params";
+        measurement.b = "VERB";
+        measurement.startTime = 0L;
+        measurement.endTime = 999 * 1000000L;
+
+        writer.begin();
+        writer.write(measurement, "test-metric");
+        writer.end();
+
+        String writtenString = extractWrittenString(outputStream);
+        JSONAssert.assertEquals(urlMeasurementJson.content, writtenString, true);
+    }
+
+    @Rule public TestData customMeasurementJson = new TestData("custom_measurement.json");
+    @Test public void shouldWriteSingleCustomMeasurement() throws JSONException, IOException {
+        Measurement measurement = new Measurement();
+        measurement.type = Measurement.CUSTOM;
+        measurement.a = "custom-measurement";
+        measurement.startTime = 0L;
+        measurement.endTime = 999 * 1000000L;
+
+        writer.begin();
+        writer.write(measurement, "test-metric");
+        writer.end();
+
+        String writtenString = extractWrittenString(outputStream);
+        JSONAssert.assertEquals(customMeasurementJson.content, writtenString, true);
+    }
+
+    // silent exception handling
+
+    @Test public void shouldNotFailOnBadUrl() {
+        config.eventHubUrl = "usnteaueau";
+        writer = new EventWriter(config, envInfo);
+        // no exceptions
+    }
+
+    @Test public void shouldNotFailOnGoodUrl() {
+        config.eventHubUrl = "https://rakuten.co.jp";
+        writer = new EventWriter(config, envInfo);
+        // no exceptions
+    }
+
+    @Test public void shouldNotFailOnWritingNull() {
+        writer.write(null);
+        writer.write(null, null);
+
+        writer.begin();
+        writer.write(null);
+        writer.write(null, null);
+        writer.end();
+        // no exceptions
+    }
+
+    @Test public void shouldNotFailOnWriteWithoutBegin() {
+        Measurement measurement = new Measurement();
+        measurement.type = Measurement.CUSTOM;
+        measurement.a = "";
+        measurement.startTime = 0L;
+        measurement.endTime = 999 * 1000000L;
+        writer.write(measurement, "");
+        // no exceptions
+    }
+
+    @Test public void shouldNotFailOnNullPayload() {
+        Measurement measurement = new Measurement();
+        measurement.type = Measurement.CUSTOM;
+        measurement.a = null;
+        measurement.b = null;
+        measurement.startTime = 0L;
+        measurement.endTime = 999 * 1000000L;
+        writer.begin();
+        writer.write(measurement, null);
+        measurement.type = Measurement.METHOD;
+        writer.write(measurement, null);
+        measurement.type = Measurement.URL;
+        writer.write(measurement, null);
+        measurement.type = Measurement.METRIC;
+        writer.write(measurement, null);
+        measurement.type = 5; // invalid type
+        writer.write(measurement, null);
+
+        Metric metric = new Metric();
+        metric.startTime = 0L;
+        metric.endTime = 999 * 1000000L;
+        metric.id = null;
+        metric.urls = 999;
+        writer.write(metric);
+        writer.end();
+        // no exceptions
+    }
+
+    @Test public void shouldNotFailOnIncorrectEnd() {
+        writer.end();
+        writer.begin();
+        writer.end();
+        writer.end();
+        // no exceptions
+    }
+
+    @Rule public TestData escapedJson = new TestData("escaped.json");
+    // TODO reenable after REM-20533 is merged
+//    @Test
+    public void shouldHandleMalformedData() throws IOException, JSONException {
+        Measurement measurement = new Measurement();
+        measurement.type = Measurement.CUSTOM;
+        measurement.a = "\"";
+        measurement.startTime = 0L;
+        measurement.endTime = 999 * 1000000L;
+
+        writer.begin();
+        writer.write(measurement, "test-metric");
+        measurement.a = "\"[";
+        writer.write(measurement, "test-metric");
+        measurement.a = "\"{";
+        writer.write(measurement, "test-metric");
+        measurement.a = "\",";
+        writer.write(measurement, "test-metric");
+        measurement.a = "'}'";
+        writer.end();
+
+        String writtenString = extractWrittenString(outputStream);
+        JSONAssert.assertEquals(escapedJson.content, writtenString, true);
+    }
+
+
+    // smoke test
+
+    @Rule public TestData smokeTestJson = new TestData("smoke_test.json");
+    @Test public void smokeTest() throws IOException, JSONException {
         Metric metric = new Metric();
         metric.startTime = 0L;
         metric.endTime = 999 * 1000000L;
         metric.id = "test-metric";
         metric.urls = 999;
+
+        writer.begin();
+        writer.write(metric);
+        writer.write(metric);
 
         Measurement measurement = new Measurement();
         measurement.type = Measurement.METHOD;
@@ -125,13 +309,35 @@ public class EventWriterSpec {
         measurement.startTime = 0L;
         measurement.endTime = 999 * 1000000L;
 
-        writer.begin();
-        writer.write(metric);
         writer.write(measurement, metric.id);
+
+        measurement.type = Measurement.URL;
+        measurement.a = "https://rakuten.co.jp/some/path?and=some&url=params";
+        measurement.b = "VERB";
+        measurement.startTime = 0L;
+        measurement.endTime = 999 * 1000000L;
+
+        writer.write(measurement, metric.id);
+
+        measurement.type = Measurement.CUSTOM;
+        measurement.a = "custom-measurement";
+        measurement.startTime = 0L;
+        measurement.endTime = 999 * 1000000L;
+
+        writer.write(measurement, metric.id);
+
+        measurement.type = Measurement.URL;
+        measurement.a = new URL("https://amazon.co.jp/other/path?and=some&url=params");
+        measurement.b = "BERV";
+        measurement.startTime = 0L;
+        measurement.endTime = 100 * 1000000L;
+
+        writer.write(measurement, metric.id);
+
         writer.end();
 
         String writtenString = extractWrittenString(outputStream);
-        JSONAssert.assertEquals(mixMetricsAndMeasuremnts.content, writtenString, true);
+        JSONAssert.assertEquals(smokeTestJson.content, writtenString, true);
     }
 
     // helpers
