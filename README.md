@@ -56,20 +56,24 @@ There can be only one metric running at any given point of time.
 The Performance Tracking SDK features automatic metric termination.
 That means developers are only required to start metrics and the SDK takes care of the rest by following a rule set.
 
-**What makes a metric start :**<br />
-    -The launch metric is started automatically by the SDK at the launch of the application<br />
-    -Other metrics are started manually through the SDK's public API<br />
 
-**What makes a metric keep going :**<br />
-    -Activity life cycle changes<br />
-    -Fragment life cycle and visibility changes<br />
-    -Loading a page in WebView<br />
+**What makes a metric start:**
 
-**What makes a metric terminate :**<br />
-    -User interactions (clicks, back button pushed, etc.)<br />
-    -WebView finishes loading a page<br />
-    -Timeout of 10 seconds<br />
-    -New metric start<br />
+* The launch metric is started automatically by the SDK at the launch of the application
+* Other metrics are started manually through the SDK's public API
+
+**What makes a metric keep going :**
+
+* Activity life cycle changes
+* Fragment life cycle and visibility changes
+* Loading a page in WebView
+
+**What makes a metric terminate :**
+
+* User interactions (clicks, back button pushed, etc.)
+* WebView finishes loading a page
+* Timeout of 10 seconds
+* New metric start
 
 User can start new metric as shown in below sample.
 
