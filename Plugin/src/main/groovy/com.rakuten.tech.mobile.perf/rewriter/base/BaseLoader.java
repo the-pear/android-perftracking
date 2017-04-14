@@ -9,6 +9,7 @@ public class BaseLoader {
         base.name = cn.name.replace('/', '.');
         base.internalName = cn.name;
         base.superName = cn.superName.replace('/', '.');
+        base.internalSuperName = cn.superName;
         base.cn = cn;
         return base;
     }

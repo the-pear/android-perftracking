@@ -18,9 +18,16 @@ public class SupportV4FragmentBase extends Fragment {
 
 	public boolean com_rakuten_tech_mobile_perf_onCreate_tracking = false;
 
+	@MaxCompileSdkVersion(22)
 	public void onAttach (Activity activity) {
 		Tracker.prolongMetric();
 		super.onAttach(activity);
+	}
+
+	@MinCompileSdkVersion(23)
+	public void onAttach (Context context) {
+		Tracker.prolongMetric();
+		super.onAttach(context);
 	}
 
 	public void onCreate (Bundle savedInstanceState) {
@@ -83,7 +90,6 @@ public class SupportV4FragmentBase extends Fragment {
 		super.onHiddenChanged(hidden);
 	}
 
-	@MinCompileSdkVersion(22)
 	@MaxCompileSdkVersion(22)
 	public void onInflate (Activity activity, AttributeSet attrs, Bundle savedInstanceState) {
 		Tracker.prolongMetric();

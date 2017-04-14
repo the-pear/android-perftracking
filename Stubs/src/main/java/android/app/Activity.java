@@ -1,7 +1,11 @@
 package android.app;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.util.AttributeSet;
+import android.view.View;
 
 public class Activity {
 
@@ -9,27 +13,41 @@ public class Activity {
 		return null;
 	}
 
-	public void onCreate (Bundle savedInstanceState) {
+	protected void onCreate (Bundle savedInstanceState) {
 	}
 
-	public void onStart () {
+	public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
 	}
 
-	public void onStop () {
+	public View onCreateView(String name, Context context, AttributeSet attrs) {
+		return null;
 	}
 
-	public void onResume () {
+	public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+		return null;
 	}
 
-	public void onPause () {
+	protected void onStart () {
 	}
 
-	public void onRestart () {
+	protected void onStop () {
 	}
 
-	public void onDestroy () {
+	protected void onResume () {
+	}
+
+	protected void onPause () {
+	}
+
+	protected void onRestart () {
+	}
+
+	protected void onDestroy () {
 	}
 
 	public void onBackPressed () {
+	}
+
+	public void onUserInteraction () {
 	}
 }

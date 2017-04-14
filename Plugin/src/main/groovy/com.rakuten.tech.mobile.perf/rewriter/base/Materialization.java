@@ -35,11 +35,27 @@ public class Materialization {
         _log.debug("Rebasing " + clazz.getName() + " to " + name);
 
         return new ClassVisitor(Opcodes.ASM5, output) {
+
             @Override
             public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
                 internalSuperName = superName;
                 Materialization.this.superName = superName.replace('/', '.');
                 super.visit(version, access, name, signature, internalName, interfaces);
+            }
+
+            @Override
+            public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+                MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
+                return new MethodVisitor(Opcodes.ASM5, mv) {
+
+                    @Override
+                    public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
+                        if ((opcode == Opcodes.INVOKESPECIAL) && base.internalSuperName.equals(owner)) {
+                            owner = internalName;
+                        }
+                        super.visitMethodInsn(opcode, owner, name, desc, itf);
+                    }
+                };
             }
         };
     }
