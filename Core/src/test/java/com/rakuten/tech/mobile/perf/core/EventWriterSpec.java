@@ -263,9 +263,7 @@ public class EventWriterSpec {
     }
 
     @Rule public TestData escapedJson = new TestData("escaped.json");
-    // TODO reenable after REM-20533 is merged
-//    @Test
-    public void shouldHandleMalformedData() throws IOException, JSONException {
+    @Test public void shouldHandleMalformedData() throws IOException, JSONException {
         Measurement measurement = new Measurement();
         measurement.type = Measurement.CUSTOM;
         measurement.a = "\"";
