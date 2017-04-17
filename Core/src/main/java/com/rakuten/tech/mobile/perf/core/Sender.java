@@ -2,6 +2,7 @@ package com.rakuten.tech.mobile.perf.core;
 
 public class Sender {
 	public static final long MIN_TIME = 5000000L; // 5 ms
+    private static final int MIN_COUNT = 10;
 
 	private final MeasurementBuffer _buffer;
 	private final Current _current;
@@ -17,7 +18,43 @@ public class Sender {
 		_debug = debug;
 	}
 
-	public int send(int startIndex, int endIndex) {
+    /**
+     * Tries to send measurements and metrics from the underlying buffer staring from {@code
+     * startIndex}. Will wait while each measurement/metric is potentially still "alive", i.e. it
+     * started less than {@link Metric#MAX_TIME} or {@link Measurement#MAX_TIME} ago respectively.
+     * Returns the buffer index next unsent measurement/metric, which should be used for the next
+     * call to this method as new {@code startIndex}.
+     * @param startIndex send measurements starting from this index (of the buffer)
+     * @return next unsent index, i.e. {@code startIndex} for the next call to send
+     */
+    public int send(int startIndex) {
+        int idIndex = _buffer.nextTrackingId.get() % MeasurementBuffer.SIZE;
+        if (idIndex < 0) {
+            idIndex += MeasurementBuffer.SIZE;
+        }
+
+        int count = idIndex - startIndex;
+        if (count < 0) {
+            count += MeasurementBuffer.SIZE;
+        }
+
+        if (count >= MIN_COUNT) {
+            startIndex = send(startIndex, idIndex);
+        }
+        return startIndex;
+    }
+
+	/**
+	 * Tries to send measurements from measurement buffer starting at {@code startIndex} until
+     * {@code endIndex}. Will stop sending if the metric/measurement is potentially still "alive",
+     * i.e. it started less than {@link Metric#MAX_TIME} or {@link Measurement#MAX_TIME} ago
+     * respectively. Returns the buffer index next unsent measurement/metric, which should be
+     * used for the next call to this method as new {@code startIndex}.
+	 * @param startIndex send measurements starting from this index (of the buffer)
+	 * @param endIndex send measurements up to this index (of the buffer)
+	 * @return last sent index + 1, i.e. {@code startIndex} for the next call to send
+	 */
+    private int send(int startIndex, int endIndex) {
 		_sent = 0;
 		long now = System.nanoTime();
 
