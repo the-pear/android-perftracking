@@ -1,0 +1,9 @@
+{
+  "enablePercent": 100,
+  "sendHeaders": {
+    "Authorization": "SharedAccessSignature sr=perf-eventhub-dev-japaneast&sig=YN%2FKvrSzkwoKELcJnb%2Fdy414mRM3F1s9HIteg9gf9f8%3D&se=1519954045&skn=SendOnly",
+    "BrokerProperties": "{\"PartitionKey\": \"com.rakuten.tech.mobile.perf.example/1.0.0\"}",
+    "Content-Type": "application/atom+xml;type=entry;charset=utf-8"
+  },
+  "sendUrl": "https://perf-eventhub-dev-japaneast.servicebus.windows.net/measurements/messages?timeout=5&api-version=2014-01"
+}
