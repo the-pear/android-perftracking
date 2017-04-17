@@ -6,3 +6,5 @@ targetCompatibility = JavaVersion.VERSION_1_7
 dependencies {
     compile project(':Stubs')
 }
+
+apply from: "test.gradle"
