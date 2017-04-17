@@ -1,9 +1,8 @@
 package com.rakuten.tech.mobile.perf.core;
 
-import java.net.URL;
-
 import android.content.Context;
-import android.view.View;
+
+import java.net.URL;
 
 /**
  * Tracker
@@ -29,7 +28,7 @@ public class Tracker {
 		EnvironmentInfo envInfo = EnvironmentInfo.get(context);
 		EventWriter writer = new EventWriter(config, envInfo);
 		Sender sender = new Sender(buffer, current, writer, debug);
-		_senderThread = new SenderThread(buffer, sender);
+		_senderThread = new SenderThread(sender);
 		_senderThread.start();
 	}
 
