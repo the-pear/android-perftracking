@@ -19,12 +19,11 @@ import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.NoCache;
 import com.google.gson.Gson;
-
-import java.util.Random;
-
 import com.rakuten.tech.mobile.perf.core.Config;
 import com.rakuten.tech.mobile.perf.runtime.Metric;
 import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
+
+import java.util.Random;
 
 /**
  * RuntimeContentProvider - a custom high-priority ContentProvider, to start tracking early in the process launch phase.
@@ -92,7 +91,7 @@ public class RuntimeContentProvider extends ContentProvider {
             Log.d(TAG, "Cannot read metadata `com.rakuten.tech.mobile.perf.SubscriptionKey` from manifest, automated performance tracking will not work.");
 
         if (param != null) {
-            new ConfigurationRequest(getMetaData("com.rakuten.tech.mobile.perf.DomainUrl"),
+            new ConfigurationRequest(getMetaData("com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix"),
                     subscriptionKey,
                     param, new Response.Listener<ConfigurationResult>() {
                 @Override

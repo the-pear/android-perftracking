@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.perf.runtime.internal;
 
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -13,23 +14,29 @@ import jp.co.rakuten.api.core.BaseRequest;
  */
 
 class ConfigurationRequest extends BaseRequest<ConfigurationResult> {
-    private static final String PATH_API_VERSION = "/api/v1";
-    private static final String DOMAIN_URL = "https://perf-config-api-dev-japaneast.azurewebsites.net";
+    private static final String DEFAULT_URL_PREFIX = "https://perf-config-api-dev-japaneast.azurewebsites.net/api/v1";
 
-    ConfigurationRequest(@Nullable String domainUrl, String subscriptionKey, ConfigurationParam param, @Nullable Response.Listener<ConfigurationResult> listener, @Nullable Response.ErrorListener errorListener) {
+    ConfigurationRequest(@Nullable String urlPrefix, String subscriptionKey, ConfigurationParam param, @Nullable Response.Listener<ConfigurationResult> listener, @Nullable Response.ErrorListener errorListener) {
         super(listener, errorListener);
         setMethod(Method.GET);
         setHeader("Ocp-Apim-Subscription-Key", subscriptionKey);
-        if (domainUrl == null) setDomain(DOMAIN_URL);
-        else setDomain(domainUrl); // TODO Have domain for prod and staging as well and inject from gradle
-        setUrlPath(PATH_API_VERSION + "/platform/" + param.getPlatform() + "/app/" + param.getAppId() + "/version/" + param.getAppVersion() +"/");
+        String prefix = urlPrefix != null ? urlPrefix : DEFAULT_URL_PREFIX;
+        Uri uri = Uri.parse(prefix);
+        uri = uri.buildUpon()
+                .appendPath("platform").appendPath(param.getPlatform())
+                .appendPath("app").appendPath(param.getAppId())
+                .appendPath("version").appendPath(param.getAppVersion())
+                .appendPath("") // for trailing slash
+                .build();
+        setUrl(uri.toString());
+
         setQueryParam("sdk", param.getSdkVersion());
         setQueryParam("country", param.getCountryCode());
     }
 
     @Override
     @Nullable
-    protected ConfigurationResult parseResponse(String response) throws Exception {
+    protected ConfigurationResult parseResponse(String response) {
         ConfigurationResult result = null;
         try {
             result = new Gson().fromJson(response, ConfigurationResult.class);
