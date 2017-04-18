@@ -309,14 +309,34 @@ public class EventWriterSpec {
 
         writer.write(measurement, metric.id);
 
+        measurement = new Measurement();
         measurement.type = Measurement.URL;
-        measurement.a = "https://rakuten.co.jp/some/path?and=some&url=params";
+        measurement.a = "https://rakuten.co.jp1/some/path?and=some&url=params";
         measurement.b = "VERB";
         measurement.startTime = 0L;
         measurement.endTime = 999 * 1000000L;
 
         writer.write(measurement, metric.id);
 
+        measurement = new Measurement();
+        measurement.type = Measurement.URL;
+        measurement.a = "https://rakuten.co.jp2/some/path?and=some&url=params";
+        measurement.b = "VERB";
+        measurement.startTime = 0L;
+        measurement.endTime = 999 * 1000000L;
+
+        writer.write(measurement, null);
+
+        measurement = new Measurement();
+        measurement.type = Measurement.URL;
+        measurement.a = "https://rakuten.co.jp3/some/path?and=some&url=params";
+        measurement.b = null;
+        measurement.startTime = 0L;
+        measurement.endTime = 999 * 1000000L;
+
+        writer.write(measurement, null);
+
+        measurement = new Measurement();
         measurement.type = Measurement.CUSTOM;
         measurement.a = "custom-measurement";
         measurement.startTime = 0L;
@@ -324,6 +344,7 @@ public class EventWriterSpec {
 
         writer.write(measurement, metric.id);
 
+        measurement = new Measurement();
         measurement.type = Measurement.URL;
         measurement.a = new URL("https://amazon.co.jp/other/path?and=some&url=params");
         measurement.b = "BERV";

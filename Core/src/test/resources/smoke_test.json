@@ -19,10 +19,19 @@
       "time": 999
     },
     {
-      "url": "https://rakuten.co.jp/some/path",
+      "url": "https://rakuten.co.jp1/some/path",
       "metric": "test-metric",
       "time": 999,
       "verb": "VERB"
+    },
+    {
+      "url": "https://rakuten.co.jp2/some/path",
+      "time": 999,
+      "verb": "VERB"
+    },
+    {
+      "url": "https://rakuten.co.jp3/some/path",
+      "time": 999
     },
     {
       "custom": "custom-measurement",
