@@ -1,19 +1,21 @@
 package com.rakuten.tech.mobile.perf.core;
 
+import android.util.Log;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import android.util.Log;
-
 public class EventWriter {
     private final String TAG = "Performance Tracking";
     private final Config _config;
     private final EnvironmentInfo _envInfo;
+    private final URL _url;
     private HttpsURLConnection _conn;
     private BufferedWriter _writer;
     private int _measurements;
@@ -21,11 +23,28 @@ public class EventWriter {
     public EventWriter(Config config, EnvironmentInfo envInfo) {
         _config = config;
         _envInfo = envInfo;
+        URL url = null;
+        try {
+            url = new URL(_config.eventHubUrl);
+        } catch (MalformedURLException e) {
+            if (_config.debug) {
+                Log.d(TAG, e.toString());
+            }
+        } finally {
+            _url = url;
+        }
+    }
+
+    /* for testing */
+    EventWriter(Config config, EnvironmentInfo envInfo, URL url) {
+        _config = config;
+        _envInfo = envInfo;
+        _url = url;
     }
 
     public void begin() {
         try {
-            _conn = (HttpsURLConnection) ((new URL(_config.eventHubUrl).openConnection()));
+            _conn = (HttpsURLConnection) _url.openConnection();
             _conn.setRequestMethod("POST");
             for (Map.Entry<String, String> entry : _config.header.entrySet())
                 _conn.setRequestProperty(entry.getKey(), entry.getValue());

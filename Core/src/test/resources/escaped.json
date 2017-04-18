@@ -1,0 +1,29 @@
+{
+  "app": "app",
+  "country": "test-land",
+  "device": "test-device",
+  "measurements": [
+    {
+      "custom": "\"",
+      "metric": "test-metric",
+      "time": 999
+    },
+    {
+      "custom": "\"[",
+      "metric": "test-metric",
+      "time": 999
+    },
+    {
+      "custom": "\"{",
+      "metric": "test-metric",
+      "time": 999
+    },
+    {
+      "custom": "\",",
+      "metric": "test-metric",
+      "time": 999
+    }
+  ],
+  "network": "test-network",
+  "version": "test-version"
+}

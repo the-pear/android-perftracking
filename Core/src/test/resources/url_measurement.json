@@ -1,0 +1,15 @@
+{
+  "app": "app",
+  "country": "test-land",
+  "device": "test-device",
+  "measurements": [
+    {
+      "url": "https://rakuten.co.jp/some/path",
+      "metric": "test-metric",
+      "time": 999,
+      "verb": "VERB"
+    }
+  ],
+  "network": "test-network",
+  "version": "test-version"
+}

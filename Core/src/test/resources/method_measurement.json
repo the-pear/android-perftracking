@@ -1,0 +1,14 @@
+{
+  "app": "app",
+  "country": "test-land",
+  "device": "test-device",
+  "measurements": [
+    {
+      "method": "TestClass#testMethod",
+      "metric": "test-metric",
+      "time": 999
+    }
+  ],
+  "network": "test-network",
+  "version": "test-version"
+}
