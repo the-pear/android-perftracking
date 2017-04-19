@@ -57,42 +57,16 @@ class ConfigurationResult implements Parcelable {
         }
     };
 
-    public double getEnablePercent() {
+    double getEnablePercent() {
         return enablePercent;
     }
 
-    public String getSendUrl() {
+    String getSendUrl() {
         return sendUrl;
     }
 
-    public Map<String, String> getHeader() {
+    Map<String, String> getHeader() {
         return header;
     }
 
-    private void write(Parcel dest, Map<String, String> strings) {
-        if (strings == null) {
-            dest.writeInt(-1);
-        }
-        {
-            dest.writeInt(strings.keySet().size());
-            for (String key : strings.keySet()) {
-                dest.writeString(key);
-                dest.writeString(strings.get(key));
-            }
-        }
-    }
-
-    private Map<String, String> readStringMap(Parcel source) {
-        int numKeys = source.readInt();
-        if (numKeys == -1) {
-            return null;
-        }
-        Map<String, String> map = new HashMap<String, String>();
-        for (int i = 0; i < numKeys; i++) {
-            String key = source.readString();
-            String value = source.readString();
-            map.put(key, value);
-        }
-        return map;
-    }
 }

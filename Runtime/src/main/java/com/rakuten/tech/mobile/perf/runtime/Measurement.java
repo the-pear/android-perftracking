@@ -10,6 +10,7 @@ import com.rakuten.tech.mobile.perf.runtime.internal.TrackingManager;
  *
  */
 
+@SuppressWarnings("WeakerAccess")
 public final class Measurement {
 
     private static final String TAG = Measurement.class.getSimpleName();

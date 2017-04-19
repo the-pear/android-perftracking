@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -59,9 +60,7 @@ public class RuntimeContentProvider extends ContentProvider {
                     ApplicationInfo ai = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
                     Bundle bundle = ai.metaData;
                     config.debug = bundle.getBoolean("com.rakuten.tech.mobile.perf.debug");
-                } catch (PackageManager.NameNotFoundException e) {
-                    config.debug = false;
-                } catch (NullPointerException e) {
+                } catch (PackageManager.NameNotFoundException | NullPointerException e) {
                     config.debug = false;
                 }
                 config.eventHubUrl = lastConfig.getSendUrl();
@@ -120,35 +119,36 @@ public class RuntimeContentProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         return null;
     }
 
     @Nullable
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         return null;
     }
 
     @Nullable
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
         return null;
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         return 0;
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         return 0;
     }
 
     private void saveConfiguration(ConfigurationResult result) {
-        if (getContext() != null)
+        if (getContext() != null) {
             getContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(CONFIG_KEY, new Gson().toJson(result)).apply();
+        }
     }
 
     @Nullable
@@ -161,11 +161,11 @@ public class RuntimeContentProvider extends ContentProvider {
     }
 
     private String getMetaData(String key) {
-        ApplicationInfo ai = null;
         try {
-            ai = getContext().getPackageManager().getApplicationInfo(getContext().getPackageName(), PackageManager.GET_META_DATA);
-            Bundle bundle = ai.metaData;
-            return bundle.getString(key);
+            Context ctx = getContext();
+            if(ctx == null) return null;
+            return ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(),
+                    PackageManager.GET_META_DATA).metaData.getString(key);
         } catch (PackageManager.NameNotFoundException e) {
             return null;
         }
