@@ -1,17 +1,17 @@
 package com.rakuten.tech.mobile.perf.core;
 
-public class TrackerImpl {
+class TrackerImpl {
 	private final MeasurementBuffer _measurementBuffer;
 	private final Current _current;
 	private final Debug _debug;
 
-	public TrackerImpl(MeasurementBuffer measurementBuffer, Current current, Debug debug) {
+	TrackerImpl(MeasurementBuffer measurementBuffer, Current current, Debug debug) {
 		_measurementBuffer = measurementBuffer;
 		_current = current;
 		_debug = debug;
 	}
 
-	public void startMetric(String metricId) {
+	void startMetric(String metricId) {
 		_current.metric.set(null);
 
 		Metric metric = new Metric();
@@ -30,7 +30,7 @@ public class TrackerImpl {
 		}
 	}
 
-	public void prolongMetric() {
+	void prolongMetric() {
 		Metric metric = _current.metric.get();
 
 		if (metric != null) {
@@ -49,7 +49,7 @@ public class TrackerImpl {
 		}
 	}
 
-	public void endMetric() {
+	void endMetric() {
 		if (_debug != null) {
 			Metric metric = _current.metric.get();
 			if (metric != null) {
@@ -86,7 +86,7 @@ public class TrackerImpl {
 		}
 	}
 
-	public int startUrl(Object url, String verb) {
+	int startUrl(Object url, String verb) {
 		if (url != null) {
 			Measurement m = startMeasurement(Measurement.URL, url, verb);
 			if (m != null) {
@@ -101,7 +101,7 @@ public class TrackerImpl {
 		return 0;
 	}
 
-	public void endUrl(int trackingId) {
+	void endUrl(int trackingId) {
 		endMeasurement(trackingId);
 
 		if (_debug != null) {
@@ -112,7 +112,7 @@ public class TrackerImpl {
 		}
 	}
 
-	public int startCustom(String measurementId) {
+	int startCustom(String measurementId) {
 		if (measurementId != null) {
 			Measurement m = startMeasurement(Measurement.CUSTOM, measurementId, null);
 			if (m != null) {
@@ -127,7 +127,7 @@ public class TrackerImpl {
 		return 0;
 	}
 
-	public void endCustom(int trackingId) {
+	void endCustom(int trackingId) {
 		endMeasurement(trackingId);
 
 		if (_debug != null) {
