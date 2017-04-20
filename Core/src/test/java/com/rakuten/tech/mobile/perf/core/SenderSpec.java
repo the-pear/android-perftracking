@@ -175,7 +175,6 @@ public class SenderSpec {
             measurement.type = Measurement.CUSTOM;
             measurement.a = "custom-measurement";
             measurement.startTime = 999 * 1000000L;
-            ;
             measurement.endTime = 1L;
             if (i == 2) {
                 measurement.type = Measurement.METRIC;
