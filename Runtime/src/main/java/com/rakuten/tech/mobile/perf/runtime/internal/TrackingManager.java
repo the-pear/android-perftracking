@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.perf.runtime.internal;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.rakuten.tech.mobile.perf.core.Config;
@@ -12,11 +11,13 @@ import java.util.Map;
 
 /**
  * TrackingManager
- *
  */
 public class TrackingManager {
     private static final String TAG = TrackingManager.class.getSimpleName();
     public static TrackingManager INSTANCE = null;
+    /**
+     * maps {@link TrackingData} to Measurement ids (from {@link Tracker}
+     */
     private Map<TrackingData, Integer> mTrackingData;
     /* Max number of objects for @TrackingManager#mTrackingData */
     private static final int TRACKING_DATA_LIMIT = 100;
@@ -36,15 +37,7 @@ public class TrackingManager {
      * @param measurementId Measurement identifier.
      */
     public synchronized void startMeasurement(String measurementId) {
-        TrackingData trackingData = new TrackingData(measurementId, null);
-        if (mTrackingData.size() >= TRACKING_DATA_LIMIT) {
-            mTrackingData.clear();
-        }
-        if (!mTrackingData.containsKey(trackingData)) {
-            mTrackingData.put(trackingData, Tracker.startCustom(measurementId));
-        } else {
-            Log.d(TAG, "Measurement already started");
-        }
+        startAggregated(measurementId, null);
     }
 
     /**
@@ -53,13 +46,7 @@ public class TrackingManager {
      * @param measurementId Measurement identifier.
      */
     public synchronized void endMeasurement(String measurementId) {
-        TrackingData trackingData = new TrackingData(measurementId, null);
-        if (mTrackingData.containsKey(trackingData)) {
-            Tracker.endCustom(mTrackingData.get(trackingData));
-            mTrackingData.remove(trackingData);
-        } else {
-            Log.d(TAG, "Measurement not found");
-        }
+        endAggregated(measurementId, null);
     }
 
     /**
@@ -76,7 +63,7 @@ public class TrackingManager {
         if (!mTrackingData.containsKey(key)) {
             mTrackingData.put(key, Tracker.startCustom(id));
         } else {
-            Log.d(TAG, "Aggregated Measurement already started");
+            Log.d(TAG, "Measurement already started");
         }
     }
 
@@ -92,7 +79,7 @@ public class TrackingManager {
             Tracker.endCustom(mTrackingData.get(key));
             mTrackingData.remove(key);
         } else {
-            Log.d(TAG, "Aggregated Measurement not found");
+            Log.d(TAG, "Measurement not found");
         }
     }
 
@@ -105,64 +92,4 @@ public class TrackingManager {
         Tracker.startMetric(metricId);
     }
 
-    private class TrackingData implements Comparable {
-        private String measurementId;
-        private Comparable object;
-
-        private TrackingData(String measurementId, Comparable object) {
-            this.measurementId = measurementId;
-            this.object = object;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o instanceof TrackingData) {
-                TrackingData data = (TrackingData) o;
-                return measurementId.equals(data.measurementId) && nullSafeEquateObjects(object, data.object);
-            } else {
-                return false;
-            }
-        }
-
-        private boolean nullSafeEquateObjects(Comparable one, Comparable two) {
-            if (one != null && two != null) {
-                return one.equals(two);
-            }
-            return one == null && two == null;
-        }
-
-        @Override
-        public int hashCode() {
-            if (object != null) {
-                return measurementId.hashCode() + object.hashCode();
-            } else {
-                return measurementId.hashCode();
-            }
-        }
-
-        @Override
-        public int compareTo(@NonNull Object another) {
-            if (another instanceof TrackingData) {
-                TrackingData data = (TrackingData) another;
-                if (measurementId.compareTo(data.measurementId) == 0) {
-                    return nullSafeCompareObjects(object, data.object);
-                } else {
-                    return measurementId.compareTo(data.measurementId);
-                }
-            }
-            return -1;
-        }
-
-
-        @SuppressWarnings("unchecked")
-        private int nullSafeCompareObjects(Comparable one, Comparable two) {
-            if (one == null && two == null) {
-                return 0;
-            }
-            if (one == null ^ two == null) {
-                return (one == null) ? -1 : 1;
-            }
-            return one.compareTo(two);
-        }
-    }
 }
