@@ -7,16 +7,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
-/**
- * Created by avinash.renukaradhya on 17/04/17.
- */
 
 public class SenderSpec {
 
@@ -25,7 +20,6 @@ public class SenderSpec {
     Current current;
     @Mock
     EventWriter eventWriter;
-    @Mock
     Debug debug;
 
     @Before
@@ -33,6 +27,7 @@ public class SenderSpec {
         MockitoAnnotations.initMocks(this);
         measurementBuffer = new MeasurementBuffer();
         debug = new Debug();
+        current = new Current();
         sender = new Sender(measurementBuffer, current, eventWriter, debug);
     }
 
@@ -52,8 +47,6 @@ public class SenderSpec {
     @Test
     public void shouldSendMetric() {
         setUp10CustomMetric(measurementBuffer);
-        current = new Current();
-        sender = new Sender(measurementBuffer, current, eventWriter, debug);
         sender.send(0);
         ArgumentCaptor<Metric> captor = ArgumentCaptor.forClass(Metric.class);
         verify(eventWriter, times(1)).begin();
@@ -67,9 +60,7 @@ public class SenderSpec {
     @Test
     public void shouldSendMetricWithNegativeBuffer() {
         setUp10CustomMetric(measurementBuffer);
-        current = new Current();
         measurementBuffer.nextTrackingId.set(-5);
-        sender = new Sender(measurementBuffer, current, eventWriter, null);
         sender.send(0);
         ArgumentCaptor<Metric> captor = ArgumentCaptor.forClass(Metric.class);
         verify(eventWriter, times(1)).begin();
@@ -84,9 +75,7 @@ public class SenderSpec {
     @Test
     public void shouldNotSendMetricBufferSizeGreaterThenMax() {
         setUp10CustomMetric(measurementBuffer);
-        current = new Current();
         measurementBuffer.nextTrackingId.set(513);
-        sender = new Sender(measurementBuffer, current, eventWriter, null);
         sender.send(513);
         verify(eventWriter, never()).begin();
     }
@@ -101,9 +90,7 @@ public class SenderSpec {
     @Test
     public void shouldNotSendMeasurementsAndMetric() {
         setUp10CustomMeasurementAndMetricLesserEndTime(measurementBuffer);
-        current = new Current();
         current.metric.set((Metric) measurementBuffer.at[3].a);
-        sender = new Sender(measurementBuffer, current, eventWriter, debug);
         sender.send(0);
         verify(eventWriter, times(1)).begin();
         ArgumentCaptor<Measurement> captor = ArgumentCaptor.forClass(Measurement.class);
@@ -117,9 +104,7 @@ public class SenderSpec {
     @Test
     public void shouldNotSendMetricLesserThenMaxTime() {
         setUp10CustomMetricLesserThenMaxTime(measurementBuffer);
-        current = new Current();
         current.metric.set((Metric) measurementBuffer.at[3].a);
-        sender = new Sender(measurementBuffer, current, eventWriter, debug);
         sender.send(0);
         verify(eventWriter, never()).begin();
     }
@@ -188,7 +173,6 @@ public class SenderSpec {
     }
 
     private void setUp10CustomMetricLesserThenMaxTime(MeasurementBuffer measurementBuffer) {
-        //Metric Max = 10000000000L, Measurement = 30000000000L
         for (int i = 0; i < 10; i++) {
             Measurement measurement = measurementBuffer.next();
             measurement.type = Measurement.CUSTOM;
