@@ -95,9 +95,6 @@ public class SenderSpec {
         verify(eventWriter, times(1)).begin();
         ArgumentCaptor<Measurement> captor = ArgumentCaptor.forClass(Measurement.class);
         verify(eventWriter, times(1)).write(captor.capture(), (String) isNotNull());
-        for (Measurement measurement : captor.getAllValues()) {
-            assertThat(measurement.a).isNull();// as measurements are cleared once sent.
-        }
         verify(eventWriter, times(1)).end();
     }
 
