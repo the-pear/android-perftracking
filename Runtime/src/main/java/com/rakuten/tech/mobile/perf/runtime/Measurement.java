@@ -10,7 +10,7 @@ import com.rakuten.tech.mobile.perf.runtime.internal.TrackingManager;
  *
  */
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "unused"})
 public final class Measurement {
 
     private static final String TAG = Measurement.class.getSimpleName();
@@ -22,12 +22,14 @@ public final class Measurement {
      * @see #end(String)
      */
     public static void start(String measurementId) {
-        if (TextUtils.isEmpty(measurementId))
+        if (TextUtils.isEmpty(measurementId)) {
             throw new IllegalArgumentException("Illegal Arguments");
-        if (TrackingManager.INSTANCE != null)
+        }
+        if (TrackingManager.INSTANCE != null) {
             TrackingManager.INSTANCE.startMeasurement(measurementId);
-        else
-            Log.d(TAG,"Tracking manager not initialized");
+        } else {
+            Log.d(TAG, "Tracking manager not initialized");
+        }
     }
 
     /**
@@ -37,12 +39,14 @@ public final class Measurement {
      * @see #start(String)
      */
     public static void end(String measurementId) {
-        if (TextUtils.isEmpty(measurementId))
+        if (TextUtils.isEmpty(measurementId)) {
             throw new IllegalArgumentException("Illegal Argument");
-        if (TrackingManager.INSTANCE != null)
+        }
+        if (TrackingManager.INSTANCE != null) {
             TrackingManager.INSTANCE.endMeasurement(measurementId);
-        else
-            Log.d(TAG,"Tracking manager not initialized");
+        } else {
+            Log.d(TAG, "Tracking manager not initialized");
+        }
     }
 
     /**
@@ -53,12 +57,14 @@ public final class Measurement {
      * @see #endAggregated(String, Comparable)
      */
     public static void startAggregated(String id, Comparable object) {
-        if (TextUtils.isEmpty(id) || object == null)
+        if (TextUtils.isEmpty(id) || object == null) {
             throw new IllegalArgumentException("Illegal Arguments");
-        if (TrackingManager.INSTANCE != null)
+        }
+        if (TrackingManager.INSTANCE != null) {
             TrackingManager.INSTANCE.startAggregated(id, object);
-        else
-            Log.d(TAG,"Tracking manager not initialized");
+        } else {
+            Log.d(TAG, "Tracking manager not initialized");
+        }
     }
 
     /**
@@ -70,12 +76,14 @@ public final class Measurement {
      * @see #startAggregated(String, Comparable)
      */
     public static void endAggregated(String id, Comparable object) {
-        if (TextUtils.isEmpty(id) || object == null)
+        if (TextUtils.isEmpty(id) || object == null) {
             throw new IllegalArgumentException("Illegal Arguments");
-        if (TrackingManager.INSTANCE != null)
+        }
+        if (TrackingManager.INSTANCE != null) {
             TrackingManager.INSTANCE.endAggregated(id, object);
-        else
-            Log.d(TAG,"Tracking manager not initialized");
+        } else {
+            Log.d(TAG, "Tracking manager not initialized");
+        }
     }
 
 }

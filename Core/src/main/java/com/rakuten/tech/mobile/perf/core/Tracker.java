@@ -46,9 +46,8 @@ public class Tracker {
 	 * @param metricId Metric ID, for example "launch", "search", "item".
 	 */
 	public static void startMetric(String metricId) {
-		TrackerImpl t = _tracker;
-		if (t != null) {
-			t.startMetric(metricId);
+		if (_tracker != null) {
+			_tracker.startMetric(metricId);
 		}
 	}
 
@@ -56,9 +55,8 @@ public class Tracker {
 	 * Prolongs current metric.
 	 */
 	public static void prolongMetric() {
-		TrackerImpl t = _tracker;
-		if (t != null) {
-			t.prolongMetric();
+		if (_tracker != null) {
+			_tracker.prolongMetric();
 		}
 	}
 
@@ -66,9 +64,8 @@ public class Tracker {
 	 * Terminates current metric.
 	 */
 	public static void endMetric() {
-		TrackerImpl t = _tracker;
-		if (t != null) {
-			t.endMetric();
+		if (_tracker != null) {
+			_tracker.endMetric();
 		}
 	}
 
@@ -79,8 +76,7 @@ public class Tracker {
 	 * @return Tracking ID
 	 */
 	public static int startMethod(Object object, String method) {
-		TrackerImpl t = _tracker;
-		return t != null ? t.startMethod(object, method) : 0;
+		return _tracker != null ? _tracker.startMethod(object, method) : 0;
 	}
 
 	/**
@@ -88,9 +84,8 @@ public class Tracker {
 	 * @param trackingId Tracking ID returned from startMethod
 	 */
 	public static void endMethod(int trackingId) {
-		TrackerImpl t = _tracker;
-		if (t != null) {
-			t.endMethod(trackingId);
+		if (_tracker != null) {
+			_tracker.endMethod(trackingId);
 		}
 	}
 
@@ -101,8 +96,7 @@ public class Tracker {
 	 * @return Tracking ID
 	 */
 	public static int startUrl(URL url, String verb) {
-		TrackerImpl t = _tracker;
-		return t != null ? t.startUrl(url, verb) : 0;
+		return _tracker != null ? _tracker.startUrl(url, verb) : 0;
 	}
 
 	/**
@@ -112,8 +106,7 @@ public class Tracker {
 	 * @return Tracking ID
 	 */
 	public static int startUrl(String url, String verb) {
-		TrackerImpl t = _tracker;
-		return t != null ? t.startUrl(url, verb) : 0;
+		return _tracker != null ? _tracker.startUrl(url, verb) : 0;
 	}
 
 	/**
@@ -121,9 +114,8 @@ public class Tracker {
 	 * @param trackingId Tracking ID returned from startUrl
 	 */
 	public static void endUrl(int trackingId) {
-		TrackerImpl t = _tracker;
-		if (t != null) {
-			t.endUrl(trackingId);
+		if (_tracker != null) {
+			_tracker.endUrl(trackingId);
 		}
 	}
 
@@ -133,8 +125,7 @@ public class Tracker {
 	 * @return Tracking ID
 	 */
 	public static int startCustom(String measurementId) {
-		TrackerImpl t = _tracker;
-		return t != null ? t.startCustom(measurementId) : 0;
+		return _tracker != null ? _tracker.startCustom(measurementId) : 0;
 	}
 
 	/**
@@ -142,9 +133,8 @@ public class Tracker {
 	 * @param trackingId Tracking ID returned from startCustom
 	 */
 	public static void endCustom(int trackingId) {
-		TrackerImpl t = _tracker;
-		if (t != null) {
-			t.endCustom(trackingId);
+		if (_tracker != null) {
+			_tracker.endCustom(trackingId);
 		}
 	}
 }

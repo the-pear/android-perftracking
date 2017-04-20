@@ -19,7 +19,6 @@ class Sender {
 	}
 
     /**
-     * Tries to send measurements and metrics from the underlying buffer staring from {@code
      * Tries to send measurements and metrics from the underlying buffer starting from {@code
      * startIndex}. Will wait while each measurement/metric is potentially still "alive", i.e. it
      * started less than {@link Metric#MAX_TIME} or {@link Measurement#MAX_TIME} ago respectively.

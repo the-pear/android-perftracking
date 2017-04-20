@@ -36,6 +36,7 @@ class EventWriter {
     }
 
     /* for testing */
+    @SuppressWarnings("unused")
     EventWriter(Config config, EnvironmentInfo envInfo, URL url) {
         _config = config;
         _envInfo = envInfo;

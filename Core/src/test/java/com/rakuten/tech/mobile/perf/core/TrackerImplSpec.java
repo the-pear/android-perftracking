@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -156,7 +157,7 @@ public class TrackerImplSpec {
         tracker.startMethod(new Object(), null);
         tracker.startMethod(null, null);
 
-        verify(buffer, times(0)).next();
+        verify(buffer, never()).next();
     }
 
     @Test public void shouldUpdateExistingMethodMeasurement() throws InterruptedException {
@@ -203,7 +204,7 @@ public class TrackerImplSpec {
         tracker.startUrl(null, "GET");
         tracker.startUrl(null, null);
 
-        verify(buffer, times(0)).next();
+        verify(buffer, never()).next();
     }
 
     @Test public void shouldCreateUrlMeasurementWithoutVerb() throws MalformedURLException {
@@ -246,7 +247,7 @@ public class TrackerImplSpec {
     @Test public void shouldNotCreateCustomMeasurementOnNullInput() {
         tracker.startCustom(null);
 
-        verify(buffer, times(0)).next();
+        verify(buffer, never()).next();
     }
 
     // unexpected collaborator behavior
