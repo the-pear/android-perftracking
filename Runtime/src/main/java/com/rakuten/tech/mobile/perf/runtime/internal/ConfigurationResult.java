@@ -26,8 +26,9 @@ class ConfigurationResult implements Parcelable {
         sendUrl = in.readString();
         Bundle bundle = in.readBundle();
         header = new HashMap<>();
-        for(String key : bundle.keySet())
+        for(String key : bundle.keySet()) {
             header.put(key, bundle.getString(key));
+        }
     }
 
     @Override
@@ -35,8 +36,9 @@ class ConfigurationResult implements Parcelable {
         dest.writeDouble(enablePercent);
         dest.writeString(sendUrl);
         Bundle bundle = new Bundle();
-        for(String key : header.keySet())
+        for(String key : header.keySet()) {
             bundle.putString(key, header.get(key));
+        }
         dest.writeBundle(bundle);
     }
 

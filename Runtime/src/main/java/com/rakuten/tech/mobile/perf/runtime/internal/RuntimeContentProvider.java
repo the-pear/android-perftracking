@@ -43,30 +43,7 @@ public class RuntimeContentProvider extends ContentProvider {
         String packageName = context.getPackageName();
         // Load data from last configuration
         ConfigurationResult lastConfig = getLastConfiguration(context);
-        Config config = null; // configuration for TrackingManager
-        if (lastConfig != null) {
-            double enablePercent = lastConfig.getEnablePercent();
-            double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
-            if (randomNumber <= enablePercent) {
-                config = new Config();
-                config.app = packageName;
-                try {
-                    config.version = packageManager
-                            .getPackageInfo(packageName, 0).versionName;
-                } catch (PackageManager.NameNotFoundException e) {
-                    Log.d(TAG, e.getMessage());
-                }
-                try {
-                    ApplicationInfo ai = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
-                    Bundle bundle = ai.metaData;
-                    config.debug = bundle.getBoolean("com.rakuten.tech.mobile.perf.debug");
-                } catch (PackageManager.NameNotFoundException | NullPointerException e) {
-                    config.debug = false;
-                }
-                config.eventHubUrl = lastConfig.getSendUrl();
-                config.header = lastConfig.getHeader();
-            }
-        }
+        Config config = createConfig(context, lastConfig);
         // Get latest configuration
         RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
         queue.start();
@@ -74,8 +51,7 @@ public class RuntimeContentProvider extends ContentProvider {
         try {
             param = new ConfigurationParam.Builder()
                     .setAppId(packageName)
-                    .setAppVersion(packageManager
-                            .getPackageInfo(packageName, 0).versionName)
+                    .setAppVersion(packageManager.getPackageInfo(packageName, 0).versionName)
                     .setCountryCode(context.getResources().getConfiguration().locale.getCountry())
                     .setPlatform("android")
                     .setSdkVersion(String.valueOf(Build.VERSION.SDK_INT))
@@ -117,6 +93,44 @@ public class RuntimeContentProvider extends ContentProvider {
         return false;
     }
 
+    /**
+     * Configuration for {@link TrackingManager}
+     * @param context application context
+     * @param lastConfig cached config, may be null
+     * @return Configuration for {@link TrackingManager}, may be null
+     */
+    @Nullable
+    private Config createConfig(@NonNull Context context, @Nullable ConfigurationResult lastConfig) {
+        PackageManager packageManager = context.getPackageManager();
+        String packageName = context.getPackageName();
+        if (lastConfig == null) return null;
+        Config config = null; // configuration for TrackingManager
+
+        double enablePercent = lastConfig.getEnablePercent();
+        double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
+        if (randomNumber <= enablePercent) {
+            config = new Config();
+            config.app = packageName;
+            try {
+                config.version = packageManager
+                        .getPackageInfo(packageName, 0).versionName;
+            } catch (PackageManager.NameNotFoundException e) {
+                Log.d(TAG, e.getMessage());
+            }
+            try {
+                ApplicationInfo ai = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
+                Bundle bundle = ai.metaData;
+                config.debug = bundle.getBoolean("com.rakuten.tech.mobile.perf.debug");
+            } catch (PackageManager.NameNotFoundException | NullPointerException e) {
+                config.debug = false;
+            }
+            config.eventHubUrl = lastConfig.getSendUrl();
+            config.header = lastConfig.getHeader();
+        }
+
+        return config;
+    }
+
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
@@ -154,10 +168,10 @@ public class RuntimeContentProvider extends ContentProvider {
     @Nullable
     private ConfigurationResult getLastConfiguration(Context context) {
         String result = null;
-        if (context != null)
+        if (context != null) {
             result = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(CONFIG_KEY, null);
-        if (result != null) return new Gson().fromJson(result, ConfigurationResult.class);
-        else return null;
+        }
+        return result != null ? new Gson().fromJson(result, ConfigurationResult.class) : null;
     }
 
     private String getMetaData(String key) {

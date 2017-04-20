@@ -1,12 +1,13 @@
 package com.rakuten.tech.mobile.perf.runtime.internal;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-class TrackingData implements Comparable {
-    private String measurementId;
-    private Comparable object;
+class TrackingData implements Comparable<TrackingData> {
+    private final String measurementId;
+    private final Comparable object;
 
-    TrackingData(String measurementId, Comparable object) {
+    TrackingData(@NonNull String measurementId, @Nullable Comparable object) {
         this.measurementId = measurementId;
         this.object = object;
     }
@@ -37,14 +38,14 @@ class TrackingData implements Comparable {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
-    public int compareTo(@NonNull Object another) {
-        if (another instanceof TrackingData) {
-            TrackingData data = (TrackingData) another;
-            if (measurementId.compareTo(data.measurementId) == 0) {
-                return nullSafeCompareObjects(object, data.object);
+    public int compareTo(TrackingData another) {
+        if (another != null) {
+            if (measurementId.compareTo(another.measurementId) == 0) {
+                return nullSafeCompareObjects(object, another.object);
             } else {
-                return measurementId.compareTo(data.measurementId);
+                return measurementId.compareTo(another.measurementId);
             }
         }
         return -1;

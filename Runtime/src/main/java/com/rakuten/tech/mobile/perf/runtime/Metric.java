@@ -18,9 +18,10 @@ public final class Metric {
      * @param id Metric identifier.
      */
     public static void start(String id) {
-        if (TrackingManager.INSTANCE != null)
+        if (TrackingManager.INSTANCE != null) {
             TrackingManager.INSTANCE.startMetric(id);
-        else
-            Log.d(TAG,"Tracking manager not initialized");
+        } else {
+            Log.d(TAG, "Tracking manager not initialized");
+        }
     }
 }
