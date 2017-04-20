@@ -71,4 +71,11 @@ public class ConfigurationRequestSpec extends RobolectricUnitSpec {
         assertThat(response.getHeader()).has(keyValue("BrokerProperties", "{\"PartitionKey\": \"com.rakuten.tech.mobile.perf.example/1.0.0\"}"));
         assertThat(response.getHeader()).has(keyValue("Content-Type", "application/atom+xml;type=entry;charset=utf-8"));
     }
+
+    @Test public void shouldNotFailOnInvalidResponseString() {
+        ConfigurationRequest request = new ConfigurationRequest(null, "", builder.build(), null, null);
+        ConfigurationResult result = request.parseResponse("some invalid json [[[[}}}");
+        assertThat(result).isNull();
+        // no exception
+    }
 }

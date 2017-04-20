@@ -10,7 +10,6 @@ import com.rakuten.tech.mobile.perf.runtime.shadow.TrackerShadow;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -19,7 +18,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-@org.robolectric.annotation.Config(shadows={TrackerShadow.class})
+@org.robolectric.annotation.Config(shadows = {TrackerShadow.class})
 public class TrackingManagerSpec extends RobolectricUnitSpec {
 
     private TrackingManager manager;
@@ -28,7 +27,6 @@ public class TrackingManagerSpec extends RobolectricUnitSpec {
     @Mock MockTracker tracker;
 
     @Before public void init() {
-        MockitoAnnotations.initMocks(this);
         TrackingManager.initialize(context, config);
         manager = TrackingManager.INSTANCE;
         TrackerShadow.mockTracker = tracker;
@@ -88,13 +86,13 @@ public class TrackingManagerSpec extends RobolectricUnitSpec {
     }
 
     @Test public void shouldRelayEndAggregatedMeasurementToTracker() {
-        manager.startAggregated("testId", "data");
-        manager.endAggregated("testId", "data");
+        manager.startAggregated("testId", "config");
+        manager.endAggregated("testId", "config");
         verify(tracker, times(1)).endCustom(anyInt());
     }
 
     @Test public void shouldOnRelayEndMeasurementWhenAlreadyStarted() {
-        manager.endAggregated("testId", "data");
+        manager.endAggregated("testId", "config");
         verify(tracker, never()).endCustom(anyInt());
     }
 
