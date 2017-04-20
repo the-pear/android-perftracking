@@ -8,6 +8,7 @@ dependencies {
     testCompile('org.robolectric:robolectric:3.3.2') {
         exclude group: 'commons-logging', module: 'commons-logging'
     }
+    testCompile 'org.robolectric:shadow-api:3.3.2'
     testCompile 'com.squareup.okio:okio:1.12.0'
 }
 
