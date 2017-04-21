@@ -46,8 +46,8 @@ public class SenderSpec {
     }
 
     @Test
-    public void shouldNotFailSendingWhenDebugIsNull(){
-        debug = null;
+    public void shouldNotFailSendingMeasurementWhenDebugIsNull(){
+        sender = new Sender(measurementBuffer, current, eventWriter, null);
         setUp10CustomMeasurement(measurementBuffer);
         sender.send(0);
         verify(eventWriter, times(1)).begin();
@@ -65,6 +65,16 @@ public class SenderSpec {
         for (Metric metric : captor.getAllValues()) {
             assertThat(metric.id).isEqualTo("custom-metric");
         }
+        verify(eventWriter, times(1)).end();
+    }
+
+    @Test
+    public void shouldNotFailSendingMetricWhenDebugIsNull(){
+        sender = new Sender(measurementBuffer, current, eventWriter, null);
+        setUp10CustomMetric(measurementBuffer);
+        sender.send(0);
+        verify(eventWriter, times(1)).begin();
+        verify(eventWriter, times(9)).write(any(Metric.class));
         verify(eventWriter, times(1)).end();
     }
 
