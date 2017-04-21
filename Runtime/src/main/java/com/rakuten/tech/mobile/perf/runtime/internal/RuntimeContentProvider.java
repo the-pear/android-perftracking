@@ -39,12 +39,22 @@ public class RuntimeContentProvider extends ContentProvider {
     public boolean onCreate() {
         Context context = getContext();
         if (context == null) return false;
-        PackageManager packageManager = context.getPackageManager();
-        String packageName = context.getPackageName();
         // Load data from last configuration
-        ConfigurationResult lastConfig = getLastConfiguration(context);
+        ConfigurationResult lastConfig = readConfigFromCache();
         Config config = createConfig(context, lastConfig);
         // Get latest configuration
+        loadConfigurationFromApi(context);
+        if (config != null) {
+            // Initialise Tracking Manager
+            TrackingManager.initialize(getContext(), config); // TODO Config class should be a builder and have all the values set properly
+            Metric.start(StandardMetric.LAUNCH.getValue());
+        }
+        return false;
+    }
+
+    private void loadConfigurationFromApi(Context context) {
+        PackageManager packageManager = context.getPackageManager();
+        String packageName = context.getPackageName();
         RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
         queue.start();
         ConfigurationParam param = null;
@@ -71,7 +81,7 @@ public class RuntimeContentProvider extends ContentProvider {
                     param, new Response.Listener<ConfigurationResult>() {
                 @Override
                 public void onResponse(ConfigurationResult response) {
-                    saveConfiguration(response); // save latest configuration
+                    writeConfigToCache(response); // save latest configuration
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -85,12 +95,6 @@ public class RuntimeContentProvider extends ContentProvider {
                 }
             }).queue(queue);
         }
-        if (config != null) {
-            // Initialise Tracking Manager
-            TrackingManager.initialize(getContext(), config); // TODO Config class should be a builder and have all the values set properly
-            Metric.start(StandardMetric.LAUNCH.getValue());
-        }
-        return false;
     }
 
     /**
@@ -159,17 +163,19 @@ public class RuntimeContentProvider extends ContentProvider {
         return 0;
     }
 
-    private void saveConfiguration(ConfigurationResult result) {
+    private void writeConfigToCache(ConfigurationResult result) {
         if (getContext() != null) {
             getContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(CONFIG_KEY, new Gson().toJson(result)).apply();
         }
     }
 
     @Nullable
-    private ConfigurationResult getLastConfiguration(Context context) {
+    private ConfigurationResult readConfigFromCache() {
+        Context context = getContext();
         String result = null;
         if (context != null) {
-            result = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(CONFIG_KEY, null);
+            result = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                    .getString(CONFIG_KEY, null);
         }
         return result != null ? new Gson().fromJson(result, ConfigurationResult.class) : null;
     }
