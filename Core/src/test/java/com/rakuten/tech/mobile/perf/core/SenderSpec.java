@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
@@ -62,12 +63,8 @@ public class SenderSpec {
         setUp10CustomMetric(measurementBuffer);
         measurementBuffer.nextTrackingId.set(-5);
         sender.send(0);
-        ArgumentCaptor<Metric> captor = ArgumentCaptor.forClass(Metric.class);
         verify(eventWriter, times(1)).begin();
-        verify(eventWriter, times(9)).write(captor.capture());
-        for (Metric metric : captor.getAllValues()) {
-            assertThat(metric.id).isEqualTo("custom-metric");
-        }
+        verify(eventWriter, times(9)).write(any(Metric.class));
         verify(eventWriter, times(1)).end();
     }
 
@@ -78,6 +75,10 @@ public class SenderSpec {
         measurementBuffer.nextTrackingId.set(513);
         sender.send(513);
         verify(eventWriter, never()).begin();
+        verify(eventWriter, never()).write(any(Measurement.class), (String) any());
+        verify(eventWriter, never()).write(any(Metric.class));
+        verify(eventWriter, never()).end();
+
     }
 
     @Test
@@ -85,6 +86,9 @@ public class SenderSpec {
         setUp10CustomMeasurementLesserEndTime(measurementBuffer);
         sender.send(0);
         verify(eventWriter, never()).begin();
+        verify(eventWriter, never()).write(any(Measurement.class), (String) any());
+        verify(eventWriter, never()).write(any(Metric.class));
+        verify(eventWriter, never()).end();
     }
 
     @Test
@@ -93,8 +97,7 @@ public class SenderSpec {
         current.metric.set((Metric) measurementBuffer.at[3].a);
         sender.send(0);
         verify(eventWriter, times(1)).begin();
-        ArgumentCaptor<Measurement> captor = ArgumentCaptor.forClass(Measurement.class);
-        verify(eventWriter, times(1)).write(captor.capture(), (String) isNotNull());
+        verify(eventWriter, times(1)).write(any(Measurement.class), (String) isNotNull());
         verify(eventWriter, times(1)).end();
     }
 
@@ -104,6 +107,9 @@ public class SenderSpec {
         current.metric.set((Metric) measurementBuffer.at[3].a);
         sender.send(0);
         verify(eventWriter, never()).begin();
+        verify(eventWriter, never()).write(any(Measurement.class), (String) any());
+        verify(eventWriter, never()).write(any(Metric.class));
+        verify(eventWriter, never()).end();
     }
 
     @Test
@@ -111,6 +117,9 @@ public class SenderSpec {
         setUp10CustomMeasurementLesserThenMaxTime(measurementBuffer);
         sender.send(0);
         verify(eventWriter, never()).begin();
+        verify(eventWriter, never()).write(any(Measurement.class), (String) any());
+        verify(eventWriter, never()).write(any(Metric.class));
+        verify(eventWriter, never()).end();
     }
 
     private void setUp10CustomMeasurement(MeasurementBuffer measurementBuffer) {
