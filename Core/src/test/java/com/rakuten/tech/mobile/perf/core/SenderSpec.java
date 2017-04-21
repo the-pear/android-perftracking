@@ -102,8 +102,8 @@ public class SenderSpec {
     }
 
     @Test
-    public void shouldNotSendMetricLesserThenMaxTime() {
-        setUp10CustomMetricLesserThenMaxTime(measurementBuffer);
+    public void shouldNotSendMetricLesserThanMaxTime() {
+        setUp10CustomMetricLesserThanMaxTime(measurementBuffer);
         current.metric.set((Metric) measurementBuffer.at[3].a);
         sender.send(0);
         verify(eventWriter, never()).begin();
@@ -113,8 +113,8 @@ public class SenderSpec {
     }
 
     @Test
-    public void shouldNotSendMeasurementsLesserThenMaxTime() {
-        setUp10CustomMeasurementLesserThenMaxTime(measurementBuffer);
+    public void shouldNotSendMeasurementsLesserThanMaxTime() {
+        setUp10CustomMeasurementLesserThanMaxTime(measurementBuffer);
         sender.send(0);
         verify(eventWriter, never()).begin();
         verify(eventWriter, never()).write(any(Measurement.class), (String) any());
@@ -132,7 +132,7 @@ public class SenderSpec {
         }
     }
 
-    private void setUp10CustomMeasurementLesserThenMaxTime(MeasurementBuffer measurementBuffer) {
+    private void setUp10CustomMeasurementLesserThanMaxTime(MeasurementBuffer measurementBuffer) {
         for (int i = 0; i < 10; i++) {
             Measurement measurement = measurementBuffer.next();
             measurement.type = Measurement.CUSTOM;
@@ -178,7 +178,7 @@ public class SenderSpec {
         }
     }
 
-    private void setUp10CustomMetricLesserThenMaxTime(MeasurementBuffer measurementBuffer) {
+    private void setUp10CustomMetricLesserThanMaxTime(MeasurementBuffer measurementBuffer) {
         for (int i = 0; i < 10; i++) {
             Measurement measurement = measurementBuffer.next();
             measurement.type = Measurement.CUSTOM;
