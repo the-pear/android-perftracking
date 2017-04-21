@@ -46,6 +46,16 @@ public class SenderSpec {
     }
 
     @Test
+    public void shouldNotFailSendingWhenDebugIsNull(){
+        debug = null;
+        setUp10CustomMeasurement(measurementBuffer);
+        sender.send(0);
+        verify(eventWriter, times(1)).begin();
+        verify(eventWriter, times(10)).write(any(Measurement.class), (String) isNull());
+        verify(eventWriter, times(1)).end();
+    }
+
+    @Test
     public void shouldSendMetric() {
         setUp10CustomMetric(measurementBuffer);
         sender.send(0);
