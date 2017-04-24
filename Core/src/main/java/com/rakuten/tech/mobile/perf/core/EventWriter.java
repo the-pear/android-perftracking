@@ -56,19 +56,19 @@ class EventWriter {
             _conn.connect();
 
             _writer = new BufferedWriter(new OutputStreamWriter(_conn.getOutputStream()));
-            _writer.append("{\"app\":\"").append(escapeValue(_config.app))
-                    .append("\",\"version\":\"").append(escapeValue(_config.version));
+            _writer.append("{\"app\":\"").append(_config.app)
+                    .append("\",\"version\":\"").append(_config.version);
 
             if (_envInfo.device != null) {
-                _writer.append("\",\"device\":\"").append(escapeValue(_envInfo.device));
+                _writer.append("\",\"device\":\"").append(_envInfo.device);
             }
 
             if (_envInfo.country != null) {
-                _writer.append("\",\"country\":\"").append(escapeValue(_envInfo.country));
+                _writer.append("\",\"country\":\"").append(_envInfo.country);
             }
 
             if (_envInfo.network != null) {
-                _writer.append("\",\"network\":\"").append(escapeValue(_envInfo.network));
+                _writer.append("\",\"network\":\"").append(_envInfo.network);
             }
 
             _writer.append("\",\"measurements\":[");
@@ -89,9 +89,9 @@ class EventWriter {
                     _writer.append(',');
                 }
                 _writer
-                        .append("{\"metric\":\"").append(escapeValue(metric.id))
-                        .append("\",\"urls\":").append(escapeValue(Integer.toString(metric.urls)))
-                        .append(",\"time\":").append(escapeValue(Integer.toString((int) ((metric.endTime - metric.startTime) / 1000000))))
+                        .append("{\"metric\":\"").append(metric.id)
+                        .append("\",\"urls\":").append(Integer.toString(metric.urls))
+                        .append(",\"time\":").append(Integer.toString((int) ((metric.endTime - metric.startTime) / 1000000)))
                         .append('}');
                 _measurements++;
             } catch (Exception e) {
@@ -112,7 +112,7 @@ class EventWriter {
 
                 switch (m.type) {
                     case Measurement.METHOD:
-                        _writer.append("{\"method\":\"").append(escapeValue((String) m.a)).append('#').append(escapeValue((String) m.b)).append('"');
+                        _writer.append("{\"method\":\"").append((String) m.a).append('#').append((String) m.b).append('"');
                         break;
 
                     case Measurement.URL:
@@ -120,7 +120,7 @@ class EventWriter {
 
                         if (m.a instanceof URL) {
                             URL url = (URL) m.a;
-                            _writer.append(escapeValue(url.getProtocol())).append("://").append(escapeValue(url.getAuthority())).append(escapeValue(url.getPath()));
+                            _writer.append(url.getProtocol()).append("://").append(url.getAuthority()).append(escapeValue(url.getPath()));
                         } else {
                             String url = (String) m.a;
                             int q = url.indexOf('?');
@@ -133,12 +133,12 @@ class EventWriter {
                         _writer.append('"');
 
                         if (m.b != null) {
-                            _writer.append(",\"verb\":\"").append(escapeValue((String) m.b)).append('"');
+                            _writer.append(",\"verb\":\"").append((String) m.b).append('"');
                         }
                         break;
 
                     case Measurement.CUSTOM:
-                        _writer.append("{\"custom\":\"").append(escapeValue((String) m.a)).append('"');
+                        _writer.append("{\"custom\":\"").append((String) m.a).append('"');
                         break;
 
                     default:
@@ -146,9 +146,9 @@ class EventWriter {
                 }
 
                 if (metricId != null) {
-                    _writer.append(",\"metric\":\"").append(escapeValue(metricId)).append('"');
+                    _writer.append(",\"metric\":\"").append(metricId).append('"');
                 }
-                _writer.append(",\"time\":").append(escapeValue(Integer.toString((int) ((m.endTime - m.startTime) / 1000000)))).append('}');
+                _writer.append(",\"time\":").append(Integer.toString((int) ((m.endTime - m.startTime) / 1000000))).append('}');
                 _measurements++;
             } catch (Exception e) {
                 if (_config.debug) {

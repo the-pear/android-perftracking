@@ -17,7 +17,7 @@ public final class Measurement {
     /**
      * Starts a new measurement.
      *
-     * @param measurementId Measurement identifier.
+     * @param measurementId Measurement identifier. Valid Arguments are AlphaNumeric, -, _, . and <i>Space</i>.
      * @return trackingId
      * @see #end(String)
      */
@@ -35,7 +35,7 @@ public final class Measurement {
     /**
      * Ends a measurement.
      *
-     * @param measurementId Measurement identifier.
+     * @param measurementId Measurement identifier. Valid Arguments are AlphaNumeric, -, _, . and <i>Space</i>.
      * @see #start(String)
      */
     public static void end(String measurementId) {
@@ -52,7 +52,7 @@ public final class Measurement {
     /**
      * Starts a new aggregated measurement.
      *
-     * @param id     Measurement identifier.
+     * @param id     Identifier. Valid Arguments are AlphaNumeric, -, _, . and <i>Space</i>.
      * @param object Object associated with the measurement.
      * @see #endAggregated(String, Comparable)
      */
@@ -70,7 +70,7 @@ public final class Measurement {
     /**
      * Ends a aggregated measurement.
      *
-     * @param id     Measurement identifier.
+     * @param id     Identifier. Valid Arguments are AlphaNumeric, -, _, . and <i>Space</i>.
      * @param object Object associated with the measurement. This must be the same
      *               object that got passed to startAggregated().
      * @see #startAggregated(String, Comparable)
