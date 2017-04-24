@@ -1,11 +1,11 @@
 package com.rakuten.tech.mobile.perf.core;
 
-public class SenderThread extends Thread {
+class SenderThread extends Thread {
 	private static final int SLEEP_INTERVAL_MILLISECONDS = 10000;
 
 	private final Sender _sender;
 
-	public SenderThread(Sender sender) {
+	SenderThread(Sender sender) {
 		_sender = sender;
 	}
 

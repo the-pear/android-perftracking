@@ -2,7 +2,7 @@ package com.rakuten.tech.mobile.perf.core;
 
 import android.util.Log;
 
-public class Debug {
+class Debug {
     private final String TAG = "Performance Tracking";
 
     public void log(String msg) {

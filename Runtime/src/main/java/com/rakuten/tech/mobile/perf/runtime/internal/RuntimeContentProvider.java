@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -38,45 +39,29 @@ public class RuntimeContentProvider extends ContentProvider {
     public boolean onCreate() {
         Context context = getContext();
         if (context == null) return false;
+        // Load data from last configuration
+        ConfigurationResult lastConfig = readConfigFromCache();
+        Config config = createConfig(context, lastConfig);
+        // Get latest configuration
+        loadConfigurationFromApi(context);
+        if (config != null) {
+            // Initialise Tracking Manager
+            TrackingManager.initialize(getContext(), config); // TODO Config class should be a builder and have all the values set properly
+            Metric.start(StandardMetric.LAUNCH.getValue());
+        }
+        return false;
+    }
+
+    private void loadConfigurationFromApi(Context context) {
         PackageManager packageManager = context.getPackageManager();
         String packageName = context.getPackageName();
-        // Load data from last configuration
-        ConfigurationResult lastConfig = getLastConfiguration(context);
-        Config config = null; // configuration for TrackingManager
-        if (lastConfig != null) {
-            double enablePercent = lastConfig.getEnablePercent();
-            double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
-            if (randomNumber <= enablePercent) {
-                config = new Config();
-                config.app = packageName;
-                try {
-                    config.version = packageManager
-                            .getPackageInfo(packageName, 0).versionName;
-                } catch (PackageManager.NameNotFoundException e) {
-                    Log.d(TAG, e.getMessage());
-                }
-                try {
-                    ApplicationInfo ai = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
-                    Bundle bundle = ai.metaData;
-                    config.debug = bundle.getBoolean("com.rakuten.tech.mobile.perf.debug");
-                } catch (PackageManager.NameNotFoundException e) {
-                    config.debug = false;
-                } catch (NullPointerException e) {
-                    config.debug = false;
-                }
-                config.eventHubUrl = lastConfig.getSendUrl();
-                config.header = lastConfig.getHeader();
-            }
-        }
-        // Get latest configuration
         RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
         queue.start();
         ConfigurationParam param = null;
         try {
             param = new ConfigurationParam.Builder()
                     .setAppId(packageName)
-                    .setAppVersion(packageManager
-                            .getPackageInfo(packageName, 0).versionName)
+                    .setAppVersion(packageManager.getPackageInfo(packageName, 0).versionName)
                     .setCountryCode(context.getResources().getConfiguration().locale.getCountry())
                     .setPlatform("android")
                     .setSdkVersion(String.valueOf(Build.VERSION.SDK_INT))
@@ -96,7 +81,7 @@ public class RuntimeContentProvider extends ContentProvider {
                     param, new Response.Listener<ConfigurationResult>() {
                 @Override
                 public void onResponse(ConfigurationResult response) {
-                    saveConfiguration(response); // save latest configuration
+                    writeConfigToCache(response); // save latest configuration
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -110,62 +95,97 @@ public class RuntimeContentProvider extends ContentProvider {
                 }
             }).queue(queue);
         }
-        if (config != null) {
-            // Initialise Tracking Manager
-            TrackingManager.initialize(getContext(), config); // TODO Config class should be a builder and have all the values set properly
-            Metric.start(StandardMetric.LAUNCH.getValue());
+    }
+
+    /**
+     * Configuration for {@link TrackingManager}
+     * @param context application context
+     * @param lastConfig cached config, may be null
+     * @return Configuration for {@link TrackingManager}, may be null
+     */
+    @Nullable
+    private Config createConfig(@NonNull Context context, @Nullable ConfigurationResult lastConfig) {
+        PackageManager packageManager = context.getPackageManager();
+        String packageName = context.getPackageName();
+        if (lastConfig == null) return null;
+        Config config = null; // configuration for TrackingManager
+
+        double enablePercent = lastConfig.getEnablePercent();
+        double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
+        if (randomNumber <= enablePercent) {
+            config = new Config();
+            config.app = packageName;
+            try {
+                config.version = packageManager
+                        .getPackageInfo(packageName, 0).versionName;
+            } catch (PackageManager.NameNotFoundException e) {
+                Log.d(TAG, e.getMessage());
+            }
+            try {
+                ApplicationInfo ai = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA);
+                Bundle bundle = ai.metaData;
+                config.debug = bundle.getBoolean("com.rakuten.tech.mobile.perf.debug");
+            } catch (PackageManager.NameNotFoundException | NullPointerException e) {
+                config.debug = false;
+            }
+            config.eventHubUrl = lastConfig.getSendUrl();
+            config.header = lastConfig.getHeader();
         }
-        return false;
+
+        return config;
     }
 
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         return null;
     }
 
     @Nullable
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         return null;
     }
 
     @Nullable
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
         return null;
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         return 0;
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         return 0;
     }
 
-    private void saveConfiguration(ConfigurationResult result) {
-        if (getContext() != null)
+    private void writeConfigToCache(ConfigurationResult result) {
+        if (getContext() != null) {
             getContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(CONFIG_KEY, new Gson().toJson(result)).apply();
+        }
     }
 
     @Nullable
-    private ConfigurationResult getLastConfiguration(Context context) {
+    private ConfigurationResult readConfigFromCache() {
+        Context context = getContext();
         String result = null;
-        if (context != null)
-            result = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(CONFIG_KEY, null);
-        if (result != null) return new Gson().fromJson(result, ConfigurationResult.class);
-        else return null;
+        if (context != null) {
+            result = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                    .getString(CONFIG_KEY, null);
+        }
+        return result != null ? new Gson().fromJson(result, ConfigurationResult.class) : null;
     }
 
     private String getMetaData(String key) {
-        ApplicationInfo ai = null;
         try {
-            ai = getContext().getPackageManager().getApplicationInfo(getContext().getPackageName(), PackageManager.GET_META_DATA);
-            Bundle bundle = ai.metaData;
-            return bundle.getString(key);
+            Context ctx = getContext();
+            if(ctx == null) return null;
+            return ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(),
+                    PackageManager.GET_META_DATA).metaData.getString(key);
         } catch (PackageManager.NameNotFoundException e) {
             return null;
         }

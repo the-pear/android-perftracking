@@ -60,23 +60,23 @@ class ConfigurationParam {
         }
     }
 
-    public String getPlatform() {
+    String getPlatform() {
         return platform;
     }
 
-    public String getAppId() {
+    String getAppId() {
         return appId;
     }
 
-    public String getAppVersion() {
+    String getAppVersion() {
         return appVersion;
     }
 
-    public String getSdkVersion() {
+    String getSdkVersion() {
         return sdkVersion;
     }
 
-    public String getCountryCode() {
+    String getCountryCode() {
         return countryCode;
     }
 }

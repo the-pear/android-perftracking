@@ -2,21 +2,21 @@ package com.rakuten.tech.mobile.perf.core;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MeasurementBuffer {
+class MeasurementBuffer {
 
 	// Size must by a power of 2 so that Integer.MAX_VALUE is divisible by it
-	public static final int SIZE = 512;
+	static final int SIZE = 512;
 
-	public final Measurement[] at = new Measurement[SIZE];
-	public final AtomicInteger nextTrackingId = new AtomicInteger(1);
+	final Measurement[] at = new Measurement[SIZE];
+	final AtomicInteger nextTrackingId = new AtomicInteger(1);
 
-	public MeasurementBuffer() {
+	MeasurementBuffer() {
 		for (int i = 0; i < SIZE; i++) {
 			at[i] = new Measurement();
 		}
 	}
 
-	public Measurement next() {
+	Measurement next() {
 		int id = nextTrackingId.getAndIncrement();
 
 		if (id == 0) {
@@ -42,7 +42,7 @@ public class MeasurementBuffer {
 		return m;
 	}
 
-	public Measurement getByTrackingId(int trackingId) {
+	Measurement getByTrackingId(int trackingId) {
 		int index = trackingId % SIZE;
 		if (index < 0) {
 			index += SIZE;

@@ -1,7 +1,7 @@
 package com.rakuten.tech.mobile.perf.core;
 
-public class Sender {
-	public static final long MIN_TIME = 5000000L; // 5 ms
+class Sender {
+	private static final long MIN_TIME = 5000000L; // 5 ms
     private static final int MIN_COUNT = 10;
 
 	private final MeasurementBuffer _buffer;
@@ -11,7 +11,7 @@ public class Sender {
 	private Metric _metric;
 	private int _sent;
 
-	public Sender(MeasurementBuffer buffer, Current current, EventWriter writer, Debug debug) {
+	Sender(MeasurementBuffer buffer, Current current, EventWriter writer, Debug debug) {
 		_buffer = buffer;
 		_current = current;
 		_writer = writer;
@@ -19,7 +19,7 @@ public class Sender {
 	}
 
     /**
-     * Tries to send measurements and metrics from the underlying buffer staring from {@code
+     * Tries to send measurements and metrics from the underlying buffer starting from {@code
      * startIndex}. Will wait while each measurement/metric is potentially still "alive", i.e. it
      * started less than {@link Metric#MAX_TIME} or {@link Measurement#MAX_TIME} ago respectively.
      * Returns the buffer index next unsent measurement/metric, which should be used for the next
@@ -27,7 +27,7 @@ public class Sender {
      * @param startIndex send measurements starting from this index (of the buffer)
      * @return next unsent index, i.e. {@code startIndex} for the next call to send
      */
-    public int send(int startIndex) {
+    int send(int startIndex) {
         int idIndex = _buffer.nextTrackingId.get() % MeasurementBuffer.SIZE;
         if (idIndex < 0) {
             idIndex += MeasurementBuffer.SIZE;

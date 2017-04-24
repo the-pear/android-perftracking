@@ -1,15 +1,15 @@
 package com.rakuten.tech.mobile.perf.core;
 
-import java.util.Locale;
-
 import android.content.Context;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 
-public class EnvironmentInfo {
-	public String device;
-	public String country;
-	public String network;
+import java.util.Locale;
+
+class EnvironmentInfo {
+	String device;
+	String country;
+	String network;
 	
 	public static EnvironmentInfo get(Context context) {
 		EnvironmentInfo info = new EnvironmentInfo();

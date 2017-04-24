@@ -11,7 +11,7 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class EventWriter {
+class EventWriter {
     private final String TAG = "Performance Tracking";
     private final Config _config;
     private final EnvironmentInfo _envInfo;
@@ -20,7 +20,7 @@ public class EventWriter {
     private BufferedWriter _writer;
     private int _measurements;
 
-    public EventWriter(Config config, EnvironmentInfo envInfo) {
+    EventWriter(Config config, EnvironmentInfo envInfo) {
         _config = config;
         _envInfo = envInfo;
         URL url = null;
@@ -36,13 +36,14 @@ public class EventWriter {
     }
 
     /* for testing */
+    @SuppressWarnings("unused")
     EventWriter(Config config, EnvironmentInfo envInfo, URL url) {
         _config = config;
         _envInfo = envInfo;
         _url = url;
     }
 
-    public void begin() {
+    void begin() {
         try {
             _conn = (HttpsURLConnection) _url.openConnection();
             _conn.setRequestMethod("POST");
@@ -81,7 +82,7 @@ public class EventWriter {
         }
     }
 
-    public void write(Metric metric) {
+    void write(Metric metric) {
         if (_writer != null) {
             try {
                 if (_measurements > 0) {
@@ -102,7 +103,7 @@ public class EventWriter {
         }
     }
 
-    public void write(Measurement m, String metricId) {
+    void write(Measurement m, String metricId) {
         if (_writer != null) {
             try {
                 if (_measurements > 0) {
@@ -158,7 +159,7 @@ public class EventWriter {
         }
     }
 
-    public void end() {
+    void end() {
         try {
             if (_writer != null) {
                 _writer.append("]}");
