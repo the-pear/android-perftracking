@@ -32,14 +32,23 @@ public class MeasurementSpec extends RobolectricUnitSpec {
             return Arrays.asList(new Object[][]{
                     {Action.START,  null},
                     {Action.START,  ""},
+                    {Action.START,  "appQ\\"},
+                    {Action.START,  "appQ\""},
                     {Action.END,    null},
                     {Action.END,    ""},
+                    {Action.END,    "appQ\\"},
+                    {Action.END,    "appQ\""},
                     {Action.START_AGGREGATED,   Pair.create(null, null)},
                     {Action.START_AGGREGATED,   Pair.create("", null)},
                     {Action.START_AGGREGATED,   Pair.create("valid", null)},
+                    {Action.START_AGGREGATED,   Pair.create("appQ\\", null)},
+                    {Action.START_AGGREGATED,   Pair.create("appQ\"", null)},
                     {Action.END_AGGREGATED,     Pair.create(null, null)},
-                    {Action.END_AGGREGATED,     Pair.create("", null) },
-                    {Action.END_AGGREGATED,     Pair.create("valid", null) }
+                    {Action.END_AGGREGATED,     Pair.create("", null)},
+                    {Action.END_AGGREGATED,     Pair.create("valid", null)},
+                    {Action.END_AGGREGATED,     Pair.create("appQ\\", null) },
+                    {Action.END_AGGREGATED,     Pair.create("appQ\"", null) }
+
             });
         }
 
@@ -116,5 +125,29 @@ public class MeasurementSpec extends RobolectricUnitSpec {
         Measurement.endAggregated("id2", "val");
 
         // no exception thrown
+    }
+
+    @Test
+    public void shouldStartMeasurement(){
+        Measurement.start("appQ1_- .");
+        verify(trackingManager).startMeasurement("appQ1_- .");
+    }
+
+    @Test
+    public void shouldEndMeasurement(){
+        Measurement.end("appQ1_- .");
+        verify(trackingManager).endMeasurement("appQ1_- .");
+    }
+
+    @Test
+    public void shouldStartAggregated(){
+        Measurement.startAggregated("appQ1_- .", "Object");
+        verify(trackingManager).startAggregated("appQ1_- .", "Object");
+    }
+
+    @Test
+    public void shouldEndAggregated(){
+        Measurement.endAggregated("appQ1_- .", "Object");
+        verify(trackingManager).endAggregated("appQ1_- .", "Object");
     }
 }

@@ -28,7 +28,9 @@ public class MetricSpec extends RobolectricUnitSpec {
         public static Collection<Object[]> data() {
             return Arrays.asList(new Object[][]{
                     {null},
-                    {""}
+                    {""},
+                    {"appQ\\"},
+                    {"appq\""}
             });
         }
 
@@ -55,5 +57,11 @@ public class MetricSpec extends RobolectricUnitSpec {
         Metric.start("id1");
 
         // no exception thrown
+    }
+
+    @Test
+    public void shouldNotThrowIllegalArgumentException(){
+        Metric.start("appQ1_- .");
+        verify(trackingManager).startMetric("appQ1_- .");
     }
 }
