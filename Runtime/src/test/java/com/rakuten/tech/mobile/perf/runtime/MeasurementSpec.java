@@ -43,11 +43,15 @@ public class MeasurementSpec extends RobolectricUnitSpec {
                     {Action.START_AGGREGATED,   Pair.create("valid", null)},
                     {Action.START_AGGREGATED,   Pair.create("appQ\\", null)},
                     {Action.START_AGGREGATED,   Pair.create("appQ\"", null)},
+                    {Action.START_AGGREGATED,   Pair.create("appQ\\", "Object")},
+                    {Action.START_AGGREGATED,   Pair.create("appQ\"", "Object")},
                     {Action.END_AGGREGATED,     Pair.create(null, null)},
                     {Action.END_AGGREGATED,     Pair.create("", null)},
                     {Action.END_AGGREGATED,     Pair.create("valid", null)},
                     {Action.END_AGGREGATED,     Pair.create("appQ\\", null) },
-                    {Action.END_AGGREGATED,     Pair.create("appQ\"", null) }
+                    {Action.END_AGGREGATED,     Pair.create("appQ\"", null) },
+                    {Action.END_AGGREGATED,     Pair.create("appQ\\", "Object") },
+                    {Action.END_AGGREGATED,     Pair.create("appQ\"", "Object") }
 
             });
         }
@@ -128,25 +132,25 @@ public class MeasurementSpec extends RobolectricUnitSpec {
     }
 
     @Test
-    public void shouldStartMeasurement(){
+    public void shouldStartMeasurementWithValidInput(){
         Measurement.start("appQ1_- .");
         verify(trackingManager).startMeasurement("appQ1_- .");
     }
 
     @Test
-    public void shouldEndMeasurement(){
+    public void shouldEndMeasurementWithValidInput(){
         Measurement.end("appQ1_- .");
         verify(trackingManager).endMeasurement("appQ1_- .");
     }
 
     @Test
-    public void shouldStartAggregated(){
+    public void shouldStartAggregatedWithValidInput(){
         Measurement.startAggregated("appQ1_- .", "Object");
         verify(trackingManager).startAggregated("appQ1_- .", "Object");
     }
 
     @Test
-    public void shouldEndAggregated(){
+    public void shouldEndAggregatedWithValidInput(){
         Measurement.endAggregated("appQ1_- .", "Object");
         verify(trackingManager).endAggregated("appQ1_- .", "Object");
     }

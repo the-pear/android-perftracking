@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
  */
 public class Validation {
 
-    private static String regex = "[a-zA-Z0-9 ._-]*";
+    private static String validInputRegex = "[a-zA-Z0-9 ._-]*";
 
     /**
      * Validate metric or measurement ids, should match backend validation rules.
@@ -28,6 +28,6 @@ public class Validation {
      * @return true if invalid, false in valid
      */
     public static boolean isInvalidId(@Nullable String idCandidate) {
-        return (TextUtils.isEmpty(idCandidate) || !Pattern.matches(regex, idCandidate));
+        return (TextUtils.isEmpty(idCandidate) || !Pattern.matches(validInputRegex, idCandidate));
     }
 }

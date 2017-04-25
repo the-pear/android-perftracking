@@ -60,7 +60,7 @@ public class MetricSpec extends RobolectricUnitSpec {
     }
 
     @Test
-    public void shouldNotThrowIllegalArgumentException(){
+    public void shouldStartMetricWithValidInput(){
         Metric.start("appQ1_- .");
         verify(trackingManager).startMetric("appQ1_- .");
     }
