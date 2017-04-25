@@ -185,6 +185,15 @@ class EventWriter {
             _conn.disconnect();
         }
         _conn = null;
+        if(_writer != null) {
+            try {
+                _writer.close();
+            } catch (IOException e) {
+                if (_config.debug) {
+                    Log.d(TAG, e.getMessage());
+                }
+            }
+        }
         _writer = null;
     }
 
