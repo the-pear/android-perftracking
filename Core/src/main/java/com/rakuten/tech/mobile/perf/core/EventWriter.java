@@ -28,7 +28,7 @@ class EventWriter {
             url = new URL(_config.eventHubUrl);
         } catch (MalformedURLException e) {
             if (_config.debug) {
-                Log.d(TAG, e.toString());
+                Log.d(TAG, e.getMessage());
             }
         } finally {
             _url = url;
@@ -76,7 +76,7 @@ class EventWriter {
 
         } catch (Exception e) {
             if (_config.debug) {
-                Log.d(TAG, e.toString());
+                Log.d(TAG, e.getMessage());
             }
             disconnect();
         }
@@ -96,7 +96,7 @@ class EventWriter {
                 _measurements++;
             } catch (Exception e) {
                 if (_config.debug) {
-                    Log.d(TAG, e.toString());
+                    Log.d(TAG, e.getMessage());
                 }
                 disconnect();
             }
@@ -152,7 +152,7 @@ class EventWriter {
                 _measurements++;
             } catch (Exception e) {
                 if (_config.debug) {
-                    Log.d(TAG, e.toString());
+                    Log.d(TAG, e.getMessage());
                 }
                 disconnect();
             }
@@ -173,7 +173,7 @@ class EventWriter {
             }
         } catch (Exception e) {
             if (_config.debug) {
-                Log.d(TAG, e.toString());
+                Log.d(TAG, e.getMessage());
             }
         } finally {
             disconnect();
