@@ -9,6 +9,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -21,6 +23,7 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.NoCache;
 import com.google.gson.Gson;
 import com.rakuten.tech.mobile.perf.core.Config;
+import com.rakuten.tech.mobile.perf.core.Tracker;
 import com.rakuten.tech.mobile.perf.runtime.Metric;
 import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
 
@@ -34,23 +37,47 @@ public class RuntimeContentProvider extends ContentProvider {
     private static final String TAG = RuntimeContentProvider.class.getSimpleName();
     private static final String PREFS = "app_performance";
     private static final String CONFIG_KEY = "config_key";
-
+    private static final int TIME_INTERVAL = 60*60*1000; // 1 HOUR in milli seconds
+    Handler handler;
+    Context mContext;
     @Override
     public boolean onCreate() {
-        Context context = getContext();
-        if (context == null) return false;
-        // Load data from last configuration
-        ConfigurationResult lastConfig = readConfigFromCache();
-        Config config = createConfig(context, lastConfig);
-        // Get latest configuration
-        loadConfigurationFromApi(context);
-        if (config != null) {
-            // Initialise Tracking Manager
-            TrackingManager.initialize(getContext(), config); // TODO Config class should be a builder and have all the values set properly
-            Metric.start(StandardMetric.LAUNCH.getValue());
-        }
+        mContext = getContext();
+        if (mContext == null) return false;
+        handler = new Handler(Looper.getMainLooper());
+        handler.removeCallbacks(periodicCheck);
+        handler.post(periodicCheck);
+        loadAndRequest();
+
         return false;
     }
+
+    private void loadAndRequest() {
+        // Load data from last configuration
+        ConfigurationResult lastConfig = readConfigFromCache();
+        Config config = createConfig(mContext, lastConfig);
+        // Get latest configuration
+        loadConfigurationFromApi(mContext);
+        if (config != null) {
+            Log.d(TAG,"Old saved config is not null, initialize tracking manager");
+            // Initialise Tracking Manager
+            TrackingManager.initialize(mContext, config); // TODO Config class should be a builder and have all the values set properly
+            Metric.start(StandardMetric.LAUNCH.getValue());
+        }
+    }
+
+    private final Runnable periodicCheck = new Runnable() {
+        public void run() {
+            try {
+                if (Tracker.isTrackerRunning()) {
+                    loadAndRequest();
+                }
+                handler.postDelayed(this, TIME_INTERVAL);
+            }catch (Exception e){
+                Log.d(TAG,"Exception :"+e.getMessage());
+            }
+        }
+    };
 
     private void loadConfigurationFromApi(Context context) {
         PackageManager packageManager = context.getPackageManager();
@@ -111,6 +138,13 @@ public class RuntimeContentProvider extends ContentProvider {
         Config config = null; // configuration for TrackingManager
 
         double enablePercent = lastConfig.getEnablePercent();
+
+        if(lastConfig.getEnablePercent() <= 0.0){
+            Log.d(TAG,"enable percent is 0 or negative, Deinitialize TrackingManager");
+            TrackingManager.deinitialize();
+            return null;
+        }
+
         double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
         if (randomNumber <= enablePercent) {
             config = new Config();

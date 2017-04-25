@@ -31,6 +31,11 @@ public class TrackingManager {
         INSTANCE = new TrackingManager();
     }
 
+    static void deinitialize() {
+        Tracker.off();
+        INSTANCE = null;
+    }
+
     /**
      * Starts a new measurement.
      *

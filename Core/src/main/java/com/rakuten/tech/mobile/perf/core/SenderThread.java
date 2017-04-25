@@ -4,9 +4,11 @@ class SenderThread extends Thread {
 	private static final int SLEEP_INTERVAL_MILLISECONDS = 10000;
 
 	private final Sender _sender;
+	private boolean isRunning;
 
 	SenderThread(Sender sender) {
 		_sender = sender;
+		isRunning = true;
 	}
 
 	@SuppressWarnings("InfiniteLoopStatement")
@@ -14,12 +16,20 @@ class SenderThread extends Thread {
 	public void run() {
 		int index = 1;
 
-		while (true) {
+		while (isRunning) {
 			index = _sender.send(index);
 
 			try {
 				Thread.sleep(SLEEP_INTERVAL_MILLISECONDS);
 			} catch (InterruptedException e) { /* continue looping if sleep is interrupted */ }
 		}
+	}
+
+	public boolean isRunning() {
+		return isRunning;
+	}
+
+	public void setRunning(boolean running) {
+		isRunning = running;
 	}
 }

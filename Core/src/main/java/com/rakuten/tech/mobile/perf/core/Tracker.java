@@ -14,6 +14,7 @@ import java.net.URL;
 public class Tracker {
 	private static TrackerImpl _tracker;
 	private static SenderThread _senderThread;
+	private static boolean isTrackerRunning = false;
 
 	/**
 	 * Turns performance tracking on.
@@ -21,6 +22,7 @@ public class Tracker {
 	 * @param config Performance tracking configuration.
 	 */
 	public static void on(Context context, Config config) {
+		isTrackerRunning = true;
 		Debug debug = config.debug ? new Debug() : null;
 		MeasurementBuffer buffer = new MeasurementBuffer();
 		Current current = new Current();
@@ -35,10 +37,19 @@ public class Tracker {
 	/**
 	 * Turns performance tracking off.
 	 */
-	public static void off()
-	{
+	public static void off() {
 		_tracker = null;
+		_senderThread.setRunning(false);
 		_senderThread = null;
+		isTrackerRunning = false;
+	}
+
+	public static boolean isTrackerRunning() {
+		return isTrackerRunning;
+	}
+
+	public static void setIsTrackerRunning(boolean isTrackerRunning) {
+		Tracker.isTrackerRunning = isTrackerRunning;
 	}
 
 	/**
