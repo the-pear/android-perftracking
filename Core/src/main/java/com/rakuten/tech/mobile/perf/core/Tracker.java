@@ -38,7 +38,8 @@ public class Tracker {
 	 */
     public static void off() {
         _tracker = null;
-        _senderThread.terminate();
+        SenderThread s = _senderThread;
+        if(s != null) s.terminate();
         _senderThread = null;
     }
 
