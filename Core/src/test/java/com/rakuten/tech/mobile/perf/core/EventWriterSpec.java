@@ -2,6 +2,7 @@ package com.rakuten.tech.mobile.perf.core;
 
 import org.json.JSONException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -263,22 +264,34 @@ public class EventWriterSpec {
     }
 
     @Rule public TestData escapedJson = new TestData("escaped.json");
-    @Test public void shouldHandleMalformedData() throws IOException, JSONException {
+    @Test public void shouldHandleMalformedURLData() throws IOException, JSONException {
         Measurement measurement = new Measurement();
-        measurement.type = Measurement.CUSTOM;
-        measurement.a = "\"";
+        measurement.type = Measurement.URL;
+        measurement.a = new URL("http://example.com:80/page1\".html");
         measurement.startTime = 0L;
         measurement.endTime = 999 * 1000000L;
 
         writer.begin();
         writer.write(measurement, "test-metric");
-        measurement.a = "\"[";
+        measurement.a = new URL("http://example.com:80/page1\"[.html");
         writer.write(measurement, "test-metric");
-        measurement.a = "\"{";
+        measurement.a = new URL("http://example.com:80/page1\"{.html");
         writer.write(measurement, "test-metric");
-        measurement.a = "\",";
+        measurement.a = new URL("http://example.com:80/page1\",.html");
         writer.write(measurement, "test-metric");
-        measurement.a = "'}'";
+        measurement.a = new URL("http://example.com:80/page1'}'.html");
+        writer.write(measurement, "test-metric");
+        //For URL as String.
+        measurement.a = "http://example.com:80/page1\".html";
+        writer.write(measurement, "test-metric");
+        measurement.a = "http://example.com:80/page1\"[.html";
+        writer.write(measurement, "test-metric");
+        measurement.a = "http://example.com:80/page1\"{.html";
+        writer.write(measurement, "test-metric");
+        measurement.a = "http://example.com:80/page1\",.html";
+        writer.write(measurement, "test-metric");
+        measurement.a = "http://example.com:80/page1'}'.html";
+        writer.write(measurement, "test-metric");
         writer.end();
 
         String writtenString = extractWrittenString(outputStream);
