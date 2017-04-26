@@ -29,7 +29,7 @@ class SenderThread extends Thread {
 		return isRunning;
 	}
 
-	public void setRunning(boolean running) {
-		isRunning = running;
+	public void stopRunning() {
+		isRunning = false;
 	}
 }

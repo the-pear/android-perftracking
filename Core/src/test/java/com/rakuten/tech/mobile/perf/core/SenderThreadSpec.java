@@ -22,11 +22,12 @@ public class SenderThreadSpec {
     }
 
     @Test
-    public void shouldInterruptSenderThread() {
+    public void shouldStopSenderThread() throws InterruptedException {
         assertTrue(senderThread.isAlive());
-        senderThread.setRunning(false);
+        senderThread.stopRunning();
         assertFalse(senderThread.isRunning());
-        while (senderThread.isAlive());
+        senderThread.interrupt();
+        Thread.sleep(10);
         assertFalse(senderThread.isAlive());
     }
 }

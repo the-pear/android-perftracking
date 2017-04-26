@@ -26,12 +26,12 @@ public class TrackingManager {
         mTrackingData = new HashMap<>();
     }
 
-    static void initialize(Context context, Config config) {
+    synchronized static void initialize(Context context, Config config) {
         Tracker.on(context, config);
         INSTANCE = new TrackingManager();
     }
 
-    static void deinitialize() {
+    synchronized static void deinitialize() {
         Tracker.off();
         INSTANCE = null;
     }

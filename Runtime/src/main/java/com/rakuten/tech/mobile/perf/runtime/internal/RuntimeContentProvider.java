@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,6 +22,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.NoCache;
+import com.android.volley.toolbox.RequestFuture;
 import com.google.gson.Gson;
 import com.rakuten.tech.mobile.perf.core.Config;
 import com.rakuten.tech.mobile.perf.core.Tracker;
@@ -28,6 +30,7 @@ import com.rakuten.tech.mobile.perf.runtime.Metric;
 import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
 
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 /**
  * RuntimeContentProvider - a custom high-priority ContentProvider, to start tracking early in the process launch phase.
@@ -40,19 +43,12 @@ public class RuntimeContentProvider extends ContentProvider {
     private static final int TIME_INTERVAL = 60*60*1000; // 1 HOUR in milli seconds
     Handler handler;
     Context mContext;
+
     @Override
     public boolean onCreate() {
         mContext = getContext();
         if (mContext == null) return false;
-        handler = new Handler(Looper.getMainLooper());
-        handler.removeCallbacks(periodicCheck);
-        handler.post(periodicCheck);
-        loadAndRequest();
 
-        return false;
-    }
-
-    private void loadAndRequest() {
         // Load data from last configuration
         ConfigurationResult lastConfig = readConfigFromCache();
         Config config = createConfig(mContext, lastConfig);
@@ -64,13 +60,39 @@ public class RuntimeContentProvider extends ContentProvider {
             TrackingManager.initialize(mContext, config); // TODO Config class should be a builder and have all the values set properly
             Metric.start(StandardMetric.LAUNCH.getValue());
         }
+
+        HandlerThread thread = new HandlerThread("Periodic Handler Thread");
+        thread.start();
+        Handler handler = new Handler(thread.getLooper());
+        handler.postDelayed(periodicCheck, TIME_INTERVAL);
+        return false;
+    }
+
+
+        private void loadConfiguration() {
+
+       // Get latest configuration synchronously
+        loadConfigurationFromApiSync(mContext);
+
+        // Load data from latest configuration
+        ConfigurationResult lastConfig = readConfigFromCache();
+        Config config = createConfig(mContext, lastConfig);
+
+        if(lastConfig.getEnablePercent() <= 0.0){
+            Log.d(TAG,"enable percent is 0 or negative, Deinitialize TrackingManager");
+            TrackingManager.deinitialize();
+            return;
+        }else if (config != null) {
+            // Update Tracking Manager with new config
+            TrackingManager.initialize(mContext, config);
+        }
     }
 
     private final Runnable periodicCheck = new Runnable() {
         public void run() {
             try {
                 if (Tracker.isTrackerRunning()) {
-                    loadAndRequest();
+                    loadConfiguration();
                 }
                 handler.postDelayed(this, TIME_INTERVAL);
             }catch (Exception e){
@@ -79,12 +101,10 @@ public class RuntimeContentProvider extends ContentProvider {
         }
     };
 
-    private void loadConfigurationFromApi(Context context) {
+    private ConfigurationParam getConfigParam(Context context){
+        ConfigurationParam param = null;
         PackageManager packageManager = context.getPackageManager();
         String packageName = context.getPackageName();
-        RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
-        queue.start();
-        ConfigurationParam param = null;
         try {
             param = new ConfigurationParam.Builder()
                     .setAppId(packageName)
@@ -96,6 +116,58 @@ public class RuntimeContentProvider extends ContentProvider {
         } catch (PackageManager.NameNotFoundException e) {
             Log.d(TAG, e.getMessage());
         }
+        return param;
+    }
+
+    private ConfigurationResult loadConfigurationFromApiSync(Context context) {
+        ConfigurationResult configResult = null;
+        RequestFuture<ConfigurationResult> future = RequestFuture.newFuture();
+        RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
+        queue.start();
+        ConfigurationParam param = getConfigParam(context);
+
+        String subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
+
+        if (subscriptionKey == null)
+            Log.d(TAG, "Cannot read metadata `com.rakuten.tech.mobile.perf.SubscriptionKey` from manifest, automated performance tracking will not work.");
+
+        if (param != null) {
+            ConfigurationRequest configRequest = new ConfigurationRequest(
+                    getMetaData("com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix"),
+                    subscriptionKey,
+                    param, null,null
+            );
+            configRequest.queue(queue);
+
+            try {
+                configResult = future.get();
+                writeConfigToCache(configResult); // save latest configuration
+            } catch (InterruptedException error) {
+                Throwable throwable = error;
+                String message = error.getClass().getName();
+                while (throwable.getMessage() == null && throwable.getCause() != null)
+                    throwable = throwable.getCause();
+                if (throwable.getMessage() != null) message = throwable.getMessage();
+                Log.d(TAG, "Error: " + message);
+            } catch (ExecutionException error) {
+                Throwable throwable = error;
+                String message = error.getClass().getName();
+                while (throwable.getMessage() == null && throwable.getCause() != null)
+                    throwable = throwable.getCause();
+                if (throwable.getMessage() != null) message = throwable.getMessage();
+                Log.d(TAG, "Error: " + message);
+            }
+
+
+        }
+        return configResult;
+    }
+
+
+    private void loadConfigurationFromApi(Context context) {
+        RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
+        queue.start();
+        ConfigurationParam param = getConfigParam(context);
 
         String subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
 
@@ -138,12 +210,6 @@ public class RuntimeContentProvider extends ContentProvider {
         Config config = null; // configuration for TrackingManager
 
         double enablePercent = lastConfig.getEnablePercent();
-
-        if(lastConfig.getEnablePercent() <= 0.0){
-            Log.d(TAG,"enable percent is 0 or negative, Deinitialize TrackingManager");
-            TrackingManager.deinitialize();
-            return null;
-        }
 
         double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
         if (randomNumber <= enablePercent) {
