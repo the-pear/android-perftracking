@@ -187,8 +187,8 @@ class EventWriter {
     private void disconnect() {
         if (_conn != null) {
             _conn.disconnect();
+            _conn = null;
         }
-        _conn = null;
         if(_writer != null) {
             try {
                 _writer.close();
@@ -197,8 +197,8 @@ class EventWriter {
                     Log.d(TAG, e.getMessage());
                 }
             }
+            _writer = null;
         }
-        _writer = null;
     }
 
     private String escapeValue(String s) {

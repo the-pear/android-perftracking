@@ -21,7 +21,7 @@ public class Tracker {
 	 * @param context Instance of android.content.Context.
 	 * @param config Performance tracking configuration.
 	 */
-	public static void on(Context context, Config config) {
+	public static synchronized void on(Context context, Config config) {
 		Debug debug = config.debug ? new Debug() : null;
 		MeasurementBuffer buffer = new MeasurementBuffer();
 		Current current = new Current();
@@ -36,7 +36,7 @@ public class Tracker {
 	/**
 	 * Turns performance tracking off.
 	 */
-    public static void off() {
+    public static synchronized void off() {
         _tracker = null;
         SenderThread s = _senderThread;
         if(s != null) s.terminate();

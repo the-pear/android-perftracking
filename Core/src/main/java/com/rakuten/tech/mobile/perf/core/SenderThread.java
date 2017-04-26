@@ -34,7 +34,7 @@ class SenderThread extends Thread {
                 _failures = 0;
             } catch (EventHubException e) {
                 if (e.statusCode == 401) {
-                    terminate();
+                    Tracker.off();
                     return;
                 } else {
                     _failures++;
