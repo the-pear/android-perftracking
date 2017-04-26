@@ -264,7 +264,7 @@ public class EventWriterSpec {
     }
 
     @Rule public TestData escapedJson = new TestData("escaped.json");
-    @Test public void shouldHandleMalformedData() throws IOException, JSONException {
+    @Test public void shouldHandleMalformedURLData() throws IOException, JSONException {
         Measurement measurement = new Measurement();
         measurement.type = Measurement.URL;
         measurement.a = new URL("http://example.com:80/page1\".html");
