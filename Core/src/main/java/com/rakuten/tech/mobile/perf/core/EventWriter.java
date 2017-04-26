@@ -43,7 +43,7 @@ class EventWriter {
         _url = url;
     }
 
-    void begin() {
+    void begin() throws IOException {
         try {
             _conn = (HttpsURLConnection) _url.openConnection();
             _conn.setRequestMethod("POST");
@@ -79,10 +79,11 @@ class EventWriter {
                 Log.d(TAG, e.getMessage());
             }
             disconnect();
+            if(e instanceof IOException) throw e;
         }
     }
 
-    void write(Metric metric) {
+    void write(Metric metric) throws IOException {
         if (_writer != null) {
             try {
                 if (_measurements > 0) {
@@ -99,11 +100,12 @@ class EventWriter {
                     Log.d(TAG, e.getMessage());
                 }
                 disconnect();
+                if(e instanceof IOException) throw e;
             }
         }
     }
 
-    void write(Measurement m, String metricId) {
+    void write(Measurement m, String metricId) throws IOException {
         if (_writer != null) {
             try {
                 if (_measurements > 0) {
@@ -155,11 +157,12 @@ class EventWriter {
                     Log.d(TAG, e.getMessage());
                 }
                 disconnect();
+                if(e instanceof IOException) throw e;
             }
         }
     }
 
-    void end() {
+    void end() throws IOException {
         try {
             if (_writer != null) {
                 _writer.append("]}");
@@ -168,13 +171,14 @@ class EventWriter {
                 int result = _conn.getResponseCode();
 
                 if (result != 201) {
-                    throw new IOException("Failed to send event with status " + result);
+                    throw new EventHubException(result);
                 }
             }
         } catch (Exception e) {
             if (_config.debug) {
                 Log.d(TAG, e.getMessage());
             }
+            if(e instanceof EventHubException) throw e;
         } finally {
             disconnect();
         }
