@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -30,7 +29,7 @@ import com.rakuten.tech.mobile.perf.runtime.Metric;
 import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
 
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
+
 
 /**
  * RuntimeContentProvider - a custom high-priority ContentProvider, to start tracking early in the process launch phase.
@@ -40,7 +39,7 @@ public class RuntimeContentProvider extends ContentProvider {
     private static final String TAG = RuntimeContentProvider.class.getSimpleName();
     private static final String PREFS = "app_performance";
     private static final String CONFIG_KEY = "config_key";
-    private static final int TIME_INTERVAL = 60*60*1000; // 1 HOUR in milli seconds
+    private static final int TIME_INTERVAL = 60 * 60 * 1000; // 1 HOUR in milli seconds
     Handler handler;
     Context mContext;
 
@@ -55,7 +54,6 @@ public class RuntimeContentProvider extends ContentProvider {
         // Get latest configuration
         loadConfigurationFromApi(mContext);
         if (config != null) {
-            Log.d(TAG,"Old saved config is not null, initialize tracking manager");
             // Initialise Tracking Manager
             TrackingManager.initialize(mContext, config); // TODO Config class should be a builder and have all the values set properly
             Metric.start(StandardMetric.LAUNCH.getValue());
@@ -63,26 +61,26 @@ public class RuntimeContentProvider extends ContentProvider {
 
         HandlerThread thread = new HandlerThread("Periodic Handler Thread");
         thread.start();
-        Handler handler = new Handler(thread.getLooper());
+        handler = new Handler(thread.getLooper());
         handler.postDelayed(periodicCheck, TIME_INTERVAL);
         return false;
     }
 
 
-        private void loadConfiguration() {
+    private void loadConfiguration() {
 
-       // Get latest configuration synchronously
+        // Get latest configuration synchronously
         loadConfigurationFromApiSync(mContext);
 
         // Load data from latest configuration
         ConfigurationResult lastConfig = readConfigFromCache();
         Config config = createConfig(mContext, lastConfig);
 
-        if(lastConfig.getEnablePercent() <= 0.0){
-            Log.d(TAG,"enable percent is 0 or negative, Deinitialize TrackingManager");
+        if (lastConfig.getEnablePercent() <= 0.0) {
+            Log.d(TAG, "enable percent is zero or negative, Deinitialize TrackingManager");
             TrackingManager.deinitialize();
             return;
-        }else if (config != null) {
+        } else if (config != null) {
             // Update Tracking Manager with new config
             TrackingManager.initialize(mContext, config);
         }
@@ -95,13 +93,13 @@ public class RuntimeContentProvider extends ContentProvider {
                     loadConfiguration();
                 }
                 handler.postDelayed(this, TIME_INTERVAL);
-            }catch (Exception e){
-                Log.d(TAG,"Exception :"+e.getMessage());
+            } catch (Exception e) {
+                Log.d(TAG, "Exception :" + e.getMessage());
             }
         }
     };
 
-    private ConfigurationParam getConfigParam(Context context){
+    private ConfigurationParam getConfigParam(Context context) {
         ConfigurationParam param = null;
         PackageManager packageManager = context.getPackageManager();
         String packageName = context.getPackageName();
@@ -135,27 +133,15 @@ public class RuntimeContentProvider extends ContentProvider {
             ConfigurationRequest configRequest = new ConfigurationRequest(
                     getMetaData("com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix"),
                     subscriptionKey,
-                    param, null,null
+                    param, future, future
             );
             configRequest.queue(queue);
 
             try {
                 configResult = future.get();
                 writeConfigToCache(configResult); // save latest configuration
-            } catch (InterruptedException error) {
-                Throwable throwable = error;
-                String message = error.getClass().getName();
-                while (throwable.getMessage() == null && throwable.getCause() != null)
-                    throwable = throwable.getCause();
-                if (throwable.getMessage() != null) message = throwable.getMessage();
-                Log.d(TAG, "Error: " + message);
-            } catch (ExecutionException error) {
-                Throwable throwable = error;
-                String message = error.getClass().getName();
-                while (throwable.getMessage() == null && throwable.getCause() != null)
-                    throwable = throwable.getCause();
-                if (throwable.getMessage() != null) message = throwable.getMessage();
-                Log.d(TAG, "Error: " + message);
+            } catch (Exception error) {
+                Log.d(TAG, "Error: " + error.getMessage());
             }
 
 
@@ -198,7 +184,8 @@ public class RuntimeContentProvider extends ContentProvider {
 
     /**
      * Configuration for {@link TrackingManager}
-     * @param context application context
+     *
+     * @param context    application context
      * @param lastConfig cached config, may be null
      * @return Configuration for {@link TrackingManager}, may be null
      */
@@ -283,7 +270,7 @@ public class RuntimeContentProvider extends ContentProvider {
     private String getMetaData(String key) {
         try {
             Context ctx = getContext();
-            if(ctx == null) return null;
+            if (ctx == null) return null;
             return ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(),
                     PackageManager.GET_META_DATA).metaData.getString(key);
         } catch (PackageManager.NameNotFoundException e) {
