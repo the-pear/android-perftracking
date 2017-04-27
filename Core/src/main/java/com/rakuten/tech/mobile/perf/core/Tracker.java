@@ -37,7 +37,9 @@ public class Tracker {
 	 */
 	public synchronized static void off() {
 		_tracker = null;
-		_senderThread.stopRunning();
+		if (_senderThread != null) {
+			_senderThread.stopRunning();
+		}
 		_senderThread = null;
 	}
 

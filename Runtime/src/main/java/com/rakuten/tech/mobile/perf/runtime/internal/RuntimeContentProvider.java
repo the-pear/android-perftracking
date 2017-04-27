@@ -10,7 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -21,7 +21,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.NoCache;
-import com.android.volley.toolbox.RequestFuture;
 import com.google.gson.Gson;
 import com.rakuten.tech.mobile.perf.core.Config;
 import com.rakuten.tech.mobile.perf.core.Tracker;
@@ -42,64 +41,43 @@ public class RuntimeContentProvider extends ContentProvider {
     private static final int TIME_INTERVAL = 60 * 60 * 1000; // 1 HOUR in milli seconds
     Handler handler;
     Context mContext;
+    RequestQueue mQueue;
 
     @Override
     public boolean onCreate() {
         mContext = getContext();
         if (mContext == null) return false;
 
+        mQueue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
+        mQueue.start();
+
         // Load data from last configuration
         ConfigurationResult lastConfig = readConfigFromCache();
         Config config = createConfig(mContext, lastConfig);
         // Get latest configuration
-        loadConfigurationFromApi(mContext);
+        loadConfigurationFromApi(mContext, mQueue);
         if (config != null) {
             // Initialise Tracking Manager
             TrackingManager.initialize(mContext, config); // TODO Config class should be a builder and have all the values set properly
             Metric.start(StandardMetric.LAUNCH.getValue());
         }
 
-        HandlerThread thread = new HandlerThread("Periodic Handler Thread");
-        thread.start();
-        handler = new Handler(thread.getLooper());
+        handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(periodicCheck, TIME_INTERVAL);
         return false;
     }
 
 
-    private void loadConfiguration() {
-
-        // Get latest configuration synchronously
-        loadConfigurationFromApiSync(mContext);
-
-        // Load data from latest configuration
-        ConfigurationResult lastConfig = readConfigFromCache();
-        Config config = createConfig(mContext, lastConfig);
-
-        if (lastConfig.getEnablePercent() <= 0.0) {
-            Log.d(TAG, "enable percent is zero or negative, Deinitialize TrackingManager");
-            TrackingManager.deinitialize();
-            return;
-        } else if (config != null) {
-            // Update Tracking Manager with new config
-            TrackingManager.initialize(mContext, config);
-        }
-    }
-
     private final Runnable periodicCheck = new Runnable() {
         public void run() {
-            try {
-                if (Tracker.isTrackerRunning()) {
-                    loadConfiguration();
-                }
-                handler.postDelayed(this, TIME_INTERVAL);
-            } catch (Exception e) {
-                Log.d(TAG, "Exception :" + e.getMessage());
+            if (Tracker.isTrackerRunning()) {
+                loadConfigurationFromApi(mContext, mQueue);
             }
+            handler.postDelayed(this, TIME_INTERVAL);
         }
     };
 
-    private ConfigurationParam getConfigParam(Context context) {
+    private ConfigurationParam createConfigParam(Context context) {
         ConfigurationParam param = null;
         PackageManager packageManager = context.getPackageManager();
         String packageName = context.getPackageName();
@@ -117,43 +95,9 @@ public class RuntimeContentProvider extends ContentProvider {
         return param;
     }
 
-    private ConfigurationResult loadConfigurationFromApiSync(Context context) {
-        ConfigurationResult configResult = null;
-        RequestFuture<ConfigurationResult> future = RequestFuture.newFuture();
-        RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
-        queue.start();
-        ConfigurationParam param = getConfigParam(context);
+    private void loadConfigurationFromApi(Context context, RequestQueue queue) {
 
-        String subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
-
-        if (subscriptionKey == null)
-            Log.d(TAG, "Cannot read metadata `com.rakuten.tech.mobile.perf.SubscriptionKey` from manifest, automated performance tracking will not work.");
-
-        if (param != null) {
-            ConfigurationRequest configRequest = new ConfigurationRequest(
-                    getMetaData("com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix"),
-                    subscriptionKey,
-                    param, future, future
-            );
-            configRequest.queue(queue);
-
-            try {
-                configResult = future.get();
-                writeConfigToCache(configResult); // save latest configuration
-            } catch (Exception error) {
-                Log.d(TAG, "Error: " + error.getMessage());
-            }
-
-
-        }
-        return configResult;
-    }
-
-
-    private void loadConfigurationFromApi(Context context) {
-        RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
-        queue.start();
-        ConfigurationParam param = getConfigParam(context);
+        ConfigurationParam param = createConfigParam(context);
 
         String subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
 
@@ -166,7 +110,19 @@ public class RuntimeContentProvider extends ContentProvider {
                     param, new Response.Listener<ConfigurationResult>() {
                 @Override
                 public void onResponse(ConfigurationResult response) {
-                    writeConfigToCache(response); // save latest configuration
+                    ConfigurationResult prevConfig = readConfigFromCache();
+                    if (prevConfig != null) {
+                        double prevEnablePercent = prevConfig.getEnablePercent();
+                        double currEnablePercent = response.getEnablePercent();
+                        double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
+                        if ((currEnablePercent < prevEnablePercent) && (randomNumber > currEnablePercent)) {
+                            // DeInitialize Tracking Manager
+                            TrackingManager.deinitialize();
+                            //Removing the periodic call backs as we already deintialized tracker.
+                            handler.removeCallbacks(periodicCheck);
+                        }
+                    }
+                    writeConfigToCache(response);
                 }
             }, new Response.ErrorListener() {
                 @Override
