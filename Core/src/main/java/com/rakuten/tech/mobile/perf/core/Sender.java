@@ -60,8 +60,10 @@ class Sender {
 		_sent = 0;
 		long now = System.nanoTime();
 
+        Metric _savedMetric = _metric == null ? null : _metric.copy();
+
 		try {
-			for (int i = startIndex; i != endIndex; i = (i + 1) % MeasurementBuffer.SIZE) {
+            for (int i = startIndex; i != endIndex; i = (i + 1) % MeasurementBuffer.SIZE) {
 				Measurement m = _buffer.at[i];
 
 				if (m.type == Measurement.METRIC) {
@@ -110,8 +112,15 @@ class Sender {
 			}
 
 			return endIndex;
-		}
-		finally {
+		} catch (IOException sendFailed) {
+            /*
+             * If the sending fails somewhere in the middle of the loop SenderThread will try to
+             * resend the same buffer range again later. So we restore the previously active metric
+             * in case it was overwritten during the loop
+             */
+            _metric = _savedMetric;
+            throw sendFailed;
+        } finally {
 			if (_sent > 0) {
 				_writer.end();
 			}
