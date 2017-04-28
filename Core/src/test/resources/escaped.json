@@ -4,22 +4,52 @@
   "device": "test-device",
   "measurements": [
     {
-      "custom": "\"",
+      "url": "http://example.com:80/page1\".html",
       "metric": "test-metric",
       "time": 999
     },
     {
-      "custom": "\"[",
+      "url": "http://example.com:80/page1\"[.html",
       "metric": "test-metric",
       "time": 999
     },
     {
-      "custom": "\"{",
+      "url": "http://example.com:80/page1\"{.html",
       "metric": "test-metric",
       "time": 999
     },
     {
-      "custom": "\",",
+      "url": "http://example.com:80/page1\",.html",
+      "metric": "test-metric",
+      "time": 999
+    },
+    {
+      "url": "http://example.com:80/page1'}'.html",
+      "metric": "test-metric",
+      "time": 999
+    },
+    {
+      "url": "http://example.com:80/page1\".html",
+      "metric": "test-metric",
+      "time": 999
+    },
+    {
+      "url": "http://example.com:80/page1\"[.html",
+      "metric": "test-metric",
+      "time": 999
+    },
+    {
+      "url": "http://example.com:80/page1\"{.html",
+      "metric": "test-metric",
+      "time": 999
+    },
+    {
+      "url": "http://example.com:80/page1\",.html",
+      "metric": "test-metric",
+      "time": 999
+    },
+    {
+      "url": "http://example.com:80/page1'}'.html",
       "metric": "test-metric",
       "time": 999
     }

@@ -16,7 +16,7 @@ public final class Metric {
     /**
      * Starts a new metric.
      *
-     * @param id Metric identifier.
+     * @param id Metric identifier. Valid Arguments are AlphaNumeric, -, _, . and <i>Space</i>.
      */
     public static void start(String id) {
         if (Validation.isInvalidId(id)) {
