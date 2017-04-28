@@ -55,13 +55,13 @@ public class RuntimeContentProvider extends ContentProvider {
         // Load data from last configuration
         ConfigurationResult lastConfig = readConfigFromCache();
         Config config = createConfig(mContext, lastConfig);
-        // Get latest configuration
-        loadConfigurationFromApi(mContext, mQueue);
         if (config != null) {
             // Initialise Tracking Manager
             TrackingManager.initialize(mContext, config); // TODO Config class should be a builder and have all the values set properly
             Metric.start(StandardMetric.LAUNCH.getValue());
         }
+        // Get latest configuration
+        loadConfigurationFromApi(mContext, mQueue);
 
         handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(periodicCheck, TIME_INTERVAL);
