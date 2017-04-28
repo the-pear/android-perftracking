@@ -9,6 +9,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -21,10 +23,12 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.NoCache;
 import com.google.gson.Gson;
 import com.rakuten.tech.mobile.perf.core.Config;
+import com.rakuten.tech.mobile.perf.core.Tracker;
 import com.rakuten.tech.mobile.perf.runtime.Metric;
 import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
 
 import java.util.Random;
+
 
 /**
  * RuntimeContentProvider - a custom high-priority ContentProvider, to start tracking early in the process launch phase.
@@ -34,30 +38,51 @@ public class RuntimeContentProvider extends ContentProvider {
     private static final String TAG = RuntimeContentProvider.class.getSimpleName();
     private static final String PREFS = "app_performance";
     private static final String CONFIG_KEY = "config_key";
+    private static final int TIME_INTERVAL = 60 * 60 * 1000; // 1 HOUR in milli seconds
+
+    private Handler handler;
+    private Context mContext;
+    private RequestQueue mQueue;
 
     @Override
     public boolean onCreate() {
-        Context context = getContext();
-        if (context == null) return false;
+        mContext = getContext();
+        if (mContext == null) return false;
+
+        mQueue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
+        mQueue.start();
+
         // Load data from last configuration
         ConfigurationResult lastConfig = readConfigFromCache();
-        Config config = createConfig(context, lastConfig);
-        // Get latest configuration
-        loadConfigurationFromApi(context);
+        Config config = createConfig(mContext, lastConfig);
         if (config != null) {
             // Initialise Tracking Manager
-            TrackingManager.initialize(getContext(), config); // TODO Config class should be a builder and have all the values set properly
+            TrackingManager.initialize(mContext, config); // TODO Config class should be a builder and have all the values set properly
             Metric.start(StandardMetric.LAUNCH.getValue());
         }
+        // Get latest configuration
+        loadConfigurationFromApi(mContext, mQueue);
+
+        handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(periodicCheck, TIME_INTERVAL);
         return false;
     }
 
-    private void loadConfigurationFromApi(Context context) {
+
+    private final Runnable periodicCheck = new Runnable() {
+        public void run() {
+            if (Tracker.isTrackerRunning()) {
+                handler.postDelayed(this, TIME_INTERVAL);
+                loadConfigurationFromApi(mContext, mQueue);
+            }
+        }
+    };
+
+    private void loadConfigurationFromApi(Context context, RequestQueue queue) {
+        ConfigurationParam param = null;
+
         PackageManager packageManager = context.getPackageManager();
         String packageName = context.getPackageName();
-        RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
-        queue.start();
-        ConfigurationParam param = null;
         try {
             param = new ConfigurationParam.Builder()
                     .setAppId(packageName)
@@ -80,12 +105,26 @@ public class RuntimeContentProvider extends ContentProvider {
                     subscriptionKey,
                     param, new Response.Listener<ConfigurationResult>() {
                 @Override
-                public void onResponse(ConfigurationResult response) {
-                    writeConfigToCache(response); // save latest configuration
+                public void onResponse(ConfigurationResult newConfig) {
+                    ConfigurationResult prevConfig = readConfigFromCache();
+                    boolean shouldRollDice = (newConfig != null && Tracker.isTrackerRunning() == true && prevConfig == null)
+                            || (prevConfig != null && newConfig != null && newConfig.getEnablePercent() < prevConfig.getEnablePercent());
+
+                    if (shouldRollDice) {
+                        double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
+                        if (randomNumber > newConfig.getEnablePercent()) {
+                            // DeInitialize Tracking Manager
+                            TrackingManager.deinitialize();
+                        }
+                    }
+                    writeConfigToCache(newConfig);
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    // DeInitialize Tracking Manager as we couldn't able to get new config from api
+                    TrackingManager.deinitialize();
+
                     Throwable throwable = error;
                     String message = error.getClass().getName();
                     while (throwable.getMessage() == null && throwable.getCause() != null)
@@ -99,7 +138,8 @@ public class RuntimeContentProvider extends ContentProvider {
 
     /**
      * Configuration for {@link TrackingManager}
-     * @param context application context
+     *
+     * @param context    application context
      * @param lastConfig cached config, may be null
      * @return Configuration for {@link TrackingManager}, may be null
      */
@@ -111,6 +151,7 @@ public class RuntimeContentProvider extends ContentProvider {
         Config config = null; // configuration for TrackingManager
 
         double enablePercent = lastConfig.getEnablePercent();
+
         double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
         if (randomNumber <= enablePercent) {
             config = new Config();
@@ -183,7 +224,7 @@ public class RuntimeContentProvider extends ContentProvider {
     private String getMetaData(String key) {
         try {
             Context ctx = getContext();
-            if(ctx == null) return null;
+            if (ctx == null) return null;
             return ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(),
                     PackageManager.GET_META_DATA).metaData.getString(key);
         } catch (PackageManager.NameNotFoundException e) {

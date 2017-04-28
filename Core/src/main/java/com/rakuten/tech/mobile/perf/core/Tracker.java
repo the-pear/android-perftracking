@@ -42,6 +42,12 @@ public class Tracker {
         if(s != null) s.terminate();
         _senderThread = null;
     }
+    /**
+     * Returns performance tracking status.
+     */
+    public static boolean isTrackerRunning() {
+        return _tracker != null;
+    }
 
     /**
      * Starts metric.

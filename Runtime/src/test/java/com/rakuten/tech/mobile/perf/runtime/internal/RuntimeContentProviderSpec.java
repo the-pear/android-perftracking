@@ -116,6 +116,7 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
 
     @SuppressLint("ApplySharedPref")
     @Test public void shouldStartTrackingAndLaunchMetricOnCachedConfig() {
+        queue.rule().whenClass(ConfigurationRequest.class).returnNetworkResponse(200, config.content);
         prefs.edit().putString("config_key", config.content).commit();
 
         provider.onCreate();
