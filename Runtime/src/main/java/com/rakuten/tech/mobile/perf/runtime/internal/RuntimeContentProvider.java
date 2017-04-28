@@ -107,9 +107,12 @@ public class RuntimeContentProvider extends ContentProvider {
                 @Override
                 public void onResponse(ConfigurationResult newConfig) {
                     ConfigurationResult prevConfig = readConfigFromCache();
-                    if (prevConfig != null & newConfig != null) {
+                    boolean shouldRollDice = (newConfig != null && Tracker.isTrackerRunning() == true && prevConfig == null)
+                            || (prevConfig != null && newConfig != null && newConfig.getEnablePercent() < prevConfig.getEnablePercent());
+
+                    if (shouldRollDice) {
                         double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
-                        if ((newConfig.getEnablePercent() < prevConfig.getEnablePercent()) && (randomNumber > newConfig.getEnablePercent())) {
+                        if (randomNumber > newConfig.getEnablePercent()) {
                             // DeInitialize Tracking Manager
                             TrackingManager.deinitialize();
                         }
