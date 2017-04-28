@@ -39,9 +39,10 @@ public class RuntimeContentProvider extends ContentProvider {
     private static final String PREFS = "app_performance";
     private static final String CONFIG_KEY = "config_key";
     private static final int TIME_INTERVAL = 60 * 60 * 1000; // 1 HOUR in milli seconds
-    Handler handler;
-    Context mContext;
-    RequestQueue mQueue;
+
+    private Handler handler;
+    private Context mContext;
+    private RequestQueue mQueue;
 
     @Override
     public boolean onCreate() {
@@ -71,14 +72,15 @@ public class RuntimeContentProvider extends ContentProvider {
     private final Runnable periodicCheck = new Runnable() {
         public void run() {
             if (Tracker.isTrackerRunning()) {
+                handler.postDelayed(this, TIME_INTERVAL);
                 loadConfigurationFromApi(mContext, mQueue);
             }
-            handler.postDelayed(this, TIME_INTERVAL);
         }
     };
 
-    private ConfigurationParam createConfigParam(Context context) {
+    private void loadConfigurationFromApi(Context context, RequestQueue queue) {
         ConfigurationParam param = null;
+
         PackageManager packageManager = context.getPackageManager();
         String packageName = context.getPackageName();
         try {
@@ -92,12 +94,6 @@ public class RuntimeContentProvider extends ContentProvider {
         } catch (PackageManager.NameNotFoundException e) {
             Log.d(TAG, e.getMessage());
         }
-        return param;
-    }
-
-    private void loadConfigurationFromApi(Context context, RequestQueue queue) {
-
-        ConfigurationParam param = createConfigParam(context);
 
         String subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
 
@@ -109,24 +105,23 @@ public class RuntimeContentProvider extends ContentProvider {
                     subscriptionKey,
                     param, new Response.Listener<ConfigurationResult>() {
                 @Override
-                public void onResponse(ConfigurationResult response) {
+                public void onResponse(ConfigurationResult newConfig) {
                     ConfigurationResult prevConfig = readConfigFromCache();
-                    if (prevConfig != null) {
-                        double prevEnablePercent = prevConfig.getEnablePercent();
-                        double currEnablePercent = response.getEnablePercent();
+                    if (prevConfig != null & newConfig != null) {
                         double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
-                        if ((currEnablePercent < prevEnablePercent) && (randomNumber > currEnablePercent)) {
+                        if ((newConfig.getEnablePercent() < prevConfig.getEnablePercent()) && (randomNumber > newConfig.getEnablePercent())) {
                             // DeInitialize Tracking Manager
                             TrackingManager.deinitialize();
-                            //Removing the periodic call backs as we already deintialized tracker.
-                            handler.removeCallbacks(periodicCheck);
                         }
                     }
-                    writeConfigToCache(response);
+                    writeConfigToCache(newConfig);
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    // DeInitialize Tracking Manager as we couldn't able to get new config from api
+                    TrackingManager.deinitialize();
+
                     Throwable throwable = error;
                     String message = error.getClass().getName();
                     while (throwable.getMessage() == null && throwable.getCause() != null)
