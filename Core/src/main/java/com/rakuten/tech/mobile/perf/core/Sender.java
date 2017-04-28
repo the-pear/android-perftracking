@@ -1,5 +1,7 @@
 package com.rakuten.tech.mobile.perf.core;
 
+import java.io.IOException;
+
 class Sender {
 	private static final long MIN_TIME = 5000000L; // 5 ms
     private static final int MIN_COUNT = 10;
@@ -27,7 +29,7 @@ class Sender {
      * @param startIndex send measurements starting from this index (of the buffer)
      * @return next unsent index, i.e. {@code startIndex} for the next call to send
      */
-    int send(int startIndex) {
+    int send(int startIndex) throws IOException {
         int idIndex = _buffer.nextTrackingId.get() % MeasurementBuffer.SIZE;
         if (idIndex < 0) {
             idIndex += MeasurementBuffer.SIZE;
@@ -54,12 +56,14 @@ class Sender {
 	 * @param endIndex send measurements up to this index (of the buffer)
 	 * @return last sent index + 1, i.e. {@code startIndex} for the next call to send
 	 */
-    private int send(int startIndex, int endIndex) {
+    private int send(int startIndex, int endIndex) throws IOException {
 		_sent = 0;
 		long now = System.nanoTime();
 
+        Metric _savedMetric = _metric == null ? null : _metric.copy();
+
 		try {
-			for (int i = startIndex; i != endIndex; i = (i + 1) % MeasurementBuffer.SIZE) {
+            for (int i = startIndex; i != endIndex; i = (i + 1) % MeasurementBuffer.SIZE) {
 				Measurement m = _buffer.at[i];
 
 				if (m.type == Measurement.METRIC) {
@@ -108,15 +112,22 @@ class Sender {
 			}
 
 			return endIndex;
-		}
-		finally {
+		} catch (IOException sendFailed) {
+            /*
+             * If the sending fails somewhere in the middle of the loop SenderThread will try to
+             * resend the same buffer range again later. So we restore the previously active metric
+             * in case it was overwritten during the loop
+             */
+            _metric = _savedMetric;
+            throw sendFailed;
+        } finally {
 			if (_sent > 0) {
 				_writer.end();
 			}
 		}
 	}
 
-	private void send(Metric metric) {
+	private void send(Metric metric) throws IOException {
 		if (metric.endTime - metric.startTime < MIN_TIME) {
 			return;
 		}
@@ -133,7 +144,7 @@ class Sender {
 		_sent++;
 	}
 
-	private void send(Measurement m, String metricId) {
+	private void send(Measurement m, String metricId) throws IOException {
 		if (m.endTime - m.startTime < MIN_TIME) {
 			return;
 		}

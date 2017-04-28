@@ -46,6 +46,7 @@ public class EventWriterSpec {
 
         when(url.openConnection()).thenReturn(conn);
         when(conn.getOutputStream()).thenReturn(outputStream);
+        when(conn.getResponseCode()).thenReturn(201);
 
         writer = new EventWriter(config, envInfo, url);
         assertThat(writer).isNotNull();
@@ -53,7 +54,7 @@ public class EventWriterSpec {
 
     // creation & init
 
-    @Test public void shouldOpenConnectionOnBegin() {
+    @Test public void shouldOpenConnectionOnBegin() throws IOException {
         writer = new EventWriter(config, envInfo, null);
 
         writer.begin();
@@ -64,7 +65,10 @@ public class EventWriterSpec {
     @Test public void shouldDisconnectOnFailure() throws IOException {
         when(conn.getOutputStream()).thenThrow(new IOException());
 
-        writer.begin();
+
+        try {
+            writer.begin();
+        } catch (IOException ignored) {}
 
         verify(conn).disconnect();
     }
@@ -206,7 +210,7 @@ public class EventWriterSpec {
         // no exceptions
     }
 
-    @Test public void shouldNotFailOnWritingNull() {
+    @Test public void shouldNotFailOnWritingNull() throws IOException {
         writer.write(null);
         writer.write(null, null);
 
@@ -217,7 +221,7 @@ public class EventWriterSpec {
         // no exceptions
     }
 
-    @Test public void shouldNotFailOnWriteWithoutBegin() {
+    @Test public void shouldNotFailOnWriteWithoutBegin() throws IOException {
         Measurement measurement = new Measurement();
         measurement.type = Measurement.CUSTOM;
         measurement.a = "";
@@ -227,7 +231,7 @@ public class EventWriterSpec {
         // no exceptions
     }
 
-    @Test public void shouldNotFailOnNullPayload() {
+    @Test public void shouldNotFailOnNullPayload() throws IOException {
         Measurement measurement = new Measurement();
         measurement.type = Measurement.CUSTOM;
         measurement.a = null;
@@ -255,7 +259,7 @@ public class EventWriterSpec {
         // no exceptions
     }
 
-    @Test public void shouldNotFailOnIncorrectEnd() {
+    @Test public void shouldNotFailOnIncorrectEnd() throws IOException {
         writer.end();
         writer.begin();
         writer.end();

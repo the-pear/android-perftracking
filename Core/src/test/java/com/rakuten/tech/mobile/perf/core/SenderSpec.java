@@ -6,6 +6,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.io.IOException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNotNull;
@@ -33,7 +35,7 @@ public class SenderSpec {
     }
 
     @Test
-    public void shouldSendMeasurements() {
+    public void shouldSendMeasurements() throws IOException {
         setUp10CustomMeasurement(measurementBuffer);
         sender.send(0);
         ArgumentCaptor<Measurement> captor = ArgumentCaptor.forClass(Measurement.class);
@@ -46,7 +48,7 @@ public class SenderSpec {
     }
 
     @Test
-    public void shouldNotFailSendingMeasurementWhenDebugIsNull(){
+    public void shouldNotFailSendingMeasurementWhenDebugIsNull() throws IOException {
         sender = new Sender(measurementBuffer, current, eventWriter, null);
         setUp10CustomMeasurement(measurementBuffer);
         sender.send(0);
@@ -56,7 +58,7 @@ public class SenderSpec {
     }
 
     @Test
-    public void shouldSendMetric() {
+    public void shouldSendMetric() throws IOException {
         setUp10CustomMetric(measurementBuffer);
         sender.send(0);
         ArgumentCaptor<Metric> captor = ArgumentCaptor.forClass(Metric.class);
@@ -69,7 +71,7 @@ public class SenderSpec {
     }
 
     @Test
-    public void shouldNotFailSendingMetricWhenDebugIsNull(){
+    public void shouldNotFailSendingMetricWhenDebugIsNull() throws IOException {
         sender = new Sender(measurementBuffer, current, eventWriter, null);
         setUp10CustomMetric(measurementBuffer);
         sender.send(0);
@@ -79,7 +81,7 @@ public class SenderSpec {
     }
 
     @Test
-    public void shouldSendMetricWithNegativeBuffer() {
+    public void shouldSendMetricWithNegativeBuffer() throws IOException {
         setUp10CustomMetric(measurementBuffer);
         measurementBuffer.nextTrackingId.set(-5);
         sender.send(0);
@@ -90,7 +92,7 @@ public class SenderSpec {
 
     //Start index greater then buffer Max size
     @Test
-    public void shouldNotSendMetricBufferSizeGreaterThenMax() {
+    public void shouldNotSendMetricBufferSizeGreaterThenMax() throws IOException {
         setUp10CustomMetric(measurementBuffer);
         measurementBuffer.nextTrackingId.set(513);
         sender.send(513);
@@ -102,7 +104,7 @@ public class SenderSpec {
     }
 
     @Test
-    public void shouldSendMeasurementsGreaterEndTime() {
+    public void shouldSendMeasurementsGreaterEndTime() throws IOException {
         setUp10CustomMeasurementLesserEndTime(measurementBuffer);
         sender.send(0);
         verify(eventWriter, never()).begin();
@@ -112,7 +114,7 @@ public class SenderSpec {
     }
 
     @Test
-    public void shouldNotSendMeasurementsAndMetric() {
+    public void shouldNotSendMeasurementsAndMetric() throws IOException {
         setUp10CustomMeasurementAndMetricLesserEndTime(measurementBuffer);
         current.metric.set((Metric) measurementBuffer.at[3].a);
         sender.send(0);
@@ -122,7 +124,7 @@ public class SenderSpec {
     }
 
     @Test
-    public void shouldNotSendMetricLesserThanMaxTime() {
+    public void shouldNotSendMetricLesserThanMaxTime() throws IOException {
         setUp10CustomMetricLesserThanMaxTime(measurementBuffer);
         current.metric.set((Metric) measurementBuffer.at[3].a);
         sender.send(0);
@@ -133,7 +135,7 @@ public class SenderSpec {
     }
 
     @Test
-    public void shouldNotSendMeasurementsLesserThanMaxTime() {
+    public void shouldNotSendMeasurementsLesserThanMaxTime() throws IOException {
         setUp10CustomMeasurementLesserThanMaxTime(measurementBuffer);
         sender.send(0);
         verify(eventWriter, never()).begin();
