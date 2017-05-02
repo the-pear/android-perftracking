@@ -14,7 +14,7 @@
       "urls": 999
     },
     {
-      "method": "TestClass#testMethod",
+      "method": "TestClass.testMethod",
       "metric": "test-metric",
       "time": 999
     },
