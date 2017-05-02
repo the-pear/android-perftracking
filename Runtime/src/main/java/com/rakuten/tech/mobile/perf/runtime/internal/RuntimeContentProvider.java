@@ -107,6 +107,10 @@ public class RuntimeContentProvider extends ContentProvider {
                     param, new Response.Listener<ConfigurationResult>() {
                 @Override
                 public void onResponse(ConfigurationResult newConfig) {
+                    if (newConfig == null && Tracker.isTrackerRunning() == true) {
+                        TrackingManager.deinitialize();
+                    }
+
                     ConfigurationResult prevConfig = readConfigFromCache();
                     boolean shouldRollDice = (newConfig != null && Tracker.isTrackerRunning() == true && prevConfig == null)
                             || (prevConfig != null && newConfig != null && newConfig.getEnablePercent() < prevConfig.getEnablePercent());
