@@ -114,7 +114,7 @@ class EventWriter {
 
                 switch (m.type) {
                     case Measurement.METHOD:
-                        _writer.append("{\"method\":\"").append((String) m.a).append('#').append((String) m.b).append('"');
+                        _writer.append("{\"method\":\"").append((String) m.a).append('.').append((String) m.b).append('"');
                         break;
 
                     case Measurement.URL:
