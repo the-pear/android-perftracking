@@ -109,7 +109,8 @@ public class RuntimeContentProvider extends ContentProvider {
                 public void onResponse(ConfigurationResult newConfig) {
                     ConfigurationResult prevConfig = readConfigFromCache();
                     boolean shouldRollDice = (newConfig != null && Tracker.isTrackerRunning() == true && prevConfig == null)
-                            || (prevConfig != null && newConfig != null && newConfig.getEnablePercent() < prevConfig.getEnablePercent());
+                            || (prevConfig != null && newConfig != null && newConfig.getEnablePercent() < prevConfig.getEnablePercent()
+                            || (newConfig == null));
 
                     if (shouldRollDice) {
                         double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
