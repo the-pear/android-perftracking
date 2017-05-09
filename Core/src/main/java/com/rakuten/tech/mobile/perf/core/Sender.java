@@ -30,19 +30,26 @@ class Sender {
      * @return next unsent index, i.e. {@code startIndex} for the next call to send
      */
     int send(int startIndex) throws IOException {
-        int idIndex = _buffer.nextTrackingId.get() % MeasurementBuffer.SIZE;
-        if (idIndex < 0) {
-            idIndex += MeasurementBuffer.SIZE;
+        int endIndex = _buffer.nextTrackingId.get() % MeasurementBuffer.SIZE;
+        if (endIndex < 0) {
+            endIndex += MeasurementBuffer.SIZE;
         }
 
-        int count = idIndex - startIndex;
+        if (startIndex == endIndex && _buffer.next() == null) {
+            // the buffer is full - but the index arithmetic will calculate count == 0
+            endIndex--; // => make the count != 0 and fix start/end index for sending loop
+            if (endIndex < 0) endIndex += MeasurementBuffer.SIZE;
+        }
+        
+        int count = endIndex - startIndex;
         if (count < 0) {
             count += MeasurementBuffer.SIZE;
         }
 
-        if (count >= MIN_COUNT) {
-            startIndex = send(startIndex, idIndex);
+        if (count >= MIN_COUNT || startIndex == endIndex && _buffer.next() == null) {
+            startIndex = send(startIndex, endIndex);
         }
+        
         return startIndex;
     }
 
