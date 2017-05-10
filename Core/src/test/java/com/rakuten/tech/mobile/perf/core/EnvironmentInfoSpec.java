@@ -45,4 +45,16 @@ public class EnvironmentInfoSpec {
         assertThat(info.country).isEqualTo(Locale.getDefault().getCountry());
     }
 
+    @SuppressWarnings("RedundantStringConstructorCall")
+    @Test
+    public void shouldFallbackToReadCountryFromLocaleIfCountryIsEmpty() {
+        when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(tm);
+        // prevent string literal from being "intern"ed so `== ""` is false in test setting, see
+        // http://stackoverflow.com/questions/27473457/in-java-why-does-string-string-evaluate-to-true-inside-a-method-as-opposed
+        when(tm.getSimCountryIso()).thenReturn(new String(""));
+        EnvironmentInfo info = EnvironmentInfo.get(ctx);
+        assertThat(info).isNotNull();
+        assertThat(info.country).isEqualToIgnoringCase(Locale.getDefault().getCountry());
+    }
+
 }

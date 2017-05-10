@@ -22,11 +22,11 @@ class EnvironmentInfo {
             info.network = tm.getNetworkOperatorName();
         }
 
-        if (info.country == null || info.country == "") {
+        if (info.country == null || "".equals(info.country)) {
             info.country = Locale.getDefault().getCountry();
         }
 
-        if (info.network == null || info.network == "") {
+        if (info.network == null || "".equals(info.network)) {
             info.network = "wifi";
         }
 
