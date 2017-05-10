@@ -26,6 +26,10 @@ class EnvironmentInfo {
             info.country = Locale.getDefault().getCountry();
         }
 
+        if (info.country != null) {
+            info.country = info.country.toLowerCase();
+        }
+
         if (info.network == null || "".equals(info.network)) {
             info.network = "wifi";
         }

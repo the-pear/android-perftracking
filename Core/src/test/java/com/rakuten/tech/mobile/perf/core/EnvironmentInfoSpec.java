@@ -36,13 +36,12 @@ public class EnvironmentInfoSpec {
         assertThat(info.device).isEqualTo(Build.MODEL);
     }
 
-    // @Test
-    // FIXME: is that how it should be?
-    public void shouldFallbackToReadCountryFromLocale() {
+    @Test
+    public void shouldFallbackToReadCountryFromLocaleIfTelephonyManagerIsNull() {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(null);
         EnvironmentInfo info = EnvironmentInfo.get(ctx);
         assertThat(info).isNotNull();
-        assertThat(info.country).isEqualTo(Locale.getDefault().getCountry());
+        assertThat(info.country).isEqualToIgnoringCase(Locale.getDefault().getCountry());
     }
 
     @SuppressWarnings("RedundantStringConstructorCall")
@@ -55,6 +54,23 @@ public class EnvironmentInfoSpec {
         EnvironmentInfo info = EnvironmentInfo.get(ctx);
         assertThat(info).isNotNull();
         assertThat(info.country).isEqualToIgnoringCase(Locale.getDefault().getCountry());
+    }
+
+    @Test
+    public void shouldNormalizeCountryCodeToLowercase() {
+        when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(null);
+        Locale.setDefault(new Locale("testLanguage", "Test-Locale-Country", "testVariant"));
+        EnvironmentInfo info = EnvironmentInfo.get(ctx);
+        assertThat(info).isNotNull();
+        assertThat(info.country).isEqualTo("test-locale-country");
+
+
+        when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(tm);
+        when(tm.getSimCountryIso()).thenReturn("Test-Sim-Country");
+
+        info = EnvironmentInfo.get(ctx);
+        assertThat(info).isNotNull();
+        assertThat(info.country).isEqualTo("test-sim-country");
     }
 
 }
