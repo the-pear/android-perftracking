@@ -35,19 +35,17 @@ class Sender {
             endIndex += MeasurementBuffer.SIZE;
         }
 
+        int count;
+
         if (startIndex == endIndex && _buffer.next() == null) {
-            // the buffer is full - but the index arithmetic will calculate count == 0
-            endIndex--; // => make the count != 0 and fix start/end index for sending loop
-            if (endIndex < 0) endIndex += MeasurementBuffer.SIZE;
-        }
-        
-        int count = endIndex - startIndex;
-        if (count < 0) {
-            count += MeasurementBuffer.SIZE;
+            count = MeasurementBuffer.SIZE;
+        } else {
+            count = endIndex - startIndex;
+            if (count < 0) count += MeasurementBuffer.SIZE;
         }
 
-        if (count >= MIN_COUNT || startIndex == endIndex && _buffer.next() == null) {
-            startIndex = send(startIndex, endIndex);
+        if (count >= MIN_COUNT) {
+            startIndex = send(startIndex, count);
         }
         
         return startIndex;
@@ -60,17 +58,17 @@ class Sender {
      * respectively. Returns the buffer index next unsent measurement/metric, which should be
      * used for the next call to this method as new {@code startIndex}.
 	 * @param startIndex send measurements starting from this index (of the buffer)
-	 * @param endIndex send measurements up to this index (of the buffer)
+	 * @param count send `count` many measurements
 	 * @return last sent index + 1, i.e. {@code startIndex} for the next call to send
 	 */
-    private int send(int startIndex, int endIndex) throws IOException {
+    private int send(int startIndex, int count) throws IOException {
 		_sent = 0;
 		long now = System.nanoTime();
-
         Metric _savedMetric = _metric == null ? null : _metric.copy();
 
 		try {
-            for (int i = startIndex; i != endIndex; i = (i + 1) % MeasurementBuffer.SIZE) {
+            for (int offset = 0; offset < count; offset++) {
+                int i = (startIndex + offset) % MeasurementBuffer.SIZE;
 				Measurement m = _buffer.at[i];
 
 				if (m.type == Measurement.METRIC) {
@@ -118,7 +116,7 @@ class Sender {
 				}
 			}
 
-			return endIndex;
+			return (startIndex + count) % MeasurementBuffer.SIZE;
 		} catch (IOException sendFailed) {
             /*
              * If the sending fails somewhere in the middle of the loop SenderThread will try to
