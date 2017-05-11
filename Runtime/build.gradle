@@ -84,9 +84,23 @@ javadoc {
 apply plugin: 'jp.co.rakuten.sdtd.artifactory'
 
 artifactory {
-    group = project.MODULE_GROUP
-    artifact = project.MODULE_NAME
-    version = project.MODULE_VERSION
-    description = project.MODULE_DESCRIPTION
-    sourceUrl = project.MODULE_REPOSITORY
+    group =         project.MODULE_GROUP
+    artifact =      project.MODULE_NAME
+    version =       project.MODULE_VERSION
+    description =   project.MODULE_DESCRIPTION
+    sourceUrl =     project.MODULE_REPOSITORY
+}
+
+// -- LOCAL MAVEN --
+
+apply plugin: 'maven-publish'
+publishing {
+    publications {
+        local(MavenPublication) {
+            groupId     project.MODULE_GROUP
+            artifactId  project.MODULE_NAME
+            version     project.MODULE_VERSION
+            artifact("$buildDir/outputs/aar/Runtime-release.aar")
+        }
+    }
 }
