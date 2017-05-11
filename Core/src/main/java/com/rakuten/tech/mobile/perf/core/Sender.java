@@ -67,8 +67,8 @@ class Sender {
         Metric _savedMetric = _metric == null ? null : _metric.copy();
 
 		try {
-            for (int offset = 0; offset < count; offset++) {
-                int i = (startIndex + offset) % MeasurementBuffer.SIZE;
+			int endIndex = (startIndex + count) % MeasurementBuffer.SIZE;
+			for (int i = startIndex; count > 0; count--, i = (i + 1) % MeasurementBuffer.SIZE) {
 				Measurement m = _buffer.at[i];
 
 				if (m.type == Measurement.METRIC) {
@@ -116,7 +116,7 @@ class Sender {
 				}
 			}
 
-			return (startIndex + count) % MeasurementBuffer.SIZE;
+			return endIndex;
 		} catch (IOException sendFailed) {
             /*
              * If the sending fails somewhere in the middle of the loop SenderThread will try to

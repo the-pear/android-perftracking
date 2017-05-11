@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.perf.core;
 
+import org.assertj.core.api.Condition;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -162,6 +163,33 @@ public class SenderSpec {
         verify(eventWriter).end();
     }
 
+    @Test public void shouldReturnNextStartIndex() throws IOException {
+        setUp10CustomMetric(measurementBuffer);
+        int startIndex = 0;
+        int nextStartIndex = sender.send(startIndex);
+
+        clearInvocations(eventWriter);
+
+        setUp10CustomMetric(measurementBuffer);
+
+        for(int i = startIndex; i < nextStartIndex; i++) { // all previous measurement are cleared
+            assertThat(measurementBuffer.at[i]).is(cleared());
+        }
+        for(int i = nextStartIndex; i < measurementBuffer.nextTrackingId.get(); i++) {
+            assertThat(measurementBuffer.at[i]).isNot(cleared()); // new measurements
+        }
+
+        sender.send(nextStartIndex);
+
+        verify(eventWriter).begin();
+        verify(eventWriter, times(10)).write(any(Metric.class));
+        verify(eventWriter).end();
+
+        for(int i = startIndex; i < measurementBuffer.nextTrackingId.get(); i++) {
+            assertThat(measurementBuffer.at[i]).is(cleared()); // all previous measurement are cleared
+        }
+    }
+
     /* setup test fixtures */
 
     private void setupFullBuffer(MeasurementBuffer buffer) {
@@ -257,5 +285,15 @@ public class SenderSpec {
             metric.endTime = 999 * 1000000L;
             measurement.a = metric;
         }
+    }
+
+    private Condition<Measurement> cleared() {
+        return new Condition<Measurement>() {
+            @Override
+            public boolean matches(Measurement value) {
+                return value.trackingId == 0 && value.type == 0 && value.a == null
+                        && value.b == null && value.startTime == 0 && value.endTime == 0;
+            }
+        };
     }
 }
