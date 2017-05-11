@@ -30,19 +30,24 @@ class Sender {
      * @return next unsent index, i.e. {@code startIndex} for the next call to send
      */
     int send(int startIndex) throws IOException {
-        int idIndex = _buffer.nextTrackingId.get() % MeasurementBuffer.SIZE;
-        if (idIndex < 0) {
-            idIndex += MeasurementBuffer.SIZE;
+        int endIndex = _buffer.nextTrackingId.get() % MeasurementBuffer.SIZE;
+        if (endIndex < 0) {
+            endIndex += MeasurementBuffer.SIZE;
         }
 
-        int count = idIndex - startIndex;
-        if (count < 0) {
-            count += MeasurementBuffer.SIZE;
+        int count;
+
+        if (startIndex == endIndex && _buffer.next() == null) {
+            count = MeasurementBuffer.SIZE;
+        } else {
+            count = endIndex - startIndex;
+            if (count < 0) count += MeasurementBuffer.SIZE;
         }
 
         if (count >= MIN_COUNT) {
-            startIndex = send(startIndex, idIndex);
+            startIndex = send(startIndex, count);
         }
+        
         return startIndex;
     }
 
@@ -53,17 +58,17 @@ class Sender {
      * respectively. Returns the buffer index next unsent measurement/metric, which should be
      * used for the next call to this method as new {@code startIndex}.
 	 * @param startIndex send measurements starting from this index (of the buffer)
-	 * @param endIndex send measurements up to this index (of the buffer)
+	 * @param count send `count` many measurements
 	 * @return last sent index + 1, i.e. {@code startIndex} for the next call to send
 	 */
-    private int send(int startIndex, int endIndex) throws IOException {
+    private int send(int startIndex, int count) throws IOException {
 		_sent = 0;
 		long now = System.nanoTime();
-
         Metric _savedMetric = _metric == null ? null : _metric.copy();
 
 		try {
-            for (int i = startIndex; i != endIndex; i = (i + 1) % MeasurementBuffer.SIZE) {
+			int endIndex = (startIndex + count) % MeasurementBuffer.SIZE;
+			for (int i = startIndex; count > 0; count--, i = (i + 1) % MeasurementBuffer.SIZE) {
 				Measurement m = _buffer.at[i];
 
 				if (m.type == Measurement.METRIC) {
