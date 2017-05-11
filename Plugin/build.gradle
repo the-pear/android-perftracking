@@ -73,3 +73,17 @@ artifactory {
     description = project.MODULE_DESCRIPTION
     sourceUrl = project.MODULE_REPOSITORY
 }
+
+// -- LOCAL MAVEN --
+
+apply plugin: 'maven-publish'
+publishing {
+    publications {
+        local(MavenPublication) {
+            groupId     project.MODULE_GROUP
+            artifactId  project.MODULE_NAME
+            version     project.MODULE_VERSION
+            artifact("$buildDir/libs/Plugin-${project.MODULE_VERSION}.jar")
+        }
+    }
+}
