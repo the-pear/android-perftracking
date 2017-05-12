@@ -21,7 +21,7 @@ import com.rakuten.tech.mobile.perf.rewriter.detours.Detourer;
 import com.rakuten.tech.mobile.perf.rewriter.mixins.Mixer;
 import com.rakuten.tech.mobile.perf.rewriter.mixins.MixinLoader;
 
-public class Rewriter {
+public class Rewriter implements  RewriterStrategy {
 
     public String input;
     public String outputJar;

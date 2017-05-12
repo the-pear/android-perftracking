@@ -1,7 +1,9 @@
 package com.rakuten.tech.mobile.perf
 
 import com.android.build.api.transform.*
+import com.rakuten.tech.mobile.perf.rewriter.DummyReWriter
 import com.rakuten.tech.mobile.perf.rewriter.Rewriter
+import com.rakuten.tech.mobile.perf.rewriter.RewriterStrategy
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
@@ -9,9 +11,20 @@ import org.gradle.api.logging.Logging
 class PerfTrackingTransform extends Transform {
 
     private final Project project
+    private boolean mEnableReWrite;
+    private RewriterStrategy mRewriterStrategy;
 
-    PerfTrackingTransform(Project project) {
+    PerfTrackingTransform(Project project, boolean enableReWrite) {
         this.project = project
+        this.mEnableReWrite = enableReWrite
+    }
+
+    public void setEnableReWrite(boolean enableReWrite) {
+        this.mEnableReWrite = enableReWrite
+    }
+
+    public boolean getEnableReWrite() {
+        this.mEnableReWrite
     }
 
     @Override
@@ -47,30 +60,40 @@ class PerfTrackingTransform extends Transform {
 
     @Override
     void transform(
-        Context context,
-        Collection<TransformInput> inputs,
-        Collection<TransformInput> referencedInputs,
-        TransformOutputProvider outputProvider,
-        boolean isIncremental
+            Context context,
+            Collection<TransformInput> inputs,
+            Collection<TransformInput> referencedInputs,
+            TransformOutputProvider outputProvider,
+            boolean isIncremental
     ) throws IOException, TransformException, InterruptedException {
+
         def input = []
         inputs.each {
             [it.jarInputs, it.directoryInputs]*.each { input << "$it.file" }
         }
 
-        Logger log = Logging.getLogger(Rewriter.class.getName())
-        Rewriter rewriter = new Rewriter(log)
-        rewriter.input = input.join(File.pathSeparator)
-        rewriter.outputJar = outputProvider.getContentLocation("classes", outputTypes, scopes, Format.JAR).toString()
-        rewriter.tempJar   = "${context.temporaryDir}${File.separator}classes.jar"
-        rewriter.classpath = project.android.bootClasspath.join(File.pathSeparator)
-        rewriter.compileSdkVersion = project.android.compileSdkVersion
+        Logger log;
+        if (mEnableReWrite) {
+            log = Logging.getLogger(Rewriter.class.getName());
+            mRewriterStrategy = new Rewriter(log);
+        } else {
+            log = Logging.getLogger(DummyReWriter.class.getName());
+            mRewriterStrategy = new DummyReWriter(log);
+        }
 
-        log.debug("INPUT:  $rewriter.input")
-        log.debug("OUTPUT:  $rewriter.outputJar")
-        log.debug("TMP JAR:  $rewriter.tempJar")
-        log.debug("PATH:  $rewriter.classpath")
 
-        rewriter.rewrite()
+        mRewriterStrategy.input = input.join(File.pathSeparator)
+        mRewriterStrategy.outputJar = outputProvider.getContentLocation("classes", outputTypes, scopes, Format.JAR).toString()
+        mRewriterStrategy.tempJar = "${context.temporaryDir}${File.separator}classes.jar"
+        mRewriterStrategy.classpath = project.android.bootClasspath.join(File.pathSeparator)
+        mRewriterStrategy.compileSdkVersion = project.android.compileSdkVersion
+
+        log.debug("INPUT:  $mRewriterStrategy.input")
+        log.debug("OUTPUT:  $mRewriterStrategy.outputJar")
+        log.debug("TMP JAR:  $mRewriterStrategy.tempJar")
+        log.debug("PATH:  $mRewriterStrategy.classpath")
+
+        mRewriterStrategy.rewrite();
+
     }
 }
