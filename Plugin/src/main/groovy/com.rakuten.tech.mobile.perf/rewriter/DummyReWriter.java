@@ -14,7 +14,7 @@ import java.io.File;
  * Dummy ReWriter to exclude performance tracking from debug build.
  */
 
-public class DummyReWriter implements RewriterStrategy {
+public class DummyRewriter implements Rewriter {
 
     public String input;
     public String outputJar;
@@ -24,14 +24,13 @@ public class DummyReWriter implements RewriterStrategy {
     public String compileSdkVersion;
     public final Logger _log;
 
-    public DummyReWriter(Logger log) {
+    public DummyRewriter(Logger log) {
         _log = log;
     }
 
     public void rewrite() {
         _log.debug(input);
-        _log.debug("DummyReWriter Populating temp JAR");
-        System.out.println("DummyReWriter Populating temp JAR");
+        _log.debug("DummyRewriter Populating temp JAR");
         ClassJarMaker tempMaker = new ClassJarMaker(new File(tempJar));
         try {
             tempMaker.populate(input);
@@ -46,9 +45,9 @@ public class DummyReWriter implements RewriterStrategy {
         try {
             ClassFilter filter = new ClassFilter();
             filter.exclude(exclude);
-            _log.info("DummyReWriter classes of : " + temp.getJarFile().getName());
+            _log.info("DummyRewriter classes of : " + temp.getJarFile().getName());
             for (String name : temp.getClasses()) {
-                _log.debug("Adding class with no DummyReWriter: " + name);
+                _log.debug("Adding class with no DummyRewriter: " + name);
                 outputMaker.add(name, temp);
             }
 

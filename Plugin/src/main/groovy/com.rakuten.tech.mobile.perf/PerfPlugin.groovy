@@ -10,28 +10,28 @@ import org.gradle.api.Task
  *
  */
 class PerfPlugin implements Plugin<Project> {
-    PerfTrackingTransform mPerfTrackingTransform;
+    PerfTrackingTransform perfTrackingTransform;
 
     @Override
     void apply(Project project) {
         def info = new Properties()
         info.load(PerfPlugin.class.classLoader.getResourceAsStream('info.properties'))
 
-        def version    = info.getProperty('version')
-        def runtime    = info.getProperty('runtime')
+        def version = info.getProperty('version')
+        def runtime = info.getProperty('runtime')
         def repository = info.getProperty('repository')
 
-        mPerfTrackingTransform = new PerfTrackingTransform(project, true)
+        perfTrackingTransform = new PerfTrackingTransform(project)
 
         def android = project.extensions.findByType(AppExtension)
-        android.registerTransform(mPerfTrackingTransform)
+        android.registerTransform(perfTrackingTransform)
 
         // disable performance tracking for debug
         project.gradle.taskGraph.beforeTask { Task task ->
             if (task.name.startsWith("transformClassesWithPerfTrackingForDebug")) {
-                mPerfTrackingTransform.setEnableReWrite(false)
+                perfTrackingTransform.setEnableReWrite(false)
             } else {
-                mPerfTrackingTransform.setEnableReWrite(true)
+                perfTrackingTransform.setEnableReWrite(true)
             }
         }
 
