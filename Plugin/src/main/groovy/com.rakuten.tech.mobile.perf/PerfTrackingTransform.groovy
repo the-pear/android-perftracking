@@ -1,7 +1,7 @@
 package com.rakuten.tech.mobile.perf
 
 import com.android.build.api.transform.*
-import com.rakuten.tech.mobile.perf.rewriter.DummyReWriter
+import com.rakuten.tech.mobile.perf.rewriter.DummyRewriter
 import com.rakuten.tech.mobile.perf.rewriter.PerformanceTrackingRewriter
 import com.rakuten.tech.mobile.perf.rewriter.Rewriter
 import org.gradle.api.Project
@@ -71,8 +71,8 @@ class PerfTrackingTransform extends Transform {
             log = Logging.getLogger(PerformanceTrackingRewriter.class.getName());
             rewriter = new PerformanceTrackingRewriter(log);
         } else {
-            log = Logging.getLogger(DummyReWriter.class.getName());
-            rewriter = new DummyReWriter(log);
+            log = Logging.getLogger(DummyRewriter.class.getName());
+            rewriter = new DummyRewriter(log);
         }
 
 
