@@ -39,10 +39,15 @@ class PerfPlugin implements Plugin<Project> {
         // disable/Enabling performance tracking or build Type
         def build = project.extensions.getByName('performanceTracking')
         project.gradle.taskGraph.beforeTask { Task task ->
-            if (task.name.startsWith("transformClassesWithPerfTrackingFor")) {
-                build.all{
-                    if (task.name.toLowerCase().contains(name)){
-                        mPerfTrackingTransform.setEnableReWrite(enable)
+            String taskName = task.name
+            if (taskName.startsWith("transformClassesWithPerfTrackingFor")) {
+                if (taskName.startsWith("transformClassesWithPerfTrackingForDebug")) {
+                    mPerfTrackingTransform.setEnableReWrite(false)
+                } else {
+                    build.all {
+                        if (taskName.toLowerCase().contains(name)) {
+                            mPerfTrackingTransform.setEnableReWrite(enable)
+                        }
                     }
                 }
             }

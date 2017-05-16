@@ -13,7 +13,5 @@ class PerfPluginTest {
         assertNotNull(project);
         project.pluginManager.apply 'com.android.application'
         project.pluginManager.apply 'com.rakuten.tech.mobile.perf'
-
-        //assertTrue(project.tasks.hello instanceof PerfPlugin)
     }
 }
