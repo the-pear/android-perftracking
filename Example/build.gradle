@@ -24,6 +24,14 @@ repositories {
 
 apply plugin: 'com.android.application'
 apply plugin: 'com.rakuten.tech.mobile.perf' // REQUIRED FOR PERFORMANCE TRACKING (3)
+performanceTracking{
+    release{
+        enable = true
+    }
+    debug {
+        enable = false
+    }
+}
 
 android {
     compileSdkVersion 23
@@ -42,6 +50,15 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    buildTypes {
+        debug {
+            project.enablePerformanceTrackingForDebug = false
+        }
+        release {
+            project.enablePerformanceTrackingForRelease = true
+        }
     }
 
 }

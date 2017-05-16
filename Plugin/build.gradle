@@ -60,6 +60,8 @@ dependencies {
     compile localGroovy()
     compile 'com.android.tools.build:gradle:2.2.2'
     compile 'org.ow2.asm:asm-all:5.1'
+    testCompile gradleTestKit()
+    testCompile 'junit:junit:4.12'
 }
 
 // -- ARTIFACTORY --
