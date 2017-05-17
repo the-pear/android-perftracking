@@ -18,13 +18,9 @@ class PerfPlugin implements Plugin<Project> {
         def info = new Properties()
         info.load(PerfPlugin.class.classLoader.getResourceAsStream('info.properties'))
 
-        // Create NamedDomainObjectContainer instance for
-        // a collection of Product objects
         NamedDomainObjectContainer<PerfPluginExtension> perfPluginExtensionContainer =
                 project.container(PerfPluginExtension)
 
-        // Add the container instance to our project
-        // with the name products.
         project.extensions.add('performanceTracking', perfPluginExtensionContainer)
 
         def version = info.getProperty('version')
@@ -42,11 +38,11 @@ class PerfPlugin implements Plugin<Project> {
             String taskName = task.name
             if (taskName.startsWith("transformClassesWithPerfTrackingFor")) {
                 if (taskName.startsWith("transformClassesWithPerfTrackingForDebug")) {
-                    mPerfTrackingTransform.setEnableReWrite(false)
+                    perfTrackingTransform.setEnableReWrite(false)
                 } else {
                     build.all {
                         if (taskName.toLowerCase().contains(name)) {
-                            mPerfTrackingTransform.setEnableReWrite(enable)
+                            perfTrackingTransform.setEnableReWrite(enable)
                         }
                     }
                 }

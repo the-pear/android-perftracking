@@ -1,15 +1,14 @@
 package com.rakuten.tech.mobile.perf
 
 import org.gradle.api.Project
+import org.gradle.api.internal.ClosureBackedAction
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Before
 import org.junit.Test
-
-import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertTrue
+import static org.junit.Assert.assertNotNull
 
-class PerfPluginTest{
-
+public class PerfPluginTest {
     Project project
 
     @Before
@@ -20,8 +19,11 @@ class PerfPluginTest{
     }
 
     @Test
-    public void testPluginIsAppliedWithError() {
+    public void testPluginIsAppliedWithOutError() {
         project.pluginManager.apply 'com.rakuten.tech.mobile.perf'
-        assertTrue(project.pluginManager.findPlugin("com.rakuten.tech.mobile.perf"))
+        assertTrue(project.pluginManager.hasPlugin("com.rakuten.tech.mobile.perf"))
+        PerfPluginExtension extension = project.extensions.getByName("performanceTracking")
+        assertNotNull(extension instanceof PerfPluginExtension)
     }
+
 }
