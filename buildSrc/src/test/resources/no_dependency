@@ -2,9 +2,10 @@ buildscript {
     repositories {
         jcenter()
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.2'
-    }
+}
+
+repositories {
+    jcenter()
 }
 
 allprojects {
@@ -20,9 +21,4 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
-}
-
-
-task preReleaseCheck(type: com.rakuten.tech.tool.CheckGradleFilesForSnapshotDependencies) {
-     exclude ~/.*\/Example\/.*\.gradle/
 }
