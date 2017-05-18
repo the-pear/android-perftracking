@@ -20,6 +20,7 @@ class PerfPlugin implements Plugin<Project> {
         def version = info.getProperty('version')
         def runtime = info.getProperty('runtime')
         def repository = info.getProperty('repository')
+        def enableInstrumentation = true
 
         perfTrackingTransform = new PerfTrackingTransform(project)
 
@@ -28,11 +29,14 @@ class PerfPlugin implements Plugin<Project> {
 
         // disable performance tracking for debug
         project.gradle.taskGraph.beforeTask { Task task ->
-            if (task.name.startsWith("transformClassesWithPerfTrackingForDebug")) {
-                perfTrackingTransform.setEnableReWrite(false)
-            } else {
-                perfTrackingTransform.setEnableReWrite(true)
+            if (task.name.startsWith("transformClassesWithPerfTrackingFor")) {
+                if (task.name.contains("Debug")) {
+                    enableInstrumentation = false
+                } else {
+                    enableInstrumentation = true
+                }
             }
+            perfTrackingTransform.setEnableReWrite(enableInstrumentation)
         }
 
         project.configure(project) {
