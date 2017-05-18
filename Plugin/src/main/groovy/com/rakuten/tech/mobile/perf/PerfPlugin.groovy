@@ -37,15 +37,17 @@ class PerfPlugin implements Plugin<Project> {
         project.gradle.taskGraph.beforeTask { Task task ->
             String taskName = task.name
             if (taskName.startsWith("transformClassesWithPerfTrackingFor")) {
-                if (taskName.startsWith("transformClassesWithPerfTrackingForDebug")) {
-                    perfTrackingTransform.enableReWrite(false)
+                def strings = taskName.split("(?=\\p{Lu})")
+                def buildType = strings[strings.length-1].toLowerCase()
+                def enable;
+                if (buildType.equals("debug")) {
+                    enable = false
+                } else if (!build.hasProperty(buildType)) {
+                    enable = true
                 } else {
-                    build.all {
-                        if (taskName.toLowerCase().contains(name)) {
-                            perfTrackingTransform.enableReWrite(enable)
-                        }
-                    }
+                    enable = build."$buildType".enable
                 }
+                perfTrackingTransform.enableReWrite(enable)
             }
         }
 
