@@ -38,11 +38,11 @@ class PerfPlugin implements Plugin<Project> {
             String taskName = task.name
             if (taskName.startsWith("transformClassesWithPerfTrackingFor")) {
                 if (taskName.startsWith("transformClassesWithPerfTrackingForDebug")) {
-                    perfTrackingTransform.setEnableReWrite(false)
+                    perfTrackingTransform.enableReWrite(false)
                 } else {
                     build.all {
                         if (taskName.toLowerCase().contains(name)) {
-                            perfTrackingTransform.setEnableReWrite(enable)
+                            perfTrackingTransform.enableReWrite(enable)
                         }
                     }
                 }

@@ -24,12 +24,12 @@ repositories {
 
 apply plugin: 'com.android.application'
 apply plugin: 'com.rakuten.tech.mobile.perf' // REQUIRED FOR PERFORMANCE TRACKING (3)
-performanceTracking{
-    release{
+performanceTracking {
+    release {
         enable = true
     }
     debug {
-        enable = false
+        enable = true
     }
 }
 

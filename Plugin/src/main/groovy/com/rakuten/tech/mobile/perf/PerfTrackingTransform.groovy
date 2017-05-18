@@ -17,7 +17,7 @@ class PerfTrackingTransform extends Transform {
         this.project = project
     }
 
-    public void setEnableReWrite(boolean rewrite) {
+    public void enableReWrite(boolean rewrite) {
         this.enableRewrite = rewrite
     }
 
