@@ -35,12 +35,16 @@ class PerfPlugin implements Plugin<Project> {
         // disable/Enabling performance tracking or build Type
         def build = project.extensions.getByName('performanceTracking')
         project.gradle.taskGraph.beforeTask { Task task ->
-            String taskName = task.name
-            if (taskName.startsWith("transformClassesWithPerfTrackingFor")) {
-                def strings = taskName.split("(?=\\p{Lu})")
+            if (task.name.startsWith("transformClassesWithPerfTrackingFor")) {
+                /*Split's String(task.name) when ever a upper case character is encountered.
+                  Example:
+                  String s = "thisIsMyString";
+                  String[] r = s.split("(?=\\p{Upper})");
+                  Content :["this", "Is", "My", "String"] */
+                def strings = task.name.split("(?=\\p{Lu})")
                 def buildType = strings[strings.length-1].toLowerCase()
                 def enable;
-                if (buildType.equals("debug")) {
+                if ((buildType.equals("debug") && !build.hasProperty("debug"))) {
                     enable = false
                 } else if (!build.hasProperty(buildType)) {
                     enable = true

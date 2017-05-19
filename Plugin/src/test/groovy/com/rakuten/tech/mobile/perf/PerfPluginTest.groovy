@@ -23,7 +23,7 @@ public class PerfPluginTest {
         project.pluginManager.apply 'com.rakuten.tech.mobile.perf'
         assertTrue(project.pluginManager.hasPlugin("com.rakuten.tech.mobile.perf"))
         PerfPluginExtension extension = project.extensions.getByName("performanceTracking")
-        assertNotNull(extension instanceof PerfPluginExtension)
+        assertTrue(extension instanceof PerfPluginExtension)
     }
 
 }
