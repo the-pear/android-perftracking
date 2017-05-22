@@ -60,9 +60,6 @@ dependencies {
     compile localGroovy()
     compile 'com.android.tools.build:gradle:2.2.2'
     compile 'org.ow2.asm:asm-all:5.1'
-
-    testCompile gradleTestKit()
-    testCompile 'junit:junit:4.12'
 }
 
 // -- ARTIFACTORY --
@@ -92,3 +89,18 @@ publishing {
 }
 
 tasks.publishToMavenLocal.dependsOn(tasks.assemble)
+
+// testing
+dependencies {
+    testCompile gradleTestKit()
+    testCompile 'junit:junit:4.12'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+// local jar and sources jar to debug local code changes
+tasks.test.dependsOn(tasks.assemble)
+tasks.test.dependsOn(tasks.sourcesJar)

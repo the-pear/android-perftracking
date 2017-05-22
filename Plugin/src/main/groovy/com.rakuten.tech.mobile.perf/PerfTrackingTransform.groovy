@@ -52,6 +52,9 @@ class PerfTrackingTransform extends Transform {
         return false
     }
 
+    /* expose for test */
+    Rewriter rewriter;
+
     @Override
     void transform(
             Context context,
@@ -65,7 +68,7 @@ class PerfTrackingTransform extends Transform {
         inputs.each {
             [it.jarInputs, it.directoryInputs]*.each { input << "$it.file" }
         }
-        Rewriter rewriter;
+
         Logger log;
         if (enableRewrite) {
             log = Logging.getLogger(PerformanceTrackingRewriter.class.getName());
