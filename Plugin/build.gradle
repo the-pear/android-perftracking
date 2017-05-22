@@ -91,6 +91,12 @@ publishing {
 tasks.publishToMavenLocal.dependsOn(tasks.assemble)
 
 // testing
+buildscript {
+    dependencies {
+        classpath "net.saliman:gradle-cobertura-plugin:2.4.0"
+    }
+}
+
 dependencies {
     testCompile gradleTestKit()
     testCompile 'junit:junit:4.12'
@@ -116,3 +122,29 @@ tasks.test.doLast {
     println "deleting temporary test directory $tempDir.absolutePath"
     if(tempDir.exists()) tempDir.deleteDir()
 }
+
+apply plugin: 'net.saliman.cobertura'
+// see https://github.com/stevesaliman/gradle-cobertura-plugin/blob/master/usage.md
+
+cobertura { // see https://github.com/stevesaliman/gradle-cobertura-plugin/blob/master/usage.md
+    coverageDirs = [
+            'src/main/groovy'
+    ]
+    coverageExcludes = [
+            '.*android.*',
+            '.*com.android.*',
+            '.*com.rakuten.tech.mobile.perf.core.*',
+            '.*it.sephiroth.*',
+            '.*org.apache.http.*',
+            '.*net.saliman.someapp.logger.*'
+    ]
+    coverageIgnoreTrivial = true
+    coverageCheckLineRate = 80
+    coverageCheckTotalBranchRate = 80
+    // TODO: enable when covered
+    // could use fine grained config with coverageCheckRegexes...
+//    coverageCheckHaltOnFailure = true
+    // TODO: define target branch rate
+//    coverageCheckBranchRate = 80
+}
+
