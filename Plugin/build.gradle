@@ -104,3 +104,15 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 // local jar and sources jar to debug local code changes
 tasks.test.dependsOn(tasks.assemble)
 tasks.test.dependsOn(tasks.sourcesJar)
+
+tasks.test.doFirst {
+    def tempDir = new File("tmp")
+    println "creating temporary test directory $tempDir.absolutePath"
+    if(!tempDir.exists()) tempDir.mkdir()
+}
+
+tasks.test.doLast {
+    def tempDir = new File("tmp")
+    println "deleting temporary test directory $tempDir.absolutePath"
+    if(tempDir.exists()) tempDir.deleteDir()
+}
