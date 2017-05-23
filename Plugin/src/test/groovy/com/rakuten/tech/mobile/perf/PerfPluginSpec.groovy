@@ -3,12 +3,14 @@ package com.rakuten.tech.mobile.perf
 import com.rakuten.tech.mobile.perf.rewriter.DummyRewriter
 import com.rakuten.tech.mobile.perf.rewriter.PerformanceTrackingRewriter
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import org.gradle.testkit.runner.TaskOutcome
 
+@Ignore
 public class PerfPluginSpec {
     @Rule public final TemporaryFolder projectDir = new TemporaryFolder(new File("tmp"))
     File buildFile
