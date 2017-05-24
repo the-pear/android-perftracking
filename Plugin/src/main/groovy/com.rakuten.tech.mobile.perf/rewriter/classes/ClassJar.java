@@ -1,5 +1,8 @@
 package com.rakuten.tech.mobile.perf.rewriter.classes;
 
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.tree.ClassNode;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -7,9 +10,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.tree.ClassNode;
 
 public class ClassJar {
 	
@@ -42,7 +42,7 @@ public class ClassJar {
 
 	public JarFile getJarFile() { return _jar; }
 
-	public InputStream getInputStream(String name) {
+	InputStream getInputStream(String name) {
 		try {
 			JarEntry entry = _entries.get(name);
 			return _jar.getInputStream(entry);

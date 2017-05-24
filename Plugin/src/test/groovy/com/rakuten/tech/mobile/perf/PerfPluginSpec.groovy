@@ -9,6 +9,7 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import static com.rakuten.tech.mobile.perf.TestUtil.*
 
 @Ignore
 public class PerfPluginSpec {
@@ -57,10 +58,6 @@ public class PerfPluginSpec {
         assert result.task(':transformClassesWithPerfTrackingForRelease').outcome  == TaskOutcome.SUCCESS
         assert !result.output.contains(DummyRewriter.canonicalName)
         assert result.output.contains(PerformanceTrackingRewriter.canonicalName)
-    }
-
-    static def resourceFile(name) {
-        new File("src/test/resources/$name")
     }
 
 }
