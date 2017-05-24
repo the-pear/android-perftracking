@@ -34,7 +34,7 @@ public class ConfigurationRequestSpec extends RobolectricUnitSpec {
     @Test public void shouldBuildUrlWithDefaultUrlPrefix() {
         ConfigurationRequest request = new ConfigurationRequest(null, "", builder.build(), null, null);
         assertThat(request.getUrl())
-                .isEqualTo("https://perf-config-api-dev-japaneast.azurewebsites.net/api/v1/platform/testPlatform/app/testId/version/testVersion/?sdk=testSdkVersion&country=testCountryCode");
+                .isEqualTo("https://api.apps.global.rakuten.com/performance/config/v1/platform/testPlatform/app/testId/version/testVersion/?sdk=testSdkVersion&country=testCountryCode");
     }
 
     @Test public void shouldBuildUrlWithCustomDomain() {

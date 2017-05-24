@@ -14,7 +14,7 @@ import jp.co.rakuten.api.core.BaseRequest;
  */
 
 class ConfigurationRequest extends BaseRequest<ConfigurationResult> {
-    private static final String DEFAULT_URL_PREFIX = "https://perf-config-api-dev-japaneast.azurewebsites.net/api/v1";
+    private static final String DEFAULT_URL_PREFIX = "https://api.apps.global.rakuten.com/performance/config/v1";
 
     ConfigurationRequest(@Nullable String urlPrefix, String subscriptionKey, ConfigurationParam param, @Nullable Response.Listener<ConfigurationResult> listener, @Nullable Response.ErrorListener errorListener) {
         super(listener, errorListener);
