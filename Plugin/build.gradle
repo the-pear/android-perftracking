@@ -87,3 +87,5 @@ publishing {
         }
     }
 }
+
+tasks.publishToMavenLocal.dependsOn(tasks.assemble)
