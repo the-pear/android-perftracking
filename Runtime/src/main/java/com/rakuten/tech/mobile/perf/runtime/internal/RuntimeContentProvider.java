@@ -7,7 +7,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -230,8 +229,9 @@ public class RuntimeContentProvider extends ContentProvider {
         try {
             Context ctx = getContext();
             if (ctx == null) return null;
-            return ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(),
-                    PackageManager.GET_META_DATA).metaData.getString(key);
+            Bundle metaData = ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(), PackageManager
+                    .GET_META_DATA).metaData;
+            return metaData != null ? metaData.getString(key) : null;
         } catch (PackageManager.NameNotFoundException e) {
             return null;
         }
