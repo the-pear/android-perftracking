@@ -1,14 +1,14 @@
 package com.rakuten.tech.mobile.perf.rewriter.base;
 
+import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJarMaker;
+import com.rakuten.tech.mobile.perf.rewriter.classes.ClassProvider;
+import com.rakuten.tech.mobile.perf.rewriter.classes.ClassWriter;
+
 import org.gradle.api.logging.Logger;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-
-import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJarMaker;
-import com.rakuten.tech.mobile.perf.rewriter.classes.ClassProvider;
-import com.rakuten.tech.mobile.perf.rewriter.classes.ClassWriter;
 
 public class Materialization {
     public final Base base;
@@ -38,7 +38,7 @@ public class Materialization {
 
             @Override
             public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
-                internalSuperName = superName;
+                internalSuperName = superName; // super of modified class before instrumentation
                 Materialization.this.superName = superName.replace('/', '.');
                 super.visit(version, access, name, signature, internalName, interfaces);
             }
@@ -50,7 +50,7 @@ public class Materialization {
 
                     @Override
                     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
-                        if ((opcode == Opcodes.INVOKESPECIAL) && base.internalSuperName.equals(owner)) {
+                        if ((opcode == Opcodes.INVOKESPECIAL) && internalSuperName.equals(owner)) {
                             owner = internalName;
                         }
                         super.visitMethodInsn(opcode, owner, name, desc, itf);
@@ -82,6 +82,8 @@ public class Materialization {
                     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
                         if (base.internalName.equals(owner)) {
                             owner = internalName;
+                        } else if (opcode == Opcodes.INVOKESPECIAL && base.internalSuperName.equals(owner)) {
+                            owner = internalSuperName;
                         }
                         super.visitMethodInsn(opcode, owner, name, desc, itf);
                     }
