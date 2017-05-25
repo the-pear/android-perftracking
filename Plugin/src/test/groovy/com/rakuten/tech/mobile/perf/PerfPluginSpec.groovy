@@ -5,13 +5,12 @@ import com.rakuten.tech.mobile.perf.rewriter.PerformanceTrackingRewriter
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+
 import static com.rakuten.tech.mobile.perf.TestUtil.*
 
-@Ignore
 public class PerfPluginSpec {
     @Rule public final TemporaryFolder projectDir = new TemporaryFolder(new File("tmp"))
     File buildFile
@@ -43,8 +42,8 @@ public class PerfPluginSpec {
 
         assert result.task(':transformClassesWithPerfTrackingForDebug').outcome == TaskOutcome.SUCCESS
         assert !result.task(':transformClassesWithPerfTrackingForRelease')
-        assert result.output.contains(DummyRewriter.canonicalName)
-        assert !result.output.contains(PerformanceTrackingRewriter.canonicalName)
+        assert result.output.contains(DummyRewriter.simpleName)
+        assert !result.output.contains(PerformanceTrackingRewriter.simpleName)
     }
 
     @Test def void "plugin should use real rewriter for release build"() {
@@ -56,8 +55,8 @@ public class PerfPluginSpec {
 
         assert !result.task(':transformClassesWithPerfTrackingForDebug')
         assert result.task(':transformClassesWithPerfTrackingForRelease').outcome  == TaskOutcome.SUCCESS
-        assert !result.output.contains(DummyRewriter.canonicalName)
-        assert result.output.contains(PerformanceTrackingRewriter.canonicalName)
+        assert !result.output.contains(DummyRewriter.simpleName)
+        assert result.output.contains(PerformanceTrackingRewriter.simpleName)
     }
 
 }
