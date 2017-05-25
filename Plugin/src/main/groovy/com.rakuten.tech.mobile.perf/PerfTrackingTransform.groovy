@@ -69,15 +69,8 @@ class PerfTrackingTransform extends Transform {
             [it.jarInputs, it.directoryInputs]*.each { input << "$it.file" }
         }
 
-        Logger log;
-        if (enableRewrite) {
-            log = Logging.getLogger(PerformanceTrackingRewriter.class.getName());
-            rewriter = new PerformanceTrackingRewriter(log);
-        } else {
-            log = Logging.getLogger(DummyRewriter.class.getName());
-            rewriter = new DummyRewriter(log);
-        }
-
+        Logger log = Logging.getLogger(PerfTrackingTransform.simpleName)
+        rewriter = enableRewrite ? new PerformanceTrackingRewriter() : new DummyRewriter();
 
         rewriter.input = input.join(File.pathSeparator)
         rewriter.outputJar = outputProvider.getContentLocation("classes", outputTypes, scopes, Format.JAR).toString()

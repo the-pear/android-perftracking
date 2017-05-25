@@ -15,6 +15,7 @@ import com.rakuten.tech.mobile.perf.rewriter.mixins.Mixer;
 import com.rakuten.tech.mobile.perf.rewriter.mixins.MixinLoader;
 
 import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.tree.ClassNode;
@@ -31,8 +32,8 @@ public class PerformanceTrackingRewriter implements Rewriter {
     public String compileSdkVersion;
     public final Logger _log;
 
-    public PerformanceTrackingRewriter(Logger log) {
-        _log = log;
+    public PerformanceTrackingRewriter() {
+        _log = Logging.getLogger(PerformanceTrackingRewriter.class.getSimpleName());
     }
 
     public void rewrite() {

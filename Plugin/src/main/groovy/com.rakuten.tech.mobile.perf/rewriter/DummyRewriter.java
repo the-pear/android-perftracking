@@ -4,6 +4,7 @@ import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJar;
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJarMaker;
 
 import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import java.io.File;
 
@@ -21,8 +22,8 @@ public class DummyRewriter implements Rewriter {
     public String compileSdkVersion;
     public final Logger _log;
 
-    public DummyRewriter(Logger log) {
-        _log = log;
+    public DummyRewriter() {
+        _log = Logging.getLogger(DummyRewriter.class.getSimpleName());
     }
 
     public void rewrite() {
