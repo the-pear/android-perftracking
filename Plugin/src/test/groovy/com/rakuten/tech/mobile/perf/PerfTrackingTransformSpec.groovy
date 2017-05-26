@@ -40,7 +40,7 @@ public class PerfTrackingTransformSpec {
         ] as TransformOutputProvider
     }
 
-    @Test public void "should use use performance tracking rewriter when enabled"() {
+    @Test public void "should use performance tracking rewriter when enabled"() {
         def (inputs, referenceInputs) = [[], []]
         transform.setEnableReWrite(true)
 
@@ -49,7 +49,7 @@ public class PerfTrackingTransformSpec {
         assert transform.rewriter instanceof PerformanceTrackingRewriter
     }
 
-    @Test public void "should use use dummy rewriter when disabled"() {
+    @Test public void "should use dummy rewriter when disabled"() {
         def (inputs, referenceInputs) = [[], []]
         transform.setEnableReWrite(false)
 
