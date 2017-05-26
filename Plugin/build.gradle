@@ -130,17 +130,29 @@ tasks.test.doLast {
 apply plugin: 'net.saliman.cobertura'
 // see https://github.com/stevesaliman/gradle-cobertura-plugin/blob/master/usage.md
 
-cobertura { // see https://github.com/stevesaliman/gradle-cobertura-plugin/blob/master/usage.md
+cobertura {
     coverageDirs = [
+            'build/classes/main'
+    ]
+    coverageSourceDirs = [
             'src/main/groovy'
     ]
     coverageExcludes = [
-            '.*android.*',
+            // for some reason '.*android.*' will create an empty report, so this is a bit verbose
+            '.*android.app.*',
+            '.*android.content.*',
+            '.*android.graphics.*',
+            '.*android.os.*',
+            '.*android.support.*',
+            '.*android.telephony.*',
+            '.*android.util.*',
+            '.*android.view.*',
+            '.*android.webkit.*',
+            '.*android.widget.*',
             '.*com.android.*',
             '.*com.rakuten.tech.mobile.perf.core.*',
             '.*it.sephiroth.*',
-            '.*org.apache.http.*',
-            '.*net.saliman.someapp.logger.*'
+            '.*org.apache.http.*'
     ]
     coverageIgnoreTrivial = true
     coverageCheckLineRate = 80
