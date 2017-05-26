@@ -154,6 +154,7 @@ cobertura {
             '.*it.sephiroth.*',
             '.*org.apache.http.*'
     ]
+    coverageFormats = ['html', 'xml']
     coverageIgnoreTrivial = true
     coverageCheckLineRate = 80
     coverageCheckTotalBranchRate = 80
