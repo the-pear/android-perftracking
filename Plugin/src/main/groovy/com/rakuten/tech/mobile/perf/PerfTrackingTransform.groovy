@@ -11,14 +11,10 @@ import org.gradle.api.logging.Logging
 class PerfTrackingTransform extends Transform {
 
     private final Project project
-    private boolean enableRewrite;
+    boolean enableRewrite;
 
     PerfTrackingTransform(Project project) {
         this.project = project
-    }
-
-    public void enableReWrite(boolean rewrite) {
-        this.enableRewrite = rewrite
     }
 
     @Override

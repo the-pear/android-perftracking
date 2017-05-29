@@ -18,10 +18,7 @@ class PerfPlugin implements Plugin<Project> {
         def info = new Properties()
         info.load(PerfPlugin.class.classLoader.getResourceAsStream('info.properties'))
 
-        NamedDomainObjectContainer<PerfPluginExtension> perfPluginExtensionContainer =
-                project.container(PerfPluginExtension)
-
-        project.extensions.add('performanceTracking', perfPluginExtensionContainer)
+        project.extensions.add('performanceTracking', project.container(PerfPluginExtension))
 
         def version = info.getProperty('version')
         def runtime = info.getProperty('runtime')
@@ -32,7 +29,6 @@ class PerfPlugin implements Plugin<Project> {
         def android = project.extensions.findByType(AppExtension)
         android.registerTransform(perfTrackingTransform)
 
-        // disable/Enabling performance tracking or build Type
         def build = project.extensions.getByName('performanceTracking')
         project.gradle.taskGraph.beforeTask { Task task ->
             if (task.name.startsWith("transformClassesWithPerfTrackingFor")) {
@@ -42,7 +38,7 @@ class PerfPlugin implements Plugin<Project> {
                   String[] r = s.split("(?=\\p{Upper})");
                   Content :["this", "Is", "My", "String"] */
                 def strings = task.name.split("(?=\\p{Lu})")
-                def buildType = strings[strings.length-1].toLowerCase()
+                def buildType = strings[strings.length - 1].toLowerCase()
                 def enable;
                 if ((buildType.equals("debug") && !build.hasProperty("debug"))) {
                     enable = false
@@ -51,7 +47,7 @@ class PerfPlugin implements Plugin<Project> {
                 } else {
                     enable = build."$buildType".enable
                 }
-                perfTrackingTransform.enableReWrite(enable)
+                perfTrackingTransform.enableRewrite = enable
             }
         }
 
