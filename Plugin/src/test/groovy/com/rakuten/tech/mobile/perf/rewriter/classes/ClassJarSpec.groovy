@@ -31,4 +31,14 @@ class ClassJarSpec {
     @Test void "should provide ClassNode"() {
         assert jar.getClassNode(existingClass) != null
     }
+
+    @Test (expected = RuntimeException)
+    void "should throw runtime exception on null constructor Paramater"() {
+        ClassJar jar = new ClassJar(null)
+    }
+
+    @Test (expected = RuntimeException)
+    void "should throw runtime exception on null Paramater"() {
+        jar.getClassReader(null)
+    }
 }
