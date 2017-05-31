@@ -37,4 +37,31 @@ class ClassTrimmerSpec {
         classTrimmer.trim(classNode)
         assert classNode.methods.size() == originalMethodSize
     }
+
+    @Test (expected = RuntimeException)
+    void "should throw RuntimeException on null compileSdkVersion"() {
+        ClassProvider provider = new ClassProvider(resourceFile("user-TestUI.jar").absolutePath)
+        classTrimmer = new ClassTrimmer(null, provider, Logging.getLogger(ClassTrimmerSpec.class.getName()))
+    }
+
+    @Test (expected = RuntimeException)
+    void "should throw RuntimeException on empty compileSdkVersion"() {
+        ClassProvider provider = new ClassProvider(resourceFile("user-TestUI.jar").absolutePath)
+        classTrimmer = new ClassTrimmer("", provider, Logging.getLogger(ClassTrimmerSpec.class.getName()))
+    }
+
+    @Test (expected = RuntimeException)
+    void "should throw RuntimeException on wrong compileSdkVersion"() {
+        ClassProvider provider = new ClassProvider(resourceFile("user-TestUI.jar").absolutePath)
+        classTrimmer = new ClassTrimmer("test", provider, Logging.getLogger(ClassTrimmerSpec.class.getName()))
+    }
+
+    @Test
+    void "should trim methods which has annotation MaxCompileSdkVersion"() {
+        ClassJar classJar = new ClassJar(resourceFile("user-TestUI.jar"))
+        ClassNode classNode = classJar.getClassNode("com.rakuten.tech.mobile.perf.core.base.SupportV4FragmentBase")
+        int originalMethodSize = classNode.methods.size()
+        classTrimmer.trim(classNode)
+        assert classNode.methods.size() != originalMethodSize
+    }
 }
