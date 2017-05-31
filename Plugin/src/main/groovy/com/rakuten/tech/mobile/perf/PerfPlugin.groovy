@@ -40,7 +40,7 @@ class PerfPlugin implements Plugin<Project> {
                 def strings = task.name.split("(?=\\p{Lu})")
                 def buildType = strings[strings.length - 1].toLowerCase()
                 def enable;
-                if ((buildType.equals("debug") && !build.hasProperty("debug"))) {
+                if ((buildType == "debug" && !build.hasProperty("debug"))) {
                     enable = false
                 } else if (!build.hasProperty(buildType)) {
                     enable = true

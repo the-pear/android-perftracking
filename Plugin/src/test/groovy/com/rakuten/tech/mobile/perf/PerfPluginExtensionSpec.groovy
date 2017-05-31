@@ -30,7 +30,6 @@ public class PerfPluginExtensionSpec {
                 .build()
 
         assert result.task(':transformClassesWithPerfTrackingForDebug').outcome == TaskOutcome.SUCCESS
-        assert !result.task(':transformClassesWithPerfTrackingForRelease')
         assert result.output.contains(PerformanceTrackingRewriter.simpleName)
         assert !result.output.contains(DummyRewriter.simpleName)
     }
@@ -43,7 +42,6 @@ public class PerfPluginExtensionSpec {
                 .build()
 
         assert result.task(':transformClassesWithPerfTrackingForRelease').outcome == TaskOutcome.SUCCESS
-        assert !result.task(':transformClassesWithPerfTrackingForDebug')
         assert result.output.contains(PerformanceTrackingRewriter.simpleName)
         assert !result.output.contains(DummyRewriter.simpleName)
     }
@@ -56,8 +54,6 @@ public class PerfPluginExtensionSpec {
                 .build()
 
         assert result.task(':transformClassesWithPerfTrackingForDebug').outcome == TaskOutcome.SUCCESS
-        assert !result.task(':transformClassesWithPerfTrackingForRelease')
-        assert !result.task(':transformClassesWithPerfTrackingForQa')
         assert !result.output.contains(PerformanceTrackingRewriter.simpleName)
         assert result.output.contains(DummyRewriter.simpleName)
     }
@@ -70,8 +66,6 @@ public class PerfPluginExtensionSpec {
                 .build()
 
         assert result.task(':transformClassesWithPerfTrackingForQa').outcome == TaskOutcome.SUCCESS
-        assert !result.task(':transformClassesWithPerfTrackingForRelease')
-        assert !result.task(':transformClassesWithPerfTrackingForDebug')
         assert result.output.contains(PerformanceTrackingRewriter.simpleName)
         assert !result.output.contains(DummyRewriter.simpleName)
     }
@@ -84,8 +78,6 @@ public class PerfPluginExtensionSpec {
                 .build()
 
         assert result.task(':transformClassesWithPerfTrackingForRelease').outcome == TaskOutcome.SUCCESS
-        assert !result.task(':transformClassesWithPerfTrackingForQa')
-        assert !result.task(':transformClassesWithPerfTrackingForDebug')
         assert !result.output.contains(PerformanceTrackingRewriter.simpleName)
         assert result.output.contains(DummyRewriter.simpleName)
     }
