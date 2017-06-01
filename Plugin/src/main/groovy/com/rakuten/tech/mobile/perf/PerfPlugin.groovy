@@ -29,7 +29,7 @@ class PerfPlugin implements Plugin<Project> {
         def android = project.extensions.findByType(AppExtension)
         android.registerTransform(perfTrackingTransform)
 
-        def build = project.extensions.getByName('performanceTracking')
+        def perfConfig = project.extensions.getByName('performanceTracking')
         project.gradle.taskGraph.beforeTask { Task task ->
             if (task.name.startsWith("transformClassesWithPerfTrackingFor")) {
                 /*Split's String(task.name) when ever a upper case character is encountered.
@@ -39,14 +39,8 @@ class PerfPlugin implements Plugin<Project> {
                   Content :["this", "Is", "My", "String"] */
                 def strings = task.name.split("(?=\\p{Lu})")
                 def buildType = strings[strings.length - 1].toLowerCase()
-                def enable;
-                if ((buildType == "debug" && !build.hasProperty("debug"))) {
-                    enable = false
-                } else if (!build.hasProperty(buildType)) {
-                    enable = true
-                } else {
-                    enable = build."$buildType".enable
-                }
+                def enable = buildType != "debug" // default value
+                if(perfConfig.hasProperty(buildType)) enable = perfConfig."$buildType".enable
                 perfTrackingTransform.enableRewrite = enable
             }
         }
