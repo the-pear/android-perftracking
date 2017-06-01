@@ -3,34 +3,35 @@
 The Performance Tracking module enables applications to measure the time taken for executing user scenarios like searching products and displaying product details.
 Each scenario/metric lists various method, network call measurements. Performance Tracking even provides api's for starting custom measurements.
 
-## Installation procedure
+## Table of Contents
+
+* [Install Perf Tracking SDK](#install)
+* [Customize Tracking](#customize)
+* [Changelog](#changelog)
+
+##  <a name="install"></a> Installation procedure
 
 ### REMS Performance Tracking Credentials
 
-Your app must be registered in the Relay Portal to use the App Performance Tracking feature.
-Request for an App Performance Tracking Subscription Key through the [Inquiry Form](https://confluence.rakuten-it.com/confluence/display/REMI/REM+Inquiry+form) with your application Bundle id (iOS)/Package name (Android)
+Your app must be registered in the [Relay Portal](https://rs-portal-web-prd-japaneast-wa.azurewebsites.net/) to use the App Performance Tracking feature.
+Request for an App Performance Tracking Subscription Key through the [Inquiry Form](https://developers.rakuten.com) with your application Bundle id (iOS)/Package name (Android)
 
-If you have any questions, please visit our [Documentation Portal] (https://developers.rakuten.com/hc/en-us/categories/115000711608-Rakuten-Ecosystem-Mobile-REM-) or you may contact us through the [Inquiry Form](https://confluence.rakuten-it.com/confluence/display/REMI/REM+Inquiry+form)
+If you have any questions, please visit our [Documentation Portal](https://developers.rakuten.com/hc/en-us/categories/115000711608-Rakuten-Ecosystem-Mobile-REM-) or you may contact us through the [Inquiry Form](https://developers.rakuten.com)
 
-### Before you begin
-
-+ Go through [Android Integration Checklist](http://www.raksdtd.com/android/android-integration-checklist/) to understand how to integrate the SDK properly.
 ### #1 Add dependency to buildscript
 
-
 ```groovy
+buildscript {
+    repositories {
+        maven { url 'http://artifactory.raksdtd.com/artifactory/libs-release' }
+    }
+    dependencies {
+        classpath 'com.rakuten.tech.mobile.perf:plugin:0.1.0'
+    }
+}
+
 apply plugin: 'com.rakuten.tech.mobile.perf'
-
-   buildscript {
-       repositories {
-           maven { url 'http://artifactory.raksdtd.com/artifactory/libs-release' }
-       }
-       dependencies {
-           classpath 'com.rakuten.tech.mobile.perf:plugin:0.1.0'
-       }
-   }
 ```
-
 
 ### #2 Provide Subscription key
 
@@ -40,96 +41,87 @@ You must provide Configuration api's subscription key as metadata in application
 <manifest>
     <application>
         <meta-data android:name="com.rakuten.tech.mobile.perf.SubscriptionKey"
-            android:value="subscriptionKey" />
+                   android:value="subscriptionKey" />
     </application>
 </manifest>
 ```
 
-### #3 Measurements
+### #3 Build Application
 
-#### Metrics
-Metrics are defined to measure how long something takes from the user perspective.
-Standard metrics include launch and user interactions like searching products and displaying product details.
-One metric measurement typically involves many low level measurements like method and network calls.
-Performance Tracking SDK will automatically start the launch metrics(_launch) once you integrate into your app.
-There can be only one metric running at any given point of time.
-The Performance Tracking SDK features automatic metric termination.
-That means developers are only required to start metrics and the SDK takes care of the rest by following a rule set.
+The SDK instruments the application at compile time (currently in build types other than `debug`). So when you build you app you will see a `transformClassesWithPerfTracking` task
 
+```bash
+$ ./gradlew assembleRelease
+:preBuild UP-TO-DATE
+:preReleaseBuild UP-TO-DATE
+:compileReleaseAidl
+# etc...
+:transformClassesWithPerfTrackingForRelease
+:transformClassesWithDexForRelease
+:transformResourcesWithMergeJavaResForRelease
+:packageRelease
+:assembleRelease
+
+BUILD SUCCESSFUL
+```
+
+Now your application is ready to automatically track the launch metrcis, network requests, view lifecycle methods, runnables, webview loads, onClick listeners, threads, volley's hurl stack and many more. To add custom measurement and structure them around metrics see [Customize Tracking](#customize). 
+
+You will see your measurements in the [Relay Portal](https://rs-portal-web-prd-japaneast-wa.azurewebsites.net/) under Features > App Performance. If you obfuscate your app you can upload the `mapping.txt` in the portal and the tracking data will be deobfuscated for you.
+
+## <a name="customize"></a> Customize Tracking
+
+### Metrics
+
+The Performance Tracking SDK is build around the concepts of **Metrics** - they measure a single event from the user perspective. Examples of metrics are app launch time, a detail screen load time or search result load time. 
+
+#### Starting Metrics
+
+To start a metric use the `Metric` API:
+
+```java
+@Override public void onCreate(Bundle savedInstanceState) {
+    Metric.start(StandardMetric.ITEM.getValue());
+}
+```
+
+Currently there can only be one active metric at any given point of time, so if you start another metric the first metric will be considered done.
+
+```java
+Metric.start(StandardMetric.ITEM.getValue()); 
+Metric.start(StandardMetric.SEACH.getValue()); // at this point the ITEM metric is considered done    
+```
+
+**NOTE:** The launch metric is started automatically by the SDK.
+
+```java
+// Custem Metric metric name can be AlphaNumeric, -, _, . and <i>Space</i>.
+Metric.start("my_custom_metric");
+```
+
+#### <a name="termination"></a> Automatic Metric Termination
+
+Metrics terminate automatically according to a set of rules described below. That means developers are only required to start metrics and the SDK takes care of the rest.
 
 **What makes a metric start:**
 
-* The launch metric is started automatically by the SDK at the launch of the application
-* Other metrics are started manually through the SDK's public API
+* The `StandardMetric.LAUNCH` metric is started automatically by the SDK 
+* Other metrics are started by tha app by calling `Metric#startMetric(String)`
 
-**What makes a metric keep going :**
+**What makes a metric keep going:**
 
 * Activity life cycle changes
 * Fragment life cycle and visibility changes
 * Loading a page in WebView
 
-**What makes a metric terminate :**
+**What makes a metric terminate:**
 
-* User interactions (clicks, back button pushed, etc.)
+* User interactions like clicks, back button presses, etc.
 * WebView finishes loading a page
 * Timeout of 10 seconds
-* New metric start
+* A new metric is started start
 
-User can start new metric as shown in below sample.
-
-```java
-        Metric.start(StandardMetric.ITEM.getValue());
-```
-
-#### Custom measurements
-Custom measurements give developers the ability to run arbitrary measurements, for which they provide the start and end.
-Using the public api's of the runtime SDK , you can start new custom measurements as shown below.
-
-```java
-
-import com.rakuten.tech.mobile.perf.runtime.Measurement;
-import com.rakuten.tech.mobile.perf.runtime.Metric;
-import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
-
-        Metric.start(StandardMetric.ITEM.getValue());
-        Measurement.start("demoTestMeasurement");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                    Measurement.end("demoTestMeasurement");
-                } catch (InterruptedException e) {
-                    Thread.interrupted();
-                }
-            }
-        }).start();
-```
-
-#### Aggregated measurements
-Aggregated measurements are useful for scenarios where multiple measurements of the same type run in parallel.
-Aggregated measurements take an extra parameter which is used to distinguish between multiple running measurements.
-
-```java
-        Metric.start(StandardMetric.ITEM.getValue());
-        Measurement.startAggregated("demoTestAggregated", "FirstImageUrl");
-        Measurement.startAggregated("demoTestAggregated", "SecondImageUrl");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                    Measurement.endAggregated("demoTestAggregated", "FirstImageUrl");
-                    Measurement.endAggregated("demoTestAggregated", "SecondImageUrl");
-                } catch (InterruptedException e) {
-                    Thread.interrupted();
-                }
-            }
-        }).start();
-```
-
-
-## Changelog <a name="Changelog"></a>
+## <a name="changelog"></a> Changelog
 
 ### 0.1.0 [in progress]
 
