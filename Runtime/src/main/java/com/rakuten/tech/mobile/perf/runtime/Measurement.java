@@ -18,7 +18,6 @@ public final class Measurement {
      * Starts a new measurement.
      *
      * @param measurementId Measurement identifier. Valid Arguments are AlphaNumeric, -, _, . and <i>Space</i>.
-     * @return trackingId
      * @see #end(String)
      */
     public static void start(String measurementId) {

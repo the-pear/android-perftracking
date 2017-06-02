@@ -76,6 +76,7 @@ javadoc {
     name = project.MODULE_NAME
     version = project.MODULE_VERSION
     title = project.MODULE_DESCRIPTION
+    exclude = ['**/Measurement.java']
 }
 
 
