@@ -14,7 +14,7 @@ Each scenario/metric lists various method, network call measurements. Performanc
 ### REMS Performance Tracking Credentials
 
 Your app must be registered in the [Relay Portal](https://rs-portal-web-prd-japaneast-wa.azurewebsites.net/) to use the App Performance Tracking feature.
-Request for an App Performance Tracking Subscription Key through the [Inquiry Form](https://developers.rakuten.com) with your application Bundle id (iOS)/Package name (Android)
+Request for an App Performance Tracking Subscription Key through the [Inquiry Form](https://developers.rakuten.com) with your application's package name.
 
 If you have any questions, please visit our [Documentation Portal](https://developers.rakuten.com/hc/en-us/categories/115000711608-Rakuten-Ecosystem-Mobile-REM-) or you may contact us through the [Inquiry Form](https://developers.rakuten.com)
 
@@ -48,7 +48,7 @@ You must provide Configuration api's subscription key as metadata in application
 
 ### #3 Build Application
 
-The SDK instruments the application at compile time (currently in build types other than `debug`). So when you build you app you will see a `transformClassesWithPerfTracking` task
+The SDK instruments the application at compile time (currently in build types other than `debug`). So when you build your app you will see a `transformClassesWithPerfTracking` task
 
 ```bash
 $ ./gradlew assembleRelease
