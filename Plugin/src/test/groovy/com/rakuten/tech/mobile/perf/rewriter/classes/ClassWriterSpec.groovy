@@ -16,38 +16,33 @@ public class ClassWriterSpec {
     }
 
     @Test
-    def void "call to getCommonSuperClass should return super type"() {
+    def void "should return common super class"() {
         String type1 = "jp.co.rakuten.api.rae.engine.TokenRequest"
         String type2 = "jp.co.rakuten.api.rae.engine.TokenCancelRequest"
         assert classWriter.getCommonSuperClass(type1, type2) == "jp/co/rakuten/api/rae/engine/EngineBaseRequest"
     }
 
     @Test
-    def void "call to getCommonSuperClass should return Object type"() {
+    def void "should return object class as super class when any one input parameter is interface"() {
         String type1 = "jp.co.rakuten.api.rae.engine.TokenRequest"
         String type2 = "jp.co.rakuten.api.core.TokenableRequest"
         assert classWriter.getCommonSuperClass(type1, type2) == "java/lang/Object"
     }
 
+    @Test
+    def void "should return same super type even by swapping input parameter"() {
+        String type1 = "jp.co.rakuten.api.rae.engine.EngineBaseRequest"
+        String type2 = "jp.co.rakuten.api.rae.engine.TokenRequest"
+        def super12 = classWriter.getCommonSuperClass(type1, type2)
+        def super21 = classWriter.getCommonSuperClass(type2, type1)
+        assert super12 == super21
+    }
+
     @Test(expected = RuntimeException.class)
-    def void "call to getCommonSuperClass should throw RuntimeException"() {
+    def void "should fail to get common super type when given class not found"() {
         String type1 = "test"
         String type2 = "test"
         classWriter.getCommonSuperClass(type1, type2)
-    }
-
-    @Test
-    def void "call to getCommonSuperClass should return assignable super"() {
-        String type1 = "jp.co.rakuten.api.rae.engine.TokenRequest"
-        String type2 = "jp.co.rakuten.api.rae.engine.EngineBaseRequest"
-        assert classWriter.getCommonSuperClass(type1, type2) == "jp.co.rakuten.api.rae.engine.EngineBaseRequest"
-    }
-
-    @Test
-    def void "call to getCommonSuperClass should return assignable super vice versa"() {
-        String type1 = "jp.co.rakuten.api.rae.engine.EngineBaseRequest"
-        String type2 = "jp.co.rakuten.api.rae.engine.TokenRequest"
-        assert classWriter.getCommonSuperClass(type1, type2) == "jp.co.rakuten.api.rae.engine.EngineBaseRequest"
     }
 
 }

@@ -12,17 +12,17 @@ public class ClassFilterSpec {
         classFilter = new ClassFilter()
     }
 
-    @Test def void "add exclude file and test canReWrite should return false"() {
+    @Test def void "canReWrite should return false when given name present in exclude list"() {
         classFilter.exclude("test")
         assert classFilter.canRewrite("test.") == false
     }
 
-    @Test def void "add exclude file and test canReWrite should return true"() {
+    @Test def void "canReWrite should return true when given name not present in exclude list"() {
         classFilter.exclude("test")
         assert classFilter.canRewrite("test") == true
     }
 
-    @Test def void "add null file exclude and canReWrite should return true"() {
+    @Test def void "canReWrite should return true with empty exclude list"() {
         classFilter.exclude(null)
         assert classFilter.canRewrite("test") == true
     }
