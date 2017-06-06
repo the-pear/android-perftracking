@@ -69,7 +69,7 @@ dependencies {
 
 configurations.all { // TODO: remove after inital release
     resolutionStrategy {
-        force 'com.rakuten.tech.mobile.perf:runtime:0.1.0-SNAPSHOT'
+        force 'com.rakuten.tech.mobile.perf:performance-tracking:0.1.0-SNAPSHOT'
     }
 }
 
