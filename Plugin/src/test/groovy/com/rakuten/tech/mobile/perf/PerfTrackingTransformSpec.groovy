@@ -42,7 +42,7 @@ public class PerfTrackingTransformSpec {
 
     @Test public void "should use performance tracking rewriter when enabled"() {
         def (inputs, referenceInputs) = [[], []]
-        transform.setEnableReWrite(true)
+        transform.enableRewrite = true
 
         transform.transform(ctx, inputs, referenceInputs, outputProvider, false)
 
@@ -51,7 +51,7 @@ public class PerfTrackingTransformSpec {
 
     @Test public void "should use dummy rewriter when disabled"() {
         def (inputs, referenceInputs) = [[], []]
-        transform.setEnableReWrite(false)
+        transform.enableRewrite = false
 
         transform.transform(ctx, inputs, referenceInputs, outputProvider, false)
 

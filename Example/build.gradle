@@ -8,13 +8,12 @@ buildscript {
 
         // REQUIRED FOR APP PERFORMANCE TRACKING (1)
         maven { url 'http://artifactory.raksdtd.com/artifactory/libs-release' }
-        maven { url 'http://artifactory.raksdtd.com/artifactory/libs-snapshot' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.2'
 
         // REQUIRED FOR APP PERFORMANCE TRACKING (2)
-        classpath 'com.rakuten.tech.mobile.perf:plugin:0.1.0-SNAPSHOT'
+        classpath 'com.rakuten.tech.mobile.perf:plugin:0.1.0'
     }
 }
 
@@ -24,6 +23,15 @@ repositories {
 
 apply plugin: 'com.android.application'
 apply plugin: 'com.rakuten.tech.mobile.perf' // REQUIRED FOR PERFORMANCE TRACKING (3)
+
+performanceTracking {
+    release {
+        enable = true
+    }
+    debug {
+        enable = true
+    }
+}
 
 android {
     compileSdkVersion 23
@@ -43,7 +51,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
-
 }
 
 dependencies {
