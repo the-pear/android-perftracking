@@ -123,6 +123,6 @@ Metrics terminate automatically according to a set of rules described below. Tha
 
 ## <a name="changelog"></a> Changelog
 
-### 0.1.0 [in progress]
+### 0.1.0
 
-- Initial version of plugin
+- MVP Release
