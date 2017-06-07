@@ -131,7 +131,7 @@ public class ClassJarMaker {
     }
     
     private void ensureDirs(String name) throws IOException {
-    	String[] pieces = name.split(".");
+    	String[] pieces = name.split("\\.");
     	String dir = "";
     	for (int i = 0; i < pieces.length - 1; i++) {
 			dir += pieces[i] + "/";

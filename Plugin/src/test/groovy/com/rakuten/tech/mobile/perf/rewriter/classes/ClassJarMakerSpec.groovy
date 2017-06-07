@@ -31,7 +31,7 @@ class ClassJarMakerSpec {
     }
 
     @Test(expected = RuntimeException.class)
-    void "should throw RuntimeException"() {
+    void "should throw RuntimeException as we add duplicate entry into jar"() {
         ClassJar classJar = new ClassJar(resourceFile("user-TestUI.jar"))
         jar.populate(resourceFile("user-TestUI.jar").absolutePath)
         ArrayList<String> arrayList = classJar.getClasses()
