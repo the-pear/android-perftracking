@@ -1,6 +1,5 @@
 package com.rakuten.tech.mobile.perf.rewriter.classes
 
-import groovy.mock.interceptor.MockFor
 import org.junit.Before
 import org.junit.Test
 
@@ -16,21 +15,21 @@ public class ClassWriterSpec {
     }
 
     @Test
-    def void "should return common super class"() {
+    def void "should provide common super class for given sub classes"() {
         String type1 = "jp.co.rakuten.api.rae.engine.TokenRequest"
         String type2 = "jp.co.rakuten.api.rae.engine.TokenCancelRequest"
         assert classWriter.getCommonSuperClass(type1, type2) == "jp/co/rakuten/api/rae/engine/EngineBaseRequest"
     }
 
     @Test
-    def void "should return object class as super class when any one input parameter is interface"() {
+    def void "should provide object class as super class when any one input parameter is interface"() {
         String type1 = "jp.co.rakuten.api.rae.engine.TokenRequest"
         String type2 = "jp.co.rakuten.api.core.TokenableRequest"
         assert classWriter.getCommonSuperClass(type1, type2) == "java/lang/Object"
     }
 
     @Test
-    def void "should return same super type even by swapping input parameter"() {
+    def void "should provide same super type even by swapping input parameter"() {
         String type1 = "jp.co.rakuten.api.rae.engine.EngineBaseRequest"
         String type2 = "jp.co.rakuten.api.rae.engine.TokenRequest"
         def super12 = classWriter.getCommonSuperClass(type1, type2)

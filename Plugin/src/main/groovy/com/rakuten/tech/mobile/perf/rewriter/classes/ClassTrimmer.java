@@ -1,13 +1,13 @@
 package com.rakuten.tech.mobile.perf.rewriter.classes;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.gradle.api.logging.Logger;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ClassTrimmer {
@@ -37,7 +37,7 @@ public class ClassTrimmer {
         ArrayList<Object> remove = new ArrayList<Object>();
 
         for (Object o : cn.methods) {
-            MethodNode mn = (MethodNode)o;
+            MethodNode mn = (MethodNode) o;
             if ((!checkAnnotations(mn.visibleAnnotations)) || (!checkAnnotations(mn.invisibleAnnotations))) {
                 remove.add(mn);
             }
@@ -45,14 +45,14 @@ public class ClassTrimmer {
 
         for (Object o : remove) {
             cn.methods.remove(o);
-            _log.debug("Trimmed method " + ((MethodNode)o).name + " of " + cn.name);
+            _log.debug("Trimmed method " + ((MethodNode) o).name + " of " + cn.name);
         }
     }
 
     private boolean checkAnnotations(List<?> list) {
         if (list != null) {
             for (Object a : list) {
-                if (!checkAnnotation((AnnotationNode)a)) {
+                if (!checkAnnotation((AnnotationNode) a)) {
                     return false;
                 }
             }
@@ -62,17 +62,15 @@ public class ClassTrimmer {
 
     private boolean checkAnnotation(AnnotationNode a) {
         if (a.desc.equals("Lcom/rakuten/tech/mobile/perf/core/annotations/Exists;")) {
-            if (!exists(((Type)a.values.get(1)).getClassName())) {
+            if (!exists(((Type) a.values.get(1)).getClassName())) {
                 return false;
             }
-        }
-        else if (a.desc.equals("Lcom/rakuten/tech/mobile/perf/core/annotations/MinCompileSdkVersion;")) {
-            if (_compileSdkVersion < (int)a.values.get(1)) {
+        } else if (a.desc.equals("Lcom/rakuten/tech/mobile/perf/core/annotations/MinCompileSdkVersion;")) {
+            if (_compileSdkVersion < (int) a.values.get(1)) {
                 return false;
             }
-        }
-        else if (a.desc.equals("Lcom/rakuten/tech/mobile/perf/core/annotations/MaxCompileSdkVersion;")) {
-            if (_compileSdkVersion > (int)a.values.get(1)) {
+        } else if (a.desc.equals("Lcom/rakuten/tech/mobile/perf/core/annotations/MaxCompileSdkVersion;")) {
+            if (_compileSdkVersion > (int) a.values.get(1)) {
                 return false;
             }
         }

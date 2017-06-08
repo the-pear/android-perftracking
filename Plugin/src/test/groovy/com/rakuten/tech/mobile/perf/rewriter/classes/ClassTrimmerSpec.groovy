@@ -38,20 +38,20 @@ class ClassTrimmerSpec {
         assert classNode.methods.size() == originalMethodSize
     }
 
-    @Test (expected = RuntimeException)
-    void "should throw RuntimeException on null compileSdkVersion"() {
+    @Test(expected = RuntimeException)
+    void "should fail to instantiate with null compileSdkVersion"() {
         ClassProvider provider = new ClassProvider(resourceFile("user-TestUI.jar").absolutePath)
         classTrimmer = new ClassTrimmer(null, provider, Logging.getLogger(ClassTrimmerSpec.class.getName()))
     }
 
-    @Test (expected = RuntimeException)
-    void "should throw RuntimeException on empty compileSdkVersion"() {
+    @Test(expected = RuntimeException)
+    void "should fail to instantiate with empty compileSdkVersion"() {
         ClassProvider provider = new ClassProvider(resourceFile("user-TestUI.jar").absolutePath)
         classTrimmer = new ClassTrimmer("", provider, Logging.getLogger(ClassTrimmerSpec.class.getName()))
     }
 
-    @Test (expected = RuntimeException)
-    void "should throw RuntimeException on wrong compileSdkVersion"() {
+    @Test(expected = RuntimeException)
+    void "should fail to instantiate with wrong compileSdkVersion"() {
         ClassProvider provider = new ClassProvider(resourceFile("user-TestUI.jar").absolutePath)
         classTrimmer = new ClassTrimmer("test", provider, Logging.getLogger(ClassTrimmerSpec.class.getName()))
     }

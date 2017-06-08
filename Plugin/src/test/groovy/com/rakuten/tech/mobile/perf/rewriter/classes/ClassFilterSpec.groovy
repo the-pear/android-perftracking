@@ -1,29 +1,38 @@
 package com.rakuten.tech.mobile.perf.rewriter.classes
 
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 
 public class ClassFilterSpec {
 
     ClassFilter classFilter
 
-    @Before def void setup() {
+    @Before
+    def void setup() {
         classFilter = new ClassFilter()
     }
 
-    @Test def void "canReWrite should return false when given name present in exclude list"() {
-        classFilter.exclude("test")
-        assert classFilter.canRewrite("test.") == false
+    @Test
+    def void "should exclude all classes from package, but still accept classes from other packages"() {
+        classFilter.exclude("package.to.exclude")
+        assert classFilter.canRewrite("package.to.exclude.SomeClass") == false
+        assert classFilter.canRewrite("other.package.OtherClass") == true
     }
 
-    @Test def void "canReWrite should return true when given name not present in exclude list"() {
-        classFilter.exclude("test")
-        assert classFilter.canRewrite("test") == true
-    }
-
-    @Test def void "canReWrite should return true with empty exclude list"() {
+    @Test
+    def void "should accept all classes when we exclude null packages"() {
         classFilter.exclude(null)
-        assert classFilter.canRewrite("test") == true
+        assert classFilter.get_exclude().size() == 0
+        assert classFilter.canRewrite("package.any.nonexclude.MyClass") == true
+    }
+
+    @Test
+    def void "should exclude classes from all excluded packages"() {
+        classFilter.exclude(null + File.pathSeparator + "package.to.exclude1" + File.pathSeparator + "package.to.exclude2")
+        assert classFilter.get_exclude().size() == 3
+        assert classFilter.canRewrite("package.any.nonexclude.SisClass") == true
+        assert classFilter.canRewrite("package.to.exclude1.FathClass") == false
+        assert classFilter.canRewrite("package.to.exclude2.BroClass") == false
+        assert classFilter.canRewrite("null.MothClass") == false
     }
 }

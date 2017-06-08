@@ -1,24 +1,20 @@
 package com.rakuten.tech.mobile.perf.rewriter.classes;
 
 public class ClassWriter extends org.objectweb.asm.ClassWriter {
-	
-	private final ClassProvider _classProvider;
 
-	public ClassWriter(ClassProvider classProvider, int arg0) {
-		super(arg0);
-		_classProvider = classProvider;
-	}
-	
-	@Override
-	protected String getCommonSuperClass(final String type1, final String type2) {
+    private final ClassProvider _classProvider;
+
+    public ClassWriter(ClassProvider classProvider, int arg0) {
+        super(arg0);
+        _classProvider = classProvider;
+    }
+
+    @Override
+    protected String getCommonSuperClass(final String type1, final String type2) {
         Class<?> c, d;
-        //ClassLoader classLoader = getClass().getClassLoader();
         try {
-            //c = Class.forName(type1.replace('/', '.'), false, classLoader);
-        	c = _classProvider.getClass(type1.replace('/', '.'));
-        	
-            //d = Class.forName(type2.replace('/', '.'), false, classLoader);
-        	d = _classProvider.getClass(type2.replace('/', '.'));
+            c = _classProvider.getClass(type1.replace('/', '.'));
+            d = _classProvider.getClass(type2.replace('/', '.'));
         } catch (Exception e) {
             throw new RuntimeException(e.toString());
         }
@@ -36,5 +32,5 @@ public class ClassWriter extends org.objectweb.asm.ClassWriter {
             } while (!c.isAssignableFrom(d));
             return c.getName().replace('.', '/');
         }
-    }	
+    }
 }

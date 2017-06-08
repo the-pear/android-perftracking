@@ -1,12 +1,11 @@
 package com.rakuten.tech.mobile.perf.rewriter.classes
 
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
-import static com.rakuten.tech.mobile.perf.TestUtil.*
+import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
 
 class ClassJarMakerSpec {
 
@@ -23,15 +22,15 @@ class ClassJarMakerSpec {
     }
 
     @Test
-    void "should populate jar fie"() {
+    void "should populate jar file with valid filepath"() {
         jar.populate(resourceFile("user-TestUI.jar").absolutePath)
         jar.Close()
         ClassProvider classProvider = new ClassProvider(jarTemp.absolutePath)
-        assert classProvider.getClass("com.rakuten.tech.mobile.perf.core.Sender") != null
+        assert classProvider.getClass("com.rakuten.tech.mobile.perf.core.Sender")
     }
 
     @Test(expected = RuntimeException.class)
-    void "should throw RuntimeException as we add duplicate entry into jar"() {
+    void "should fail to add duplicate entry into jar"() {
         ClassJar classJar = new ClassJar(resourceFile("user-TestUI.jar"))
         jar.populate(resourceFile("user-TestUI.jar").absolutePath)
         ArrayList<String> arrayList = classJar.getClasses()
@@ -39,20 +38,21 @@ class ClassJarMakerSpec {
     }
 
     @Test(expected = RuntimeException.class)
-    void "should throw RuntimeException on null parameter for class initialization"() {
+    void "should fail to instantiate without valid file"() {
         new ClassJarMaker(null)
     }
 
     @Test(expected = RuntimeException.class)
-    void "should throw RuntimeException on null parameter populate method"() {
+    void "should fail to populate without valid filepath"() {
         jar.populate(null)
     }
 
-    @Test (expected = ClassFormatError.class)
-    void "should add the class"() {
-        jar.add("com.test.test", new byte[2])
+    @Test
+    void "should add class to ClassJarMaker"() {
+        jar.add("com.rakuten.test", new byte[2])
         jar.Close()
-        ClassProvider provider = new ClassProvider(jarTemp.absolutePath)
-        provider.getClass("com.test.test").getResourceAsStream()
+        ClassJar classJar = new ClassJar(jarTemp)
+        ArrayList<String> arrayList = classJar.getClasses()
+        assert arrayList.contains("com.rakuten.test")
     }
 }
