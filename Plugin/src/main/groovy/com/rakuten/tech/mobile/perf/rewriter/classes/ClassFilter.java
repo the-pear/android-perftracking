@@ -5,10 +5,6 @@ import java.util.ArrayList;
 
 public class ClassFilter {
 
-    public ArrayList<String> get_exclude() {
-        return _exclude;
-    }
-
     private final ArrayList<String> _exclude = new ArrayList<String>();
 
     public void exclude(String filter) {

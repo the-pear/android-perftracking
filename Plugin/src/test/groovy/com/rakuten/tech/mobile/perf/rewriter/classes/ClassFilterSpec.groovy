@@ -22,17 +22,23 @@ public class ClassFilterSpec {
     @Test
     def void "should accept all classes when we exclude null packages"() {
         classFilter.exclude(null)
-        assert classFilter.get_exclude().size() == 0
         assert classFilter.canRewrite("package.any.nonexclude.MyClass") == true
     }
 
     @Test
     def void "should exclude classes from all excluded packages"() {
-        classFilter.exclude(null + File.pathSeparator + "package.to.exclude1" + File.pathSeparator + "package.to.exclude2")
-        assert classFilter.get_exclude().size() == 3
+        classFilter.exclude("package.to.exclude1")
+        classFilter.exclude("package.to.exclude2")
         assert classFilter.canRewrite("package.any.nonexclude.SisClass") == true
         assert classFilter.canRewrite("package.to.exclude1.FathClass") == false
         assert classFilter.canRewrite("package.to.exclude2.BroClass") == false
-        assert classFilter.canRewrite("null.MothClass") == false
+    }
+
+    @Test
+    def void "should pass all exclude package names as single param, check if all classes are exluded from those packages"() {
+        classFilter.exclude("package.to.exclude1" + File.pathSeparator + "package.to.exclude2")
+        assert classFilter.canRewrite("package.any.nonexclude.SisClass") == true
+        assert classFilter.canRewrite("package.to.exclude1.FathClass") == false
+        assert classFilter.canRewrite("package.to.exclude2.BroClass") == false
     }
 }

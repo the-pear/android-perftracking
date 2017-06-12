@@ -25,7 +25,7 @@ class ClassTrimmerSpec {
             return data.collect { [it] as Object[] }
         }
 
-        public ClassTrimmerSpecParameterized(final String input) {
+        ClassTrimmerSpecParameterized(final String input) {
             this.input = input
         }
 

@@ -55,4 +55,10 @@ class ClassJarMakerSpec {
         ArrayList<String> arrayList = classJar.getClasses()
         assert arrayList.contains("com.rakuten.test")
     }
+
+    @Test(expected = RuntimeException.class)
+    void "should fail to add null entry into ClassJarMaker"() {
+        jar.add(null, new byte[2])
+        jar.Close()
+    }
 }
