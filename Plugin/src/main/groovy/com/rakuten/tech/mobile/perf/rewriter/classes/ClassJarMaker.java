@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -17,6 +18,7 @@ import java.util.jar.Manifest;
 public class ClassJarMaker {
 
     private final JarOutputStream _output;
+    private final HashSet<String> _dirs = new HashSet<String>();
 
     public ClassJarMaker(File file) {
         try {
@@ -72,6 +74,7 @@ public class ClassJarMaker {
 
     public void add(String name, InputStream input) {
         try {
+            ensureDirs(name);
             JarEntry entry = new JarEntry(name.replace('.', '/') + ".class");
             _output.putNextEntry(entry);
 
@@ -94,6 +97,7 @@ public class ClassJarMaker {
 
     public void add(String name, byte[] data) {
         try {
+            ensureDirs(name);
             JarEntry entry = new JarEntry(name.replace('.', '/') + ".class");
             _output.putNextEntry(entry);
             _output.write(data);
@@ -114,4 +118,17 @@ public class ClassJarMaker {
         }
     }
 
+    private void ensureDirs(String name) throws IOException {
+        String[] pieces = name.split(".");
+        String dir = "";
+        for (int i = 0; i < pieces.length - 1; i++) {
+            dir += pieces[i] + "/";
+            if (!_dirs.contains(dir)) {
+                JarEntry entry = new JarEntry(dir);
+                _output.putNextEntry(entry);
+                _output.closeEntry();
+                _dirs.add(dir);
+            }
+        }
+    }
 }
