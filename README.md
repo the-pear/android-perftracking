@@ -14,9 +14,9 @@ Each scenario/metric lists various method, network call measurements. Performanc
 ### REMS Performance Tracking Credentials
 
 Your app must be registered in the [Relay Portal](https://rs-portal-web-prd-japaneast-wa.azurewebsites.net/) to use the App Performance Tracking feature.
-Request for an App Performance Tracking Subscription Key through the [Inquiry Form](https://developers.rakuten.com) with your application's package name.
+Request for an App Performance Tracking Subscription Key through the [API Portal](https://remsapijapaneast.portal.azure-api.net) with your application's package name.
 
-If you have any questions, please visit our [Documentation Portal](https://developers.rakuten.com/hc/en-us/categories/115000711608-Rakuten-Ecosystem-Mobile-REM-) or you may contact us through the [Inquiry Form](https://developers.rakuten.com)
+If you have any questions, please visit our [Developer Portal](https://developers.rakuten.com/hc/en-us) or you may contact us through the [Inquiry Form](https://developers.rakuten.com/hc/en-us/requests/new?ticket_form_id=399907)
 
 ### #1 Add dependency to buildscript
 
