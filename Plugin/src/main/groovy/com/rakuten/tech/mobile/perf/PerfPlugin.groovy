@@ -1,11 +1,9 @@
 package com.rakuten.tech.mobile.perf
 
 import com.android.build.gradle.AppExtension
-import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
-
 /**
  * Gradle plugin
  *
@@ -16,7 +14,7 @@ class PerfPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
         def info = new Properties()
-        info.load(PerfPlugin.class.classLoader.getResourceAsStream('info.properties'))
+        info.load(PerfPlugin.classLoader.getResourceAsStream('info.properties'))
 
         project.extensions.add('performanceTracking', project.container(PerfPluginExtension))
 
