@@ -5,10 +5,27 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 
+import java.util.regex.Pattern
+
 import static com.rakuten.tech.tool.Functions.findAllSnapshots
 
 @SuppressWarnings("GroovyUnusedDeclaration")
 public class CheckGradleFilesForSnapshotDependencies extends DefaultTask {
+    /**
+     * Regex or collection of Regexes to exclude files/paths from filtering.
+     * Example configurations:
+     *
+     * ```groovy
+     * // single
+     * exclude = ~/.*\/Example\/.*\.gradle/
+     *
+     * // list of Regexes
+     * exclude = [
+     *          ~/.*\/Example\/.*\.gradle/ ,
+     *          ~/.*\/Runtime\/.*\.gradle/
+     *          ]
+     * ```
+     */
     def exclude
 
     CheckGradleFilesForSnapshotDependencies() {
@@ -46,10 +63,25 @@ public class CheckGradleFilesForSnapshotDependencies extends DefaultTask {
             println "✓"
         }
 
+        def filter = { false }
+
+        if (exclude instanceof Pattern) {
+            filter = exclude
+        } else if ( exclude && [Collection, Object[]].any { it.isAssignableFrom(exclude.getClass())
+        }) {
+            filter = { file ->
+                def shouldExclude = exclude.any {
+                    file.absolutePath ==~ it
+                }
+                if(shouldExclude) println "excluding file $file.absolutePath"
+                shouldExclude
+            }
+        }
+
         project.rootDir.traverse type: FileType.FILES,
                 visit: visitGradleFile,
                 nameFilter: ~/.*\.gradle$/,
-                excludeFilter: exclude
+                excludeFilter: filter
 
         println "No SNAPSHOTS found ✓"
     }

@@ -15,6 +15,10 @@ class Functions {
             it.expression.arguments.expressions.get(0) // first argument
         }
         dependencyArgs == null ? [] :
-                dependencyArgs.findAll { it instanceof ConstantExpression && it.value.contains ("SNAPSHOT") }
+                dependencyArgs.findAll {
+                    // following semver.org
+                    // "A pre-release version MAY be denoted by appending a hyphen"
+                    it instanceof ConstantExpression && it.value.split(':')[2].contains('-')
+                }
     }
 }
