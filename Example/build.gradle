@@ -29,7 +29,7 @@ performanceTracking {
         enable = true
     }
     debug {
-        enable = true
+        enable = false
     }
 }
 

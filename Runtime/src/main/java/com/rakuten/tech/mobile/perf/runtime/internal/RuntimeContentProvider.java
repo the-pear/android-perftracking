@@ -22,6 +22,7 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.NoCache;
 import com.google.gson.Gson;
 import com.rakuten.tech.mobile.perf.R;
+import com.rakuten.tech.mobile.perf.core.AppPerformanceConfig;
 import com.rakuten.tech.mobile.perf.core.Config;
 import com.rakuten.tech.mobile.perf.core.Tracker;
 import com.rakuten.tech.mobile.perf.runtime.Metric;
@@ -48,6 +49,7 @@ public class RuntimeContentProvider extends ContentProvider {
     public boolean onCreate() {
         mContext = getContext();
         if (mContext == null) return false;
+        if (!AppPerformanceConfig.enabled) return false; // Return when instrumentation is disabled
 
         mQueue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
         mQueue.start();
