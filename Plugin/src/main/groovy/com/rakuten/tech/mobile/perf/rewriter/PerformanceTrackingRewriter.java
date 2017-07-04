@@ -96,17 +96,15 @@ public class PerformanceTrackingRewriter implements Rewriter {
                 } else if (name.startsWith("com.rakuten.tech.mobile.perf.core.mixins.")) {
                     _log.debug("Removing mixin " + name + " from build");
                 } else if (name.startsWith("com.rakuten.tech.mobile.perf.core")) {
-                    if (name.contains("AppPerformanceConfig")) {
-                        _log.debug("Modifying " + name + " dynamically with enabled = true");
-                        outputMaker.add(name, ClassGenerator.generateConfigClass(true));
-                    } else {
-                        ClassNode cn = trimmer.trim(temp.getClassNode(name));
-                        if (cn != null) {
-                            ClassWriter cw = new ClassWriter(provider, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
-                            cn.accept(cw);
-                            outputMaker.add(name, cw.toByteArray());
-                        }
+                    ClassNode cn = trimmer.trim(temp.getClassNode(name));
+                    if (cn != null) {
+                        ClassWriter cw = new ClassWriter(provider, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
+                        cn.accept(cw);
+                        outputMaker.add(name, cw.toByteArray());
                     }
+                } else if (name.startsWith("com.rakuten.tech.mobile.perf.runtime.internal.AppPerformanceConfig")) {
+                    _log.debug("Modifying " + name + " dynamically with enabled = true");
+                    outputMaker.add(name, ClassGenerator.generateConfigClass(true));
                 } else if (filter.canRewrite(name)) {
                     _log.debug("Rewriting class: " + name);
 
