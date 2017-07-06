@@ -41,7 +41,7 @@ public class DummyRewriter implements Rewriter {
         try {
             _log.info("DummyRewriter classes of : " + temp.getJarFile().getName());
             for (String name : temp.getClasses()) {
-                if (name.startsWith("com.rakuten.tech.mobile.perf.runtime.internal.AppPerformanceConfig")) {
+                if (name.equals("com.rakuten.tech.mobile.perf.runtime.internal.AppPerformanceConfig")) {
                     _log.debug("Modifying " + name + " dynamically with enabled = false");
                     outputMaker.add(name, ClassGenerator.generateConfigClass(false));
                 } else {

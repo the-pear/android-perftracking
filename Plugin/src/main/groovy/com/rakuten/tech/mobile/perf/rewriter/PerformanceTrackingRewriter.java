@@ -102,7 +102,7 @@ public class PerformanceTrackingRewriter implements Rewriter {
                         cn.accept(cw);
                         outputMaker.add(name, cw.toByteArray());
                     }
-                } else if (name.startsWith("com.rakuten.tech.mobile.perf.runtime.internal.AppPerformanceConfig")) {
+                } else if (name.equals("com.rakuten.tech.mobile.perf.runtime.internal.AppPerformanceConfig")) {
                     _log.debug("Modifying " + name + " dynamically with enabled = true");
                     outputMaker.add(name, ClassGenerator.generateConfigClass(true));
                 } else if (filter.canRewrite(name)) {
