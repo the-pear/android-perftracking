@@ -48,6 +48,7 @@ public class RuntimeContentProvider extends ContentProvider {
     public boolean onCreate() {
         mContext = getContext();
         if (mContext == null) return false;
+        if (!AppPerformanceConfig.enabled) return false; // Return when instrumentation is disabled
 
         mQueue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
         mQueue.start();
