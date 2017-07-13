@@ -2,20 +2,13 @@ package com.rakuten.tech.mobile.perf.rewriter.mixins
 
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJar
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassProvider
-import com.rakuten.tech.mobile.perf.rewriter.classes.ClassWriter
+import org.gradle.api.logging.Logging
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassVisitor
-import org.objectweb.asm.tree.AnnotationNode
-import org.gradle.api.logging.Logging
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
-import org.mockito.Mockito
 import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.Type
-import org.objectweb.asm.tree.FieldNode
 
 import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
 
@@ -28,7 +21,9 @@ class MixinSpec {
     }
 
     @Test def void "should return false if the input class does not belong to com.rakuten.tech.mobile.perf.core.mixins "() {
-        assert !mixin.match(Object.class)
+        def match = mixin.match(Object.class)
+
+        assert !match
     }
 
     @RunWith(Parameterized)
@@ -56,8 +51,11 @@ class MixinSpec {
             ClassProvider provider = new ClassProvider(resourceFile("Core.jar").absolutePath)
             ClassNode classNode = jar.getClassNode(mixinInput)
             MixinLoader mixinLoader = new MixinLoader(Logging.getLogger(MixinLoaderSpec.simpleName))
-            Mixin mixinTest = mixinLoader.loadMixin(classNode)
-            assert mixinTest.match(provider.getClass(classInput))
+            Mixin mixin = mixinLoader.loadMixin(classNode)
+
+            def match = mixin.match(provider.getClass(classInput))
+
+            assert match
         }
     }
 
@@ -86,9 +84,11 @@ class MixinSpec {
             ClassProvider provider = new ClassProvider(resourceFile("Core.jar").absolutePath)
             ClassNode classNode = jar.getClassNode(mixinInput)
             MixinLoader mixinLoader = new MixinLoader(Logging.getLogger(MixinLoaderSpec.simpleName))
-            Mixin mixinTest = mixinLoader.loadMixin(classNode)
-            assert !mixinTest.match(provider.getClass(classInput))
+            Mixin mixin = mixinLoader.loadMixin(classNode)
+
+            def match = mixin.match(provider.getClass(classInput))
+
+            assert !match
         }
     }
-
 }

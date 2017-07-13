@@ -4,7 +4,6 @@ import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJar
 import org.gradle.api.logging.Logging
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
 import org.objectweb.asm.tree.AnnotationNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
@@ -15,196 +14,177 @@ import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
 public class MixinLoaderSpec {
     MixinLoader mixinLoader
     ClassJar jar
+    ClassNode classNode
 
     @Before def void setup() {
         mixinLoader = new MixinLoader(Logging.getLogger(MixinLoaderSpec.simpleName))
         jar = new ClassJar(resourceFile("user-TestUI.jar"))
+        classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.VolleyHurlStackMixin")
     }
 
     @Test def void "should create Mixin Object for classNode with MixSubclassOf annotation"() {
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.ActivityMixin")
-        assert mixinLoader.loadMixin(classNode).targetSubclassOf != null
+        classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.ActivityMixin")
+
+        String subClassName = mixinLoader.loadMixin(classNode).targetSubclassOf
+
+        assert subClassName != null
     }
 
     @Test def void "should create Mixin Object for classNode with MixImplementationOf annotation"() {
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.AdapterViewOnItemClickListenerMixin")
-        assert mixinLoader.loadMixin(classNode).targetImplementationOf != null
+        classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.AdapterViewOnItemClickListenerMixin")
+
+        String targetImplementationName = mixinLoader.loadMixin(classNode).targetImplementationOf
+
+        assert targetImplementationName != null
     }
 
     @Test def void "should create Mixin Object for classNode with MixClass annotation"() {
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.VolleyHurlStackMixin")
-        assert mixinLoader.loadMixin(classNode).mixinClass != null
+        String className = mixinLoader.loadMixin(classNode).mixinClass
+
+        assert className != null
     }
 
     @Test def void "should create a mixin object with fields if the ClassNode contains visible annotations, but exclude null AnnotationNode"() {
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.VolleyHurlStackMixin")
-
-        List<FieldNode> fieldNodeList = new ArrayList<FieldNode>();
-        FieldNode fieldNode = Mockito.mock(FieldNode.class)
-        fieldNode.name = "testFieldName"
+        def fieldNodeList = []
+        FieldNode fieldNode = new FieldNode(0, "testFieldName", null, null, new Integer(1))
         fieldNodeList.add(fieldNode)
-        FieldNode fieldNode2 = Mockito.mock(FieldNode.class)
+        FieldNode fieldNode2 = new FieldNode(0, null, null, null, new Integer(1))
         fieldNodeList.add(fieldNode2)
-
-        List<AnnotationNode> annotationNodeList = new ArrayList<AnnotationNode>()
-        AnnotationNode annotationNode = Mockito.mock(AnnotationNode.class)
-        annotationNode.desc = "Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;"
+        def annotationNodeList = []
+        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;")
         annotationNodeList.add(annotationNode)
         fieldNode.visibleAnnotations = annotationNodeList
-
         classNode.fields = fieldNodeList
-        assert mixinLoader.loadMixin(classNode).fields.get(0).name.equals("testFieldName")
+
+        String name = mixinLoader.loadMixin(classNode).fields.get(0).name
+
+        assert name == "testFieldName"
     }
 
     @Test def void "should create a mixin object with fields if the ClassNode contains invisible annotation, but exclude null AnnotationNode"() {
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.VolleyHurlStackMixin")
-
-        List<FieldNode> fieldNodeList = new ArrayList<FieldNode>();
-        FieldNode fieldNode = Mockito.mock(FieldNode.class)
-        fieldNode.name = "testFieldName"
+        def fieldNodeList = []
+        FieldNode fieldNode = new FieldNode(0, "testFieldName", null, null, new Integer(1))
         fieldNodeList.add(fieldNode)
-        FieldNode fieldNode2 = Mockito.mock(FieldNode.class)
+        FieldNode fieldNode2 = new FieldNode(0, null, null, null, new Integer(1))
         fieldNodeList.add(fieldNode2)
-
-        List<AnnotationNode> annotationNodeList = new ArrayList<AnnotationNode>()
-        AnnotationNode annotationNode = Mockito.mock(AnnotationNode.class)
-        annotationNode.desc = "Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;"
+        def annotationNodeList = []
+        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;")
         annotationNodeList.add(annotationNode)
         fieldNode.invisibleAnnotations = annotationNodeList
-
         classNode.fields = fieldNodeList
-        assert mixinLoader.loadMixin(classNode).fields.get(0).name.equals("testFieldName")
+
+        String name = mixinLoader.loadMixin(classNode).fields.get(0).name
+
+        assert name == "testFieldName"
     }
 
     @Test def void "should create a mixin object with fields if the ClassNode contains visible annotations, but exclude empty AnnotationNodeList"() {
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.VolleyHurlStackMixin")
-
-        List<FieldNode> fieldNodeList = new ArrayList<FieldNode>();
-        FieldNode fieldNode = Mockito.mock(FieldNode.class)
-        fieldNode.name = "testFieldName"
+        def fieldNodeList = []
+        FieldNode fieldNode = new FieldNode(0, "testFieldName", null, null, new Integer(1))
         fieldNodeList.add(fieldNode)
-        FieldNode fieldNode2 = Mockito.mock(FieldNode.class)
+        FieldNode fieldNode2 = new FieldNode(0, null, null, null, new Integer(1))
         fieldNodeList.add(fieldNode2)
-
-        List<AnnotationNode> annotationNodeList = new ArrayList<AnnotationNode>()
-        AnnotationNode annotationNode = Mockito.mock(AnnotationNode.class)
-        annotationNode.desc = "Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;"
+        def annotationNodeList = []
+        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;")
         annotationNodeList.add(annotationNode)
         fieldNode.visibleAnnotations = annotationNodeList
-
-        List<AnnotationNode> annotationNodeList2 = new ArrayList<AnnotationNode>()
+        def annotationNodeList2 = []
         fieldNode2.visibleAnnotations = annotationNodeList2
-
         classNode.fields = fieldNodeList
-        assert mixinLoader.loadMixin(classNode).fields.get(0).name.equals("testFieldName")
+
+        String name = mixinLoader.loadMixin(classNode).fields.get(0).name
+
+        assert name == "testFieldName"
     }
 
     @Test def void "should create a mixin object with fields if the ClassNode contains invisible annotation, but exclude empty AnnotationNodeList"() {
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.VolleyHurlStackMixin")
-
-        List<FieldNode> fieldNodeList = new ArrayList<FieldNode>();
-        FieldNode fieldNode = Mockito.mock(FieldNode.class)
-        fieldNode.name = "testFieldName"
+        def fieldNodeList = []
+        FieldNode fieldNode = new FieldNode(0, "testFieldName", null, null, new Integer(1))
         fieldNodeList.add(fieldNode)
-        FieldNode fieldNode2 = Mockito.mock(FieldNode.class)
+        FieldNode fieldNode2 = new FieldNode(0, null, null, null, new Integer(1))
         fieldNodeList.add(fieldNode2)
-
-        List<AnnotationNode> annotationNodeList = new ArrayList<AnnotationNode>()
-        AnnotationNode annotationNode = Mockito.mock(AnnotationNode.class)
-        annotationNode.desc = "Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;"
+        def annotationNodeList = []
+        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;")
         annotationNodeList.add(annotationNode)
         fieldNode.invisibleAnnotations = annotationNodeList
-
-        List<AnnotationNode> annotationNodeList2 = new ArrayList<AnnotationNode>()
+        def annotationNodeList2 = []
         fieldNode2.invisibleAnnotations = annotationNodeList2
-
         classNode.fields = fieldNodeList
-        assert mixinLoader.loadMixin(classNode).fields.get(0).name.equals("testFieldName")
+
+        String name = mixinLoader.loadMixin(classNode).fields.get(0).name
+
+        assert name == "testFieldName"
     }
 
     @Test def void "should create a mixin object with methods if the ClassNode contains visible annotations, but exclude null AnnotationNode"() {
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.VolleyHurlStackMixin")
-
-        List<MethodNode> methodNodeList = new ArrayList<MethodNode>();
-        MethodNode methodNode = Mockito.mock(MethodNode.class)
-        methodNode.name = "testFieldName"
+        def methodNodeList = []
+        MethodNode methodNode = new MethodNode(0, "testFieldName", null, null, new String[0])
         methodNodeList.add(methodNode)
-        MethodNode methodNode2 = Mockito.mock(MethodNode.class)
+        MethodNode methodNode2 = new MethodNode(0, null, null, null, new String[0])
         methodNodeList.add(methodNode2)
-
-        List<AnnotationNode> annotationNodeList = new ArrayList<AnnotationNode>()
-        AnnotationNode annotationNode = Mockito.mock(AnnotationNode.class)
-        annotationNode.desc = "Lcom/rakuten/tech/mobile/perf/core/annotations/ReplaceMethod;"
+        def annotationNodeList = []
+        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/ReplaceMethod;")
         annotationNodeList.add(annotationNode)
         methodNode.visibleAnnotations = annotationNodeList
-
         classNode.methods = methodNodeList
-        assert mixinLoader.loadMixin(classNode).methods.size() == 1
+
+        int size = mixinLoader.loadMixin(classNode).methods.size()
+
+        assert size == 1
     }
 
     @Test def void "should create a mixin object with methods if the ClassNode contains invisible annotation, but exclude null AnnotationNode"() {
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.VolleyHurlStackMixin")
-
-        List<MethodNode> methodNodeList = new ArrayList<MethodNode>();
-        MethodNode methodNode = Mockito.mock(MethodNode.class)
-        methodNode.name = "testFieldName"
+        def methodNodeList = []
+        MethodNode methodNode = new MethodNode(0, "testFieldName", null, null, new String[0])
         methodNodeList.add(methodNode)
-        MethodNode methodNode2 = Mockito.mock(MethodNode.class)
+        MethodNode methodNode2 = new MethodNode(0, null, null, null, new String[0])
         methodNodeList.add(methodNode2)
-
-        List<AnnotationNode> annotationNodeList = new ArrayList<AnnotationNode>()
-        AnnotationNode annotationNode = Mockito.mock(AnnotationNode.class)
-        annotationNode.desc = "Lcom/rakuten/tech/mobile/perf/core/annotations/ReplaceMethod;"
+        def annotationNodeList = []
+        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/ReplaceMethod;")
         annotationNodeList.add(annotationNode)
         methodNode.invisibleAnnotations = annotationNodeList
-
         classNode.methods = methodNodeList
-        assert mixinLoader.loadMixin(classNode).methods.size() == 1
+
+        int size = mixinLoader.loadMixin(classNode).methods.size()
+
+        assert size == 1
     }
 
     @Test def void "should create a mixin object with methods if the ClassNode contains visible annotations, but exclude empty AnnotationNodeList"() {
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.VolleyHurlStackMixin")
-
-        List<MethodNode> methodNodeList = new ArrayList<MethodNode>();
-        MethodNode methodNode = Mockito.mock(MethodNode.class)
-        methodNode.name = "testFieldName"
+        def methodNodeList = []
+        MethodNode methodNode = new MethodNode(0, "testFieldName", null, null, new String[0])
         methodNodeList.add(methodNode)
-        MethodNode methodNode2 = Mockito.mock(MethodNode.class)
+        MethodNode methodNode2 = new MethodNode(0, null, null, null, new String[0])
         methodNodeList.add(methodNode2)
-
-        List<AnnotationNode> annotationNodeList = new ArrayList<AnnotationNode>()
-        AnnotationNode annotationNode = Mockito.mock(AnnotationNode.class)
-        annotationNode.desc = "Lcom/rakuten/tech/mobile/perf/core/annotations/ReplaceMethod;"
+        def annotationNodeList = []
+        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/ReplaceMethod;")
         annotationNodeList.add(annotationNode)
         methodNode.visibleAnnotations = annotationNodeList
-
-        List<AnnotationNode> annotationNodeList2 = new ArrayList<AnnotationNode>()
+        def annotationNodeList2 = []
         methodNode2.visibleAnnotations = annotationNodeList2
-
         classNode.methods = methodNodeList
-        assert mixinLoader.loadMixin(classNode).methods.size() == 1
+
+        int size = mixinLoader.loadMixin(classNode).methods.size()
+
+        assert size == 1
     }
 
     @Test def void "should create a mixin object with methods if the ClassNode contains invisible annotation, but exclude empty AnnotationNodeList"() {
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.VolleyHurlStackMixin")
-
-        List<MethodNode> methodNodeList = new ArrayList<MethodNode>();
-        MethodNode methodNode = Mockito.mock(MethodNode.class)
-        methodNode.name = "testFieldName"
+        def methodNodeList = []
+        MethodNode methodNode = new MethodNode(0, "testFieldName", null, null, new String[0])
         methodNodeList.add(methodNode)
-        MethodNode methodNode2 = Mockito.mock(MethodNode.class)
+        MethodNode methodNode2 = new MethodNode(0, null, null, null, new String[0])
         methodNodeList.add(methodNode2)
-
-        List<AnnotationNode> annotationNodeList = new ArrayList<AnnotationNode>()
-        AnnotationNode annotationNode = Mockito.mock(AnnotationNode.class)
-        annotationNode.desc = "Lcom/rakuten/tech/mobile/perf/core/annotations/ReplaceMethod;"
+        def annotationNodeList = []
+        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/ReplaceMethod;")
         annotationNodeList.add(annotationNode)
         methodNode.invisibleAnnotations = annotationNodeList
-
-        List<AnnotationNode> annotationNodeList2 = new ArrayList<AnnotationNode>()
+        def annotationNodeList2 = []
         methodNode2.invisibleAnnotations = annotationNodeList2
-
         classNode.methods = methodNodeList
-        assert mixinLoader.loadMixin(classNode).methods.size() == 1
+
+        int size = mixinLoader.loadMixin(classNode).methods.size()
+
+        assert size == 1
     }
 }

@@ -1,33 +1,31 @@
 package com.rakuten.tech.mobile.perf.rewriter.mixins
 
-import org.junit.Test
-import org.mockito.Mockito
-import org.objectweb.asm.tree.FieldNode
 import org.gradle.api.logging.Logging
-import org.objectweb.asm.ClassVisitor
 import org.junit.Before
+import org.junit.Test
+import org.objectweb.asm.ClassVisitor
+import org.objectweb.asm.tree.FieldNode
 
+import static org.mockito.ArgumentMatchers.any
+import static org.mockito.Mockito.*
 
 public class MixinFieldSpec {
     MixinField mixinField
 
     @Before def void setup() {
-        FieldNode fieldNode = Mockito.mock(FieldNode.class)
-        fieldNode.name = "test_name"
-        fieldNode.access = 0
-        fieldNode.desc = "test_desc"
-        fieldNode.signature = "test_signature"
-        fieldNode.value = new Integer(1)
+        FieldNode fieldNode = new FieldNode(0, "test_name", "test_desc", "test_signature", new Integer(1))
         mixinField = new MixinField(Logging.getLogger(MixinLoaderSpec.simpleName), fieldNode)
     }
 
-    @Test def void "should visit the field with the provided class visitor"() {
-        ClassVisitor classVisitor = Mockito.mock(ClassVisitor.class)
-        Mockito.when(classVisitor.visitField(Mockito.any(int), Mockito.any(String.class),
-                Mockito.any(String.class), Mockito.any(String.class), Mockito.any(Object.class))).thenReturn(null)
-        mixinField.add(classVisitor)
-        Mockito.verify(classVisitor,Mockito.times(1))visitField(Mockito.any(int),
-                Mockito.any(String.class), Mockito.any(String.class), Mockito.any(String.class), Mockito.any(Object.class))
+    @Test def void "should visit the field with the provided class visitor, when mixin field's add method is invoked"() {
+        ClassVisitor classVisitorMock = mock(ClassVisitor.class)
+        when(classVisitorMock.visitField(any(int), any(String.class),
+                any(String.class), any(String.class), any(Object.class))).thenReturn(null)
+
+        mixinField.add(classVisitorMock)
+
+        verify(classVisitorMock).visitField(any(int),
+                any(String.class), any(String.class), any(String.class), any(Object.class))
     }
 
 }
