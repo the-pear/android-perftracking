@@ -8,6 +8,7 @@ import com.rakuten.tech.mobile.perf.core.Tracker;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Observable;
 
 /**
  * TrackingManager
@@ -26,8 +27,8 @@ public class TrackingManager {
         mTrackingData = new HashMap<>();
     }
 
-    synchronized static void initialize(Context context, Config config) {
-        Tracker.on(context, config);
+    synchronized static void initialize(Context context, Config config, Observable observable) {
+        Tracker.on(context, config, observable);
         INSTANCE = new TrackingManager();
     }
 

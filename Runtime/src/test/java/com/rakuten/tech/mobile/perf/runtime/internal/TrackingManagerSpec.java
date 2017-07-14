@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.rakuten.tech.mobile.perf.core.Config;
 import com.rakuten.tech.mobile.perf.core.MockTracker;
+import com.rakuten.tech.mobile.perf.core.ObservableLocation;
 import com.rakuten.tech.mobile.perf.runtime.RobolectricUnitSpec;
 import com.rakuten.tech.mobile.perf.runtime.shadow.TrackerShadow;
 
@@ -25,9 +26,11 @@ public class TrackingManagerSpec extends RobolectricUnitSpec {
     @Mock Context context;
     @Mock Config config;
     @Mock MockTracker tracker;
+    @Mock
+    ObservableLocation observableLocation;
 
     @Before public void init() {
-        TrackingManager.initialize(context, config);
+        TrackingManager.initialize(context, config, observableLocation);
         manager = TrackingManager.INSTANCE;
         TrackerShadow.mockTracker = tracker;
     }
@@ -36,13 +39,13 @@ public class TrackingManagerSpec extends RobolectricUnitSpec {
 
     @Test public void shouldCreateInstanceOnInit() {
         TrackingManager.INSTANCE = null;
-        TrackingManager.initialize(context, config);
+        TrackingManager.initialize(context, config, observableLocation);
         assertThat(TrackingManager.INSTANCE).isNotNull();
     }
 
     @Test public void shouldCreateNewInstanceOnEveryInit() {
         TrackingManager previousInstance = TrackingManager.INSTANCE;
-        TrackingManager.initialize(context, config);
+        TrackingManager.initialize(context, config, observableLocation);
         assertThat(previousInstance).isNotEqualTo(TrackingManager.INSTANCE);
     }
 

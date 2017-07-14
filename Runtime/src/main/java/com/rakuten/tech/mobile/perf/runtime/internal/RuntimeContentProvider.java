@@ -23,10 +23,12 @@ import com.android.volley.toolbox.NoCache;
 import com.google.gson.Gson;
 import com.rakuten.tech.mobile.perf.R;
 import com.rakuten.tech.mobile.perf.core.Config;
+import com.rakuten.tech.mobile.perf.core.ObservableLocation;
 import com.rakuten.tech.mobile.perf.core.Tracker;
 import com.rakuten.tech.mobile.perf.runtime.Metric;
 import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
 
+import java.util.Locale;
 import java.util.Random;
 
 
@@ -38,14 +40,17 @@ public class RuntimeContentProvider extends ContentProvider {
     private static final String TAG = RuntimeContentProvider.class.getSimpleName();
     private static final String PREFS = "app_performance";
     private static final String CONFIG_KEY = "config_key";
+    private static final String LOCATION_KEY = "location_key";
     private static final int TIME_INTERVAL = 60 * 60 * 1000; // 1 HOUR in milli seconds
 
     private Handler handler;
     private Context mContext;
     private RequestQueue mQueue;
+    private ObservableLocation locationObservable;
 
     @Override
     public boolean onCreate() {
+        locationObservable = new ObservableLocation(null);
         mContext = getContext();
         if (mContext == null) return false;
         if (!AppPerformanceConfig.enabled) return false; // Return when instrumentation is disabled
@@ -55,17 +60,23 @@ public class RuntimeContentProvider extends ContentProvider {
 
         // Load data from last configuration
         ConfigurationResult lastConfig = readConfigFromCache();
+        if(readLocationFromCache() != null) {
+            locationObservable.setValue(readLocationFromCache());
+        }
         Config config = createConfig(mContext, lastConfig);
         if (config != null) {
             // Initialise Tracking Manager
-            TrackingManager.initialize(mContext, config); // TODO Config class should be a builder and have all the values set properly
+            TrackingManager.initialize(mContext, config, locationObservable); // TODO Config class should be a builder and have all the values set properly
             Metric.start(StandardMetric.LAUNCH.getValue());
         }
         // Get latest configuration
         loadConfigurationFromApi(mContext, mQueue);
+        // Get latest Location
+        loadLocationFromApi(mQueue);
 
         handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(periodicCheck, TIME_INTERVAL);
+        handler.postDelayed(periodicLocationCheck, TIME_INTERVAL);
         return false;
     }
 
@@ -75,6 +86,15 @@ public class RuntimeContentProvider extends ContentProvider {
             if (Tracker.isTrackerRunning()) {
                 handler.postDelayed(this, TIME_INTERVAL);
                 loadConfigurationFromApi(mContext, mQueue);
+            }
+        }
+    };
+
+    private final Runnable periodicLocationCheck = new Runnable() {
+        public void run() {
+            if (Tracker.isTrackerRunning()) {
+                handler.postDelayed(this, TIME_INTERVAL);
+                loadLocationFromApi(mQueue);
             }
         }
     };
@@ -139,6 +159,35 @@ public class RuntimeContentProvider extends ContentProvider {
                 }
             }).queue(queue);
         }
+    }
+
+    private void loadLocationFromApi(RequestQueue queue) {
+
+        // geo location dev environment - subscription key
+        String subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.geo.SubscriptionKey");
+        if (subscriptionKey == null)
+            Log.d(TAG, "Cannot read metadata `com.rakuten.tech.mobile.perf.geo.SubscriptionKey` from manifest, automated performance tracking will not work.");
+
+        new GeoLocationRequest(null,
+                subscriptionKey,
+                new Response.Listener<GeoLocationResult>() {
+                    @Override
+                    public void onResponse(GeoLocationResult newLocation) {
+                        writeLocationToCache(newLocation.getRegionName());
+                        locationObservable.setValue(newLocation.getRegionName());
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Throwable throwable = error;
+                String message = error.getClass().getName();
+                while (throwable.getMessage() == null && throwable.getCause() != null)
+                    throwable = throwable.getCause();
+                if (throwable.getMessage() != null) message = throwable.getMessage();
+                writeLocationToCache(Locale.getDefault().getCountry());
+                locationObservable.setValue(Locale.getDefault().getCountry());
+            }
+        }).queue(queue);
     }
 
     /**
@@ -224,6 +273,23 @@ public class RuntimeContentProvider extends ContentProvider {
                     .getString(CONFIG_KEY, null);
         }
         return result != null ? new Gson().fromJson(result, ConfigurationResult.class) : null;
+    }
+
+    private void writeLocationToCache(String locationName) {
+        if (getContext() != null) {
+            getContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(LOCATION_KEY, locationName).apply();
+        }
+    }
+
+    @Nullable
+    private String readLocationFromCache() {
+        Context context = getContext();
+        String result = null;
+        if (context != null) {
+            result = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                    .getString(LOCATION_KEY, null);
+        }
+        return result != null ? result : null;
     }
 
     private String getMetaData(String key) {

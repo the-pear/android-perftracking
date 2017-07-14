@@ -5,14 +5,26 @@ import android.os.Build;
 import android.telephony.TelephonyManager;
 
 import java.util.Locale;
+import java.util.Observable;
+import java.util.Observer;
 
-class EnvironmentInfo {
+class EnvironmentInfo implements Observer {
     String device;
     String country;
     String network;
+    private Observable ov = null;
+    private static EnvironmentInfo info;
 
-    public static EnvironmentInfo get(Context context) {
-        EnvironmentInfo info = new EnvironmentInfo();
+    EnvironmentInfo(Observable ov){
+        this.ov = ov;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public static EnvironmentInfo get(Context context, Observable observable) {
+        info = new EnvironmentInfo(observable);
 
         info.device = Build.MODEL;
 
@@ -35,5 +47,12 @@ class EnvironmentInfo {
         }
 
         return info;
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        if(ov == observable) {
+            info.setCountry(((ObservableLocation) observable).getValue());
+        }
     }
 }

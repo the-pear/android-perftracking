@@ -92,7 +92,7 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
 
         provider.onCreate();
 
-        verify(prefs).edit();
+        verify(prefs,times(2)).edit();
         String cachedResponse = prefs.getString("config_key", null);
         JSONAssert.assertEquals(config.content, cachedResponse, true);
     }
@@ -132,7 +132,7 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
         provider.onCreate();
 
         // no exception
-        verify(queue, never()).add(any(Request.class));
+        verify(queue, times(1)).add(any(Request.class));
     }
 
     @SuppressLint("ApplySharedPref")

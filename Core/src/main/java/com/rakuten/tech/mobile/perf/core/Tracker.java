@@ -3,6 +3,7 @@ package com.rakuten.tech.mobile.perf.core;
 import android.content.Context;
 
 import java.net.URL;
+import java.util.Observable;
 
 /**
  * Tracker
@@ -21,12 +22,13 @@ public class Tracker {
 	 * @param context Instance of android.content.Context.
 	 * @param config Performance tracking configuration.
 	 */
-	public static synchronized void on(Context context, Config config) {
+	public static synchronized void on(Context context, Config config, Observable observable) {
 		Debug debug = config.debug ? new Debug() : null;
 		MeasurementBuffer buffer = new MeasurementBuffer();
 		Current current = new Current();
 		_tracker = new TrackerImpl(buffer, current, debug);
-		EnvironmentInfo envInfo = EnvironmentInfo.get(context);
+		EnvironmentInfo envInfo = EnvironmentInfo.get(context,observable);
+        observable.addObserver(envInfo);
 		EventWriter writer = new EventWriter(config, envInfo);
 		Sender sender = new Sender(buffer, current, writer, debug);
 		_senderThread = new SenderThread(sender);

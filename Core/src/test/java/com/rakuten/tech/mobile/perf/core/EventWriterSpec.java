@@ -2,7 +2,6 @@ package com.rakuten.tech.mobile.perf.core;
 
 import org.json.JSONException;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,6 +27,7 @@ public class EventWriterSpec {
     @Mock URL url;
     @Mock OutputStream outputStream;
     @Mock HttpsURLConnection conn;
+    @Mock ObservableLocation ov;
     private EventWriter writer;
 
     @Before public void initMocks() throws IOException {
@@ -39,7 +39,7 @@ public class EventWriterSpec {
         config.eventHubUrl = ""; // url injected via constructor
         config.header = new HashMap<>();
 
-        envInfo = new EnvironmentInfo();
+        envInfo = new EnvironmentInfo(ov);
         envInfo.country = "test-land";
         envInfo.network = "test-network";
         envInfo.device = "test-device";

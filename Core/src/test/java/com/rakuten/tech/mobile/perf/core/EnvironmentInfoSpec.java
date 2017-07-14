@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 public class EnvironmentInfoSpec {
     @Mock TelephonyManager tm;
     @Mock Context ctx;
+    @Mock ObservableLocation ov;
     private final String simCountry = "test-sim-country";
     private final String networkOperator = "test-network-operator";
 
@@ -29,7 +30,7 @@ public class EnvironmentInfoSpec {
 
     @Test public void shouldReadCountryAndNetworkFromTelephonyManager() {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(tm);
-        EnvironmentInfo info = EnvironmentInfo.get(ctx);
+        EnvironmentInfo info = EnvironmentInfo.get(ctx, ov);
         assertThat(info).isNotNull();
         assertThat(info.country).isEqualTo(simCountry);
         assertThat(info.network).isEqualTo(networkOperator);
@@ -39,7 +40,7 @@ public class EnvironmentInfoSpec {
     @Test
     public void shouldFallbackToReadCountryFromLocaleIfTelephonyManagerIsNull() {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(null);
-        EnvironmentInfo info = EnvironmentInfo.get(ctx);
+        EnvironmentInfo info = EnvironmentInfo.get(ctx, ov);
         assertThat(info).isNotNull();
         assertThat(info.country).isEqualToIgnoringCase(Locale.getDefault().getCountry());
     }
@@ -51,7 +52,7 @@ public class EnvironmentInfoSpec {
         // prevent string literal from being "intern"ed so `== ""` is false in test setting, see
         // http://stackoverflow.com/questions/27473457/in-java-why-does-string-string-evaluate-to-true-inside-a-method-as-opposed
         when(tm.getSimCountryIso()).thenReturn(new String(""));
-        EnvironmentInfo info = EnvironmentInfo.get(ctx);
+        EnvironmentInfo info = EnvironmentInfo.get(ctx, ov);
         assertThat(info).isNotNull();
         assertThat(info.country).isEqualToIgnoringCase(Locale.getDefault().getCountry());
     }
@@ -60,7 +61,7 @@ public class EnvironmentInfoSpec {
     public void shouldNormalizeCountryCodeToLowercase() {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(null);
         Locale.setDefault(new Locale("testLanguage", "Test-Locale-Country", "testVariant"));
-        EnvironmentInfo info = EnvironmentInfo.get(ctx);
+        EnvironmentInfo info = EnvironmentInfo.get(ctx, ov);
         assertThat(info).isNotNull();
         assertThat(info.country).isEqualTo("test-locale-country");
 
@@ -68,7 +69,7 @@ public class EnvironmentInfoSpec {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(tm);
         when(tm.getSimCountryIso()).thenReturn("Test-Sim-Country");
 
-        info = EnvironmentInfo.get(ctx);
+        info = EnvironmentInfo.get(ctx, ov);
         assertThat(info).isNotNull();
         assertThat(info.country).isEqualTo("test-sim-country");
     }
