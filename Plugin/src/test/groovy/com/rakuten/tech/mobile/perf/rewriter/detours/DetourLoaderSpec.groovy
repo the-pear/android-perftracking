@@ -18,6 +18,14 @@ public class DetourLoaderSpec {
     @Test void "test"() {
         ClassJar jar = new ClassJar(resourceFile("user-testUI.jar"))
         ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.detours.URLDetours")
-        detourLoader.load(classNode)
+        ArrayList<Detourer> detourers = detourLoader.load(classNode)
+        assert detourers.get(0) instanceof CallDetour
+    }
+
+    @Test void "test1"() {
+        ClassJar jar = new ClassJar(resourceFile("user-testUI.jar"))
+        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.ActivityMixin")
+        ArrayList<Detourer> detourers = detourLoader.load(classNode)
+        assert detourers.size() == 0
     }
 }
