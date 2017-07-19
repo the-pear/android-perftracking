@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock
 
 class TestUtil {
 
+    static final String mixinPkg = "com.rakuten.tech.mobile.perf.core.mixins"
     final static String detoursPkg = "com.rakuten.tech.mobile.perf.core.detours"
 
     static def resourceFile(name) {

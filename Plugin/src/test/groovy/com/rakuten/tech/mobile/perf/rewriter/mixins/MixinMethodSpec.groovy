@@ -3,7 +3,6 @@ package com.rakuten.tech.mobile.perf.rewriter.mixins
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJar
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassProvider
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassWriter
-import org.gradle.api.logging.Logging
 import org.junit.Before
 import org.junit.Test
 import org.objectweb.asm.ClassReader
@@ -13,9 +12,8 @@ import org.objectweb.asm.tree.AnnotationNode
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 
-import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
-import static org.mockito.ArgumentMatchers.any
-import static org.mockito.ArgumentMatchers.eq
+import static com.rakuten.tech.mobile.perf.TestUtil.*
+import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 public class MixinMethodSpec {
@@ -28,57 +26,56 @@ public class MixinMethodSpec {
     @Before def void setup() {
         jar = new ClassJar(resourceFile("user-TestUI.jar"))
         provider = new ClassProvider(resourceFile("user-TestUI.jar").absolutePath)
-        mixinLoader = new MixinLoader(Logging.getLogger(MixinMethodSpec.simpleName))
+        mixinLoader = new MixinLoader(testLogger())
         writer = new ClassWriter(provider, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
     }
 
     @Test def void "should invoke visit method on the provided class parameters"() {
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.AdapterViewOnItemClickListenerMixin")
+        ClassNode classNode = jar.getClassNode("${mixinPkg}.AdapterViewOnItemClickListenerMixin")
         Mixin mixin = mixinLoader.loadMixin(classNode)
-        Class clazz = provider.getClass("com.rakuten.tech.mobile.perf.core.mixins.AdapterViewOnItemClickListenerMixin")
-        ClassReader reader = jar.getClassReader("com.rakuten.tech.mobile.perf.core.mixins.AdapterViewOnItemClickListenerMixin")
+        Class clazz = provider.getClass("${mixinPkg}.AdapterViewOnItemClickListenerMixin")
+        ClassReader reader = jar.getClassReader("${mixinPkg}.AdapterViewOnItemClickListenerMixin")
         ClassVisitor visitor = mixin.rewrite(clazz, writer)
-        ClassVisitor visitorSpy = spy(visitor)
+        ClassVisitor visitorMock = spy(visitor)
 
-        reader.accept(visitorSpy, 0)
+        reader.accept(visitorMock, 0)
 
-        verify(visitorSpy).visit(any(int), any(int), eq("com/rakuten/tech/mobile/perf/core/mixins/AdapterViewOnItemClickListenerMixin"), any(), any(String.class), any(String[].class))
+        verify(visitorMock).visit(anyInt(), anyInt(), eq("com/rakuten/tech/mobile/perf/core/mixins/AdapterViewOnItemClickListenerMixin"), any(), anyString(), any(String[]))
     }
 
     @Test def void "should invoke visit method on the provided class parameters, and visit instance fields if exists withing the method"() {
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.ActivityMixin")
+        ClassNode classNode = jar.getClassNode("${mixinPkg}.ActivityMixin")
         Mixin mixin = mixinLoader.loadMixin(classNode)
-        Class clazz = provider.getClass("com.rakuten.tech.mobile.perf.core.mixins.ActivityMixin")
-        ClassReader reader = jar.getClassReader("com.rakuten.tech.mobile.perf.core.mixins.ActivityMixin")
+        Class clazz = provider.getClass("${mixinPkg}.ActivityMixin")
+        ClassReader reader = jar.getClassReader("${mixinPkg}.ActivityMixin")
         ClassVisitor visitor = mixin.rewrite(clazz, writer)
-        ClassVisitor visitorSpy = spy(visitor)
+        ClassVisitor visitorMock = spy(visitor)
 
-        reader.accept(visitorSpy, 0)
+        reader.accept(visitorMock, 0)
 
-        verify(visitorSpy).visit(any(int), any(int), eq("com/rakuten/tech/mobile/perf/core/mixins/ActivityMixin"), any(), any(String.class), any(String[].class))
+        verify(visitorMock).visit(anyInt(), anyInt(), eq("com/rakuten/tech/mobile/perf/core/mixins/ActivityMixin"), any(), anyString(), any(String[]))
     }
 
-    @Test def void "Should call add method of MixinField, If any Field Node exists in Mixin Object"() {
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.VolleyHurlStackMixin")
-        def fieldNodeList = []
-        FieldNode fieldNode = mock(FieldNode.class)
-        fieldNode.name = "testFieldName"
-        fieldNode.desc = Type.OBJECT
-        fieldNodeList.add(fieldNode)
-        def annotationNodeList = []
-        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;")
-        annotationNodeList.add(annotationNode)
-        fieldNode.visibleAnnotations = annotationNodeList
-        classNode.fields = fieldNodeList
+    @Test def void "Should call add method of MixinField class, If any Field Node exists in input classNode"() {
+        ClassNode classNode = jar.getClassNode("${mixinPkg}.VolleyHurlStackMixin")
+        classNode.fields = [createFieldNode("testFieldName", Type.OBJECT, [new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;")])]
         Mixin mixin = mixinLoader.loadMixin(classNode)
-        MixinField mixinFieldSpy = spy(mixin.fields.get(0))
-        mixin.fields.add(0,mixinFieldSpy)
-        Class clazz = provider.getClass("com.rakuten.tech.mobile.perf.core.mixins.VolleyHurlStackMixin")
-        ClassReader reader = jar.getClassReader("com.rakuten.tech.mobile.perf.core.mixins.VolleyHurlStackMixin")
+        MixinField mixinFieldMock = spy(mixin.fields.get(0))
+        mixin.fields.add(0,mixinFieldMock)
+        Class clazz = provider.getClass("${mixinPkg}.VolleyHurlStackMixin")
+        ClassReader reader = jar.getClassReader("${mixinPkg}.VolleyHurlStackMixin")
         ClassVisitor visitor = mixin.rewrite(clazz, writer)
 
         reader.accept(visitor, 0)
 
-        verify(mixinFieldSpy).add(any(ClassVisitor.class))
+        verify(mixinFieldMock).add(any(ClassVisitor))
+    }
+
+    private FieldNode createFieldNode(def name, def desc, def visibleAnnotations) {
+        FieldNode fieldNode = mock(FieldNode)
+        fieldNode.name = name
+        fieldNode.desc = desc
+        fieldNode.visibleAnnotations = visibleAnnotations
+        return fieldNode
     }
 }

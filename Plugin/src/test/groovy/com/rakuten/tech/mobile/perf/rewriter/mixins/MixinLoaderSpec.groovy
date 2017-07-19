@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.perf.rewriter.mixins
 
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJar
-import org.gradle.api.logging.Logging
 import org.junit.Before
 import org.junit.Test
 import org.objectweb.asm.tree.AnnotationNode
@@ -9,21 +8,24 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.MethodNode
 
-import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
+import static com.rakuten.tech.mobile.perf.TestUtil.*
 
 public class MixinLoaderSpec {
     MixinLoader mixinLoader
     ClassJar jar
     ClassNode classNode
+    final String addFieldAnnotationDec = "Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;"
+    final String replaceMethodAnnotationDec = "Lcom/rakuten/tech/mobile/perf/core/annotations/ReplaceMethod;"
+    final String testName = "testFieldName"
 
     @Before def void setup() {
-        mixinLoader = new MixinLoader(Logging.getLogger(MixinLoaderSpec.simpleName))
+        mixinLoader = new MixinLoader(testLogger())
         jar = new ClassJar(resourceFile("user-TestUI.jar"))
-        classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.VolleyHurlStackMixin")
+        classNode = jar.getClassNode("${mixinPkg}.VolleyHurlStackMixin")
     }
 
     @Test def void "should create Mixin Object for classNode with MixSubclassOf annotation"() {
-        classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.ActivityMixin")
+        classNode = jar.getClassNode("${mixinPkg}.ActivityMixin")
 
         String subClassName = mixinLoader.loadMixin(classNode).targetSubclassOf
 
@@ -31,7 +33,7 @@ public class MixinLoaderSpec {
     }
 
     @Test def void "should create Mixin Object for classNode with MixImplementationOf annotation"() {
-        classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.AdapterViewOnItemClickListenerMixin")
+        classNode = jar.getClassNode("${mixinPkg}.AdapterViewOnItemClickListenerMixin")
 
         String targetImplementationName = mixinLoader.loadMixin(classNode).targetImplementationOf
 
@@ -45,88 +47,48 @@ public class MixinLoaderSpec {
     }
 
     @Test def void "should create a mixin object with fields if the ClassNode contains visible annotations, but exclude null AnnotationNode"() {
-        def fieldNodeList = []
-        FieldNode fieldNode = new FieldNode(0, "testFieldName", null, null, new Integer(1))
-        fieldNodeList.add(fieldNode)
-        FieldNode fieldNode2 = new FieldNode(0, null, null, null, new Integer(1))
-        fieldNodeList.add(fieldNode2)
-        def annotationNodeList = []
-        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;")
-        annotationNodeList.add(annotationNode)
-        fieldNode.visibleAnnotations = annotationNodeList
-        classNode.fields = fieldNodeList
+        classNode.fields = [createFieldNodes(testName, [new AnnotationNode(addFieldAnnotationDec)], null),
+                            createFieldNodes(null, null, null)]
 
-        String name = mixinLoader.loadMixin(classNode).fields.get(0).name
+        Mixin mixin = mixinLoader.loadMixin(classNode)
 
-        assert name == "testFieldName"
+        assert mixin.fields.get(0).name == testName
+        assert mixin.fields.size() == 1
     }
 
     @Test def void "should create a mixin object with fields if the ClassNode contains invisible annotation, but exclude null AnnotationNode"() {
-        def fieldNodeList = []
-        FieldNode fieldNode = new FieldNode(0, "testFieldName", null, null, new Integer(1))
-        fieldNodeList.add(fieldNode)
-        FieldNode fieldNode2 = new FieldNode(0, null, null, null, new Integer(1))
-        fieldNodeList.add(fieldNode2)
-        def annotationNodeList = []
-        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;")
-        annotationNodeList.add(annotationNode)
-        fieldNode.invisibleAnnotations = annotationNodeList
-        classNode.fields = fieldNodeList
+        classNode.fields = [createFieldNodes(testName, null, [new AnnotationNode(addFieldAnnotationDec)]),
+                            createFieldNodes(null, null, null)]
 
-        String name = mixinLoader.loadMixin(classNode).fields.get(0).name
+        Mixin mixin = mixinLoader.loadMixin(classNode)
 
-        assert name == "testFieldName"
+        assert mixin.fields.get(0).name == testName
+        assert mixin.fields.size() == 1
     }
 
     @Test def void "should create a mixin object with fields if the ClassNode contains visible annotations, but exclude empty AnnotationNodeList"() {
-        def fieldNodeList = []
-        FieldNode fieldNode = new FieldNode(0, "testFieldName", null, null, new Integer(1))
-        fieldNodeList.add(fieldNode)
-        FieldNode fieldNode2 = new FieldNode(0, null, null, null, new Integer(1))
-        fieldNodeList.add(fieldNode2)
-        def annotationNodeList = []
-        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;")
-        annotationNodeList.add(annotationNode)
-        fieldNode.visibleAnnotations = annotationNodeList
-        def annotationNodeList2 = []
-        fieldNode2.visibleAnnotations = annotationNodeList2
-        classNode.fields = fieldNodeList
+        classNode.fields = [createFieldNodes(testName, [new AnnotationNode(addFieldAnnotationDec)], null),
+                            createFieldNodes(null, [], null)]
 
-        String name = mixinLoader.loadMixin(classNode).fields.get(0).name
+        Mixin mixin = mixinLoader.loadMixin(classNode)
 
-        assert name == "testFieldName"
+        assert mixin.fields.get(0).name == testName
+        assert mixin.fields.size() == 1
     }
 
     @Test def void "should create a mixin object with fields if the ClassNode contains invisible annotation, but exclude empty AnnotationNodeList"() {
-        def fieldNodeList = []
-        FieldNode fieldNode = new FieldNode(0, "testFieldName", null, null, new Integer(1))
-        fieldNodeList.add(fieldNode)
-        FieldNode fieldNode2 = new FieldNode(0, null, null, null, new Integer(1))
-        fieldNodeList.add(fieldNode2)
-        def annotationNodeList = []
-        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;")
-        annotationNodeList.add(annotationNode)
-        fieldNode.invisibleAnnotations = annotationNodeList
-        def annotationNodeList2 = []
-        fieldNode2.invisibleAnnotations = annotationNodeList2
-        classNode.fields = fieldNodeList
+        classNode.fields = [createFieldNodes(testName, null, [new AnnotationNode(addFieldAnnotationDec)]),
+                            createFieldNodes(null, null, [])]
 
-        String name = mixinLoader.loadMixin(classNode).fields.get(0).name
+        Mixin mixin = mixinLoader.loadMixin(classNode)
 
-        assert name == "testFieldName"
+        assert mixin.fields.get(0).name == testName
+        assert mixin.fields.size() == 1
     }
 
     @Test def void "should create a mixin object with methods if the ClassNode contains visible annotations, but exclude null AnnotationNode"() {
-        def methodNodeList = []
-        MethodNode methodNode = new MethodNode(0, "testFieldName", null, null, new String[0])
-        methodNodeList.add(methodNode)
-        MethodNode methodNode2 = new MethodNode(0, null, null, null, new String[0])
-        methodNodeList.add(methodNode2)
-        def annotationNodeList = []
-        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/ReplaceMethod;")
-        annotationNodeList.add(annotationNode)
-        methodNode.visibleAnnotations = annotationNodeList
-        classNode.methods = methodNodeList
+        classNode.methods = [createMethodNodes("testFieldName", [new AnnotationNode(replaceMethodAnnotationDec)], null),
+                             createMethodNodes(null, null, null)]
 
         int size = mixinLoader.loadMixin(classNode).methods.size()
 
@@ -134,16 +96,8 @@ public class MixinLoaderSpec {
     }
 
     @Test def void "should create a mixin object with methods if the ClassNode contains invisible annotation, but exclude null AnnotationNode"() {
-        def methodNodeList = []
-        MethodNode methodNode = new MethodNode(0, "testFieldName", null, null, new String[0])
-        methodNodeList.add(methodNode)
-        MethodNode methodNode2 = new MethodNode(0, null, null, null, new String[0])
-        methodNodeList.add(methodNode2)
-        def annotationNodeList = []
-        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/ReplaceMethod;")
-        annotationNodeList.add(annotationNode)
-        methodNode.invisibleAnnotations = annotationNodeList
-        classNode.methods = methodNodeList
+        classNode.methods = [createMethodNodes("testFieldName", null, [new AnnotationNode(replaceMethodAnnotationDec)]),
+                             createMethodNodes(null, null, null)]
 
         int size = mixinLoader.loadMixin(classNode).methods.size()
 
@@ -151,18 +105,8 @@ public class MixinLoaderSpec {
     }
 
     @Test def void "should create a mixin object with methods if the ClassNode contains visible annotations, but exclude empty AnnotationNodeList"() {
-        def methodNodeList = []
-        MethodNode methodNode = new MethodNode(0, "testFieldName", null, null, new String[0])
-        methodNodeList.add(methodNode)
-        MethodNode methodNode2 = new MethodNode(0, null, null, null, new String[0])
-        methodNodeList.add(methodNode2)
-        def annotationNodeList = []
-        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/ReplaceMethod;")
-        annotationNodeList.add(annotationNode)
-        methodNode.visibleAnnotations = annotationNodeList
-        def annotationNodeList2 = []
-        methodNode2.visibleAnnotations = annotationNodeList2
-        classNode.methods = methodNodeList
+        classNode.methods = [createMethodNodes("testFieldName", [new AnnotationNode(replaceMethodAnnotationDec)], null),
+                             createMethodNodes(null, [], null)]
 
         int size = mixinLoader.loadMixin(classNode).methods.size()
 
@@ -170,21 +114,25 @@ public class MixinLoaderSpec {
     }
 
     @Test def void "should create a mixin object with methods if the ClassNode contains invisible annotation, but exclude empty AnnotationNodeList"() {
-        def methodNodeList = []
-        MethodNode methodNode = new MethodNode(0, "testFieldName", null, null, new String[0])
-        methodNodeList.add(methodNode)
-        MethodNode methodNode2 = new MethodNode(0, null, null, null, new String[0])
-        methodNodeList.add(methodNode2)
-        def annotationNodeList = []
-        AnnotationNode annotationNode = new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/ReplaceMethod;")
-        annotationNodeList.add(annotationNode)
-        methodNode.invisibleAnnotations = annotationNodeList
-        def annotationNodeList2 = []
-        methodNode2.invisibleAnnotations = annotationNodeList2
-        classNode.methods = methodNodeList
+        classNode.methods = [createMethodNodes("testFieldName", null, [new AnnotationNode(replaceMethodAnnotationDec)]),
+                             createMethodNodes(null, null, [])]
 
         int size = mixinLoader.loadMixin(classNode).methods.size()
 
         assert size == 1
+    }
+
+    private MethodNode createMethodNodes(def name, def visibleAnnotationNodes, def invisibleAnnotationNodes) {
+        MethodNode methodNode = new MethodNode(0, name, null, null, new String[0])
+        methodNode.visibleAnnotations = visibleAnnotationNodes
+        methodNode.invisibleAnnotations = invisibleAnnotationNodes
+        return methodNode
+    }
+
+    private FieldNode createFieldNodes(def name, def visibleAnnotationNodes, def invisibleAnnotationNodes) {
+        FieldNode fieldNode = new FieldNode(0, name, null, null, new Integer(1))
+        fieldNode.visibleAnnotations = visibleAnnotationNodes
+        fieldNode.invisibleAnnotations = invisibleAnnotationNodes
+        return fieldNode
     }
 }

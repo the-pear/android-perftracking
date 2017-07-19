@@ -2,7 +2,6 @@ package com.rakuten.tech.mobile.perf.rewriter.mixins
 
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJar
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassProvider
-import org.gradle.api.logging.Logging
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -11,13 +10,14 @@ import org.junit.runners.Parameterized.Parameters
 import org.objectweb.asm.tree.ClassNode
 
 import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
+import static com.rakuten.tech.mobile.perf.TestUtil.testLogger
 
 class MixinSpec {
 
     Mixin mixin
 
     @Before def void setup() {
-        mixin = new Mixin(Logging.getLogger(MixinSpec.simpleName))
+        mixin = new Mixin(testLogger())
     }
 
     @Test def void "should return false if the input class does not belong to com.rakuten.tech.mobile.perf.core.mixins "() {
@@ -50,7 +50,7 @@ class MixinSpec {
             ClassJar jar = new ClassJar(resourceFile("user-TestUI.jar"))
             ClassProvider provider = new ClassProvider(resourceFile("Core.jar").absolutePath)
             ClassNode classNode = jar.getClassNode(mixinInput)
-            MixinLoader mixinLoader = new MixinLoader(Logging.getLogger(MixinLoaderSpec.simpleName))
+            MixinLoader mixinLoader = new MixinLoader(testLogger())
             Mixin mixin = mixinLoader.loadMixin(classNode)
 
             def match = mixin.match(provider.getClass(classInput))
@@ -83,7 +83,7 @@ class MixinSpec {
             ClassJar jar = new ClassJar(resourceFile("user-TestUI.jar"))
             ClassProvider provider = new ClassProvider(resourceFile("Core.jar").absolutePath)
             ClassNode classNode = jar.getClassNode(mixinInput)
-            MixinLoader mixinLoader = new MixinLoader(Logging.getLogger(MixinLoaderSpec.simpleName))
+            MixinLoader mixinLoader = new MixinLoader(testLogger())
             Mixin mixin = mixinLoader.loadMixin(classNode)
 
             def match = mixin.match(provider.getClass(classInput))
