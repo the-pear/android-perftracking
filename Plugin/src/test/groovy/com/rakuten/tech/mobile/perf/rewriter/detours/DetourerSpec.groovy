@@ -9,8 +9,7 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.tree.ClassNode
 
-import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
-import static com.rakuten.tech.mobile.perf.TestUtil.testLogger
+import static com.rakuten.tech.mobile.perf.TestUtil.*
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.Mockito.*
@@ -47,12 +46,12 @@ public class DetourerSpec{
     @Test void "should visit the class and method with the data in collection"() {
         DetourLoader detourLoader = new DetourLoader(testLogger())
         ClassJar jar = new ClassJar(resourceFile("user-testUI.jar"))
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.detours.URLDetours")
+        ClassNode classNode = jar.getClassNode("${detoursPkg}.URLDetours")
         ArrayList<Detourer> detourers = detourLoader.load(classNode)
         ClassProvider classProvider = new ClassProvider(resourceFile("user-testUI.jar").absolutePath)
         detourer.add(detourers.get(0))
         ClassVisitor visitor = new ClassWriter(classProvider, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES)
-        ClassReader reader = jar.getClassReader("com.rakuten.tech.mobile.perf.core.detours.URLDetours")
+        ClassReader reader = jar.getClassReader("${detoursPkg}.URLDetours")
         ClassVisitor classVisitor = detourer.rewrite(Object.class, visitor)
         ClassVisitor classVisitorMock = spy(classVisitor)
 

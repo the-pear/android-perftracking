@@ -5,6 +5,9 @@ import org.gradle.api.logging.Logger
 import static org.mockito.Mockito.mock
 
 class TestUtil {
+
+    final static String detoursPkg = "com.rakuten.tech.mobile.perf.core.detours"
+
     static def resourceFile(name) {
         new File("src/test/resources/$name")
     }

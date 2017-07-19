@@ -6,8 +6,7 @@ import org.junit.Test
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.*
 
-import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
-import static com.rakuten.tech.mobile.perf.TestUtil.testLogger
+import static com.rakuten.tech.mobile.perf.TestUtil.*
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
@@ -20,7 +19,7 @@ public class DetourLoaderSpec {
 
     @Test void "should return a list of detours for the input classNode, if any detour annotations exists, input classnode contains calldetour"() {
         ClassJar jar = new ClassJar(resourceFile("user-testUI.jar"))
-        ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.detours.URLDetours")
+        ClassNode classNode = jar.getClassNode("${detoursPkg}.URLDetours")
 
         ArrayList<Detourer> detourers = detourLoader.load(classNode)
 
