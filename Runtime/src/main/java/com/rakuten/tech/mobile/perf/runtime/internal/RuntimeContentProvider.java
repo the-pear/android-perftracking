@@ -50,7 +50,7 @@ public class RuntimeContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        locationObservable = new ObservableLocation(null);
+        locationObservable = new ObservableLocation();
         mContext = getContext();
         if (mContext == null) return false;
         if (!AppPerformanceConfig.enabled) return false; // Return when instrumentation is disabled
@@ -61,7 +61,7 @@ public class RuntimeContentProvider extends ContentProvider {
         // Load data from last configuration
         ConfigurationResult lastConfig = readConfigFromCache();
         if(readLocationFromCache() != null) {
-            locationObservable.setValue(readLocationFromCache());
+            locationObservable.updateValue(readLocationFromCache());
         }
         Config config = createConfig(mContext, lastConfig);
         if (config != null) {
@@ -174,7 +174,7 @@ public class RuntimeContentProvider extends ContentProvider {
                     @Override
                     public void onResponse(GeoLocationResult newLocation) {
                         writeLocationToCache(newLocation.getRegionName());
-                        locationObservable.setValue(newLocation.getRegionName());
+                        locationObservable.updateValue(newLocation.getRegionName());
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -185,7 +185,7 @@ public class RuntimeContentProvider extends ContentProvider {
                     throwable = throwable.getCause();
                 if (throwable.getMessage() != null) message = throwable.getMessage();
                 writeLocationToCache(Locale.getDefault().getCountry());
-                locationObservable.setValue(Locale.getDefault().getCountry());
+                locationObservable.updateValue(Locale.getDefault().getCountry());
             }
         }).queue(queue);
     }

@@ -27,8 +27,7 @@ public class Tracker {
 		MeasurementBuffer buffer = new MeasurementBuffer();
 		Current current = new Current();
 		_tracker = new TrackerImpl(buffer, current, debug);
-		EnvironmentInfo envInfo = EnvironmentInfo.get(context,observable);
-        observable.addObserver(envInfo);
+		EnvironmentInfo envInfo = new EnvironmentInfo(context,observable);
 		EventWriter writer = new EventWriter(config, envInfo);
 		Sender sender = new Sender(buffer, current, writer, debug);
 		_senderThread = new SenderThread(sender);

@@ -10,49 +10,55 @@ import java.util.Observer;
 
 class EnvironmentInfo implements Observer {
     String device;
-    String country;
     String network;
-    private Observable ov = null;
-    private static EnvironmentInfo info;
+    private String country;
+    private Observable observable;
+    private final Object lock = new Object();
 
-    EnvironmentInfo(Observable ov){
-        this.ov = ov;
-    }
 
-    public void setCountry(String country) {
-        this.country = country;
-    }
+    EnvironmentInfo(Context context, Observable observable) {
 
-    public static EnvironmentInfo get(Context context, Observable observable) {
-        info = new EnvironmentInfo(observable);
+        this.observable = observable;
 
-        info.device = Build.MODEL;
+        this.device = Build.MODEL;
 
         TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
         if (tm != null) {
-            info.country = tm.getSimCountryIso();
-            info.network = tm.getNetworkOperatorName();
+            this.country = tm.getSimCountryIso();
+            this.network = tm.getNetworkOperatorName();
         }
 
-        if (info.country == null || "".equals(info.country)) {
-            info.country = Locale.getDefault().getCountry();
+        if (this.country == null || "".equals(this.country)) {
+            this.country = Locale.getDefault().getCountry();
         }
 
-        if (info.country != null) {
-            info.country = info.country.toLowerCase();
+        if (this.country != null) {
+            this.country = this.country.toLowerCase();
         }
 
-        if (info.network == null || "".equals(info.network)) {
-            info.network = "wifi";
+        if (this.network == null || "".equals(this.network)) {
+            this.network = "wifi";
         }
+        this.observable.addObserver(this);
 
-        return info;
+    }
+    // Required for unit tests
+    void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getCountry() {
+        synchronized (lock) {
+            return this.country;
+        }
     }
 
     @Override
-    public void update(Observable observable, Object o) {
-        if(ov == observable) {
-            info.setCountry(((ObservableLocation) observable).getValue());
+    public void update(Observable observable, Object value) {
+        if (value instanceof String) {
+            synchronized (lock) {
+                this.country = (String)value;
+            }
         }
     }
 }
