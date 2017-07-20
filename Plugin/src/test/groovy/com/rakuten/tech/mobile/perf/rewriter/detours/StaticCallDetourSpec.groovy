@@ -37,7 +37,7 @@ public class StaticCallDetourSpec {
         staticCallDetour.detourOwner = "java.lang.String"
         MethodVisitor methodVisitorMock = mock(MethodVisitor)
 
-        staticCallDetour.rewrite(methodVisitorMock, (int)0, "java.lang.Object", Object.class, "name", "desc", true)
+        staticCallDetour.rewrite(methodVisitorMock, Opcodes.NOP, "java.lang.Object", Object.class, "name", "desc", true)
 
         verify(methodVisitorMock).visitMethodInsn(eq(Opcodes.INVOKESTATIC), eq("java.lang.String"), eq("name"), eq("desc"), eq(false))
     }

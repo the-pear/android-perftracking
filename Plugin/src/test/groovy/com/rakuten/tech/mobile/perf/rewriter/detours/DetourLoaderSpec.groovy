@@ -17,16 +17,17 @@ public class DetourLoaderSpec {
         detourLoader = new DetourLoader(testLogger())
     }
 
-    @Test void "should return a list of detours for the input classNode, if any detour annotations exists, input classnode contains calldetour"() {
+    @Test void "should only load detours of type CallDetour"() {
         ClassJar jar = new ClassJar(resourceFile("user-testUI.jar"))
         ClassNode classNode = jar.getClassNode("${detoursPkg}.URLDetours")
 
         ArrayList<Detourer> detourers = detourLoader.load(classNode)
 
+        assert detourers.size() == 1
         assert detourers.get(0) instanceof CallDetour
     }
 
-    @Test void "should return a empty detours list if the class node does not contain any detour annotations"() {
+    @Test void "should not load detours if input classNode does not contain detour annotation"() {
         ClassJar jar = new ClassJar(resourceFile("user-testUI.jar"))
         ClassNode classNode = jar.getClassNode("com.rakuten.tech.mobile.perf.core.mixins.ActivityMixin")
 
@@ -35,7 +36,7 @@ public class DetourLoaderSpec {
         assert detourers.size() == 0
     }
 
-    @Test void "should return a list of detours for the input classNode, if any detour annotations exists, input classnode contains parameterDetour"() {
+    @Test void "should only load detours of type ParameterDetour"() {
 
         ClassNode classNodeStub = mock(ClassNode)
         classNodeStub.methods = [createMethodNode("testName", "(Ljava/lang/String;)V", [createAnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/DetourConstructorParameter;")], null)]
@@ -45,7 +46,7 @@ public class DetourLoaderSpec {
         assert detourers.get(0) instanceof ParameterDetour
     }
 
-    @Test void "should return a list of detours for the input classNode, if any detour annotations exists, input classnode contains staticCallDetour"() {
+    @Test void "should only load detours of type StaticCallDetour"() {
         ClassNode classNodeStub = mock(ClassNode)
         classNodeStub.methods = [createMethodNode("testName", null, [createAnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/DetourStaticCall;")], createInstructionList("testName"))]
 
@@ -55,7 +56,7 @@ public class DetourLoaderSpec {
 
     }
 
-    @Test void "should return a empty detours list if the methodNode name is not equal to the methodInstanceNode name "() {
+    @Test void "should not load detours if methodNode name does not match with any of the Instruction Nodes"() {
         ClassNode classNodeStub = mock(ClassNode)
         classNodeStub.methods = [createMethodNode("testName", null, [createAnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/DetourStaticCall;")], createInstructionList("testName1"))]
 
@@ -64,7 +65,7 @@ public class DetourLoaderSpec {
         assert detourers.size() == 0
     }
 
-    private InsnList createInstructionList(def methodInstNodeName) {
+    private static InsnList createInstructionList(def methodInstNodeName) {
         InsnList insnListStub = mock(InsnList)
         when(insnListStub.size()).thenReturn(1)
         MethodInsnNode methodInsnNodeStub = mock(MethodInsnNode)
@@ -73,7 +74,7 @@ public class DetourLoaderSpec {
         return insnListStub
     }
 
-    private AnnotationNode createAnnotationNode(def annotationName) {
+    private static AnnotationNode createAnnotationNode(def annotationName) {
         AnnotationNode annotationNodeStub = mock(AnnotationNode)
         annotationNodeStub.desc = annotationName
         Type typeStub =  mock(Type)
@@ -85,7 +86,7 @@ public class DetourLoaderSpec {
         return annotationNodeStub
     }
 
-    private MethodNode createMethodNode(def methodName, def methodDesc, def annotations, def instructions) {
+    private static MethodNode createMethodNode(def methodName, def methodDesc, def annotations, def instructions) {
         MethodNode methodNodeStub = mock(MethodNode)
         methodNodeStub.name = methodName
         methodNodeStub.desc = methodDesc

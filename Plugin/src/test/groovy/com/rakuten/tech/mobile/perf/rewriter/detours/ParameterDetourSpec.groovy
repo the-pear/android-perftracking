@@ -17,7 +17,7 @@ public class ParameterDetourSpec {
         parameterDetour = new ParameterDetour(testLogger())
     }
 
-    @Test void "should match if the input ownerClass is equal to the owner of the parameterDetour"() {
+    @Test void "should match if the input ownerClass or any of it's super classes is equal to the owner of the parameterDetour"() {
         parameterDetour.owner = "java.lang.Object"
 
         boolean match = parameterDetour.matchOwner(null, String.class)
@@ -25,23 +25,23 @@ public class ParameterDetourSpec {
         assert match
     }
 
-    @Test void "should not match if the input owner is not equal to the owner of the parameterDetour"() {
-        parameterDetour.owner = "java.lang.class"
+    @Test void "should not match if the input ownerClass or any of it's super classes is not equal to the owner of the parameterDetour"() {
+        parameterDetour.owner = "java.lang.Integer"
 
         boolean match = parameterDetour.matchOwner(null, String.class)
 
         assert !match
     }
 
-    @Test void "should visit method instance for the parameterDetour inputs"() {
+    @Test void "should visit methodInstruction for the parameterDetour inputs"() {
         parameterDetour.detourOwner = "java.lang.String"
         parameterDetour.detourDesc = "detourDesc"
         parameterDetour.detourName = "detourName"
         MethodVisitor methodVisitorMock = mock(MethodVisitor)
 
-        parameterDetour.rewrite(methodVisitorMock, 0, "java.lang.Object", Object.class, "name", "desc", true)
+        parameterDetour.rewrite(methodVisitorMock, Opcodes.NOP, "java.lang.Object", Object.class, "name", "desc", true)
 
         verify(methodVisitorMock).visitMethodInsn(eq(Opcodes.INVOKESTATIC), eq("java.lang.String"), eq("detourName"), eq("detourDesc"), eq(false))
-        verify(methodVisitorMock).visitMethodInsn(eq(0), eq("java.lang.Object"), eq("name"), eq("desc"), eq(true))
+        verify(methodVisitorMock).visitMethodInsn(eq(Opcodes.NOP), eq("java.lang.Object"), eq("name"), eq("desc"), eq(true))
     }
 }

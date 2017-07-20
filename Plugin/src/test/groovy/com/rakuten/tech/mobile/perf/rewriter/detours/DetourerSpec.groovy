@@ -8,6 +8,7 @@ import org.junit.Test
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.Opcodes
 
 import static com.rakuten.tech.mobile.perf.TestUtil.*
 import static org.mockito.ArgumentMatchers.any
@@ -29,7 +30,7 @@ public class DetourerSpec{
 
         detourer.add(detourStub)
 
-        //TODO Validate (Maybe you need reflection.)
+        assert detourer._detours.get("matchMethod"+"matchDesc").size() == 1
     }
 
     @Test void "should add the input detourers into the collection, should add new entry to the arraylist if matches"() {
@@ -40,10 +41,10 @@ public class DetourerSpec{
         detourer.add(detourStub)
         detourer.add(detourStub)
 
-        //TODO Validate (Maybe you need reflection.)
+        assert detourer._detours.get("matchMethod"+"matchDesc").size() == 2
     }
 
-    @Test void "should visit the class and method with the data in collection"() {
+    @Test void "should rewrite method of URL with URLDetours, if URL class is avaiable in ClassProvider"() {
         DetourLoader detourLoader = new DetourLoader(testLogger())
         ClassJar jar = new ClassJar(resourceFile("user-testUI.jar"))
         ClassNode classNode = jar.getClassNode("${detoursPkg}.URLDetours")
@@ -57,6 +58,6 @@ public class DetourerSpec{
 
         reader.accept(classVisitorMock, 0)
 
-        verify(classVisitorMock).visitMethod(eq(9), eq("openConnection"), eq("(Ljava/net/URL;)Ljava/net/URLConnection;"), eq(null), any())
+        verify(classVisitorMock).visitMethod(eq(Opcodes.LCONST_0), eq("openConnection"), eq("(Ljava/net/URL;)Ljava/net/URLConnection;"), eq(null), any())
     }
 }
