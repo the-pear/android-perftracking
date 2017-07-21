@@ -44,7 +44,7 @@ public class DetourerSpec{
         assert detourer._detours.get("matchMethod"+"matchDesc").size() == 2
     }
 
-    @Test void "should rewrite method of URL with URLDetours, if URL class is avaiable in ClassProvider"() {
+    @Test void "should rewrite method of URL with URLDetours, if URL class is available in ClassProvider"() {
         DetourLoader detourLoader = new DetourLoader(testLogger())
         ClassJar jar = new ClassJar(resourceFile("user-testUI.jar"))
         ClassNode classNode = jar.getClassNode("${detoursPkg}.URLDetours")
@@ -53,8 +53,7 @@ public class DetourerSpec{
         detourer.add(detourers.get(0))
         ClassVisitor visitor = new ClassWriter(classProvider, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES)
         ClassReader reader = jar.getClassReader("${detoursPkg}.URLDetours")
-        ClassVisitor classVisitor = detourer.rewrite(Object.class, visitor)
-        ClassVisitor classVisitorMock = spy(classVisitor)
+        ClassVisitor classVisitorMock = spy(detourer.rewrite(Object.class, visitor))
 
         reader.accept(classVisitorMock, 0)
 
