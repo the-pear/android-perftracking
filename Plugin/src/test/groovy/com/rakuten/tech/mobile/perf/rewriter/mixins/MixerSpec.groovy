@@ -53,7 +53,7 @@ public class MixerSpec {
         mixer.add(mixin)
         Class<?> clazz = classProvider.getClass("${mixinPkg}.ActivityMixin");
 
-        ClassVisitor classVisitor = mixer.rewrite(clazz, classVisitor)
+        ClassVisitor classVisitor = mixer.rewrite(clazz, this.classVisitor)
 
         assert classVisitor == this.classVisitor
     }
@@ -62,7 +62,7 @@ public class MixerSpec {
         mixer.add(mixin)
         Class<?> clazz = classProvider.getClass("${volleyToolBoxPkg}.HurlStack");
 
-        ClassVisitor classVisitor = mixer.rewrite(clazz, classVisitor)
+        ClassVisitor classVisitor = mixer.rewrite(clazz, this.classVisitor)
 
         assert classVisitor != this.classVisitor
     }

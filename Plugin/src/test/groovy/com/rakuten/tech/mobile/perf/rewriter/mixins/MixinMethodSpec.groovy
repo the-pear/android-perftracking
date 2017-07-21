@@ -31,12 +31,10 @@ public class MixinMethodSpec {
     }
 
     @Test def void "should invoke visit method on the provided class parameters"() {
-        ClassNode classNode = jar.getClassNode("${mixinPkg}.AdapterViewOnItemClickListenerMixin")
-        Mixin mixin = mixinLoader.loadMixin(classNode)
-        Class clazz = provider.getClass("${mixinPkg}.AdapterViewOnItemClickListenerMixin")
-        ClassReader reader = jar.getClassReader("${mixinPkg}.AdapterViewOnItemClickListenerMixin")
-        ClassVisitor visitor = mixin.rewrite(clazz, writer)
-        ClassVisitor visitorMock = spy(visitor)
+        def mixinName = "${mixinPkg}.AdapterViewOnItemClickListenerMixin"
+        Mixin mixin = mixinLoader.loadMixin(jar.getClassNode(mixinName))
+        ClassVisitor visitorMock = spy(mixin.rewrite(provider.getClass(mixinName), writer))
+        ClassReader reader = jar.getClassReader(mixinName)
 
         reader.accept(visitorMock, 0)
 
@@ -58,7 +56,7 @@ public class MixinMethodSpec {
 
     @Test def void "Should call add method of MixinField class, If any Field Node exists in input classNode"() {
         ClassNode classNode = jar.getClassNode("${mixinPkg}.VolleyHurlStackMixin")
-        classNode.fields = [createFieldNode("testFieldName", Type.OBJECT, [new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;")])]
+        classNode.fields = [createFieldNode("testMethodName", Type.OBJECT, [new AnnotationNode("Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;")])]
         Mixin mixin = mixinLoader.loadMixin(classNode)
         MixinField mixinFieldMock = spy(mixin.fields.get(0))
         mixin.fields.add(0,mixinFieldMock)
@@ -71,7 +69,7 @@ public class MixinMethodSpec {
         verify(mixinFieldMock).add(any(ClassVisitor))
     }
 
-    private FieldNode createFieldNode(def name, def desc, def visibleAnnotations) {
+    private static FieldNode createFieldNode(def name, def desc, def visibleAnnotations) {
         FieldNode fieldNode = mock(FieldNode)
         fieldNode.name = name
         fieldNode.desc = desc

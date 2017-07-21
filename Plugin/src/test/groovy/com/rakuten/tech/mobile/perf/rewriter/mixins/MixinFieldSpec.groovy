@@ -17,7 +17,7 @@ public class MixinFieldSpec {
         mixinField = new MixinField(testLogger(), fieldNode)
     }
 
-    @Test def void "should visit the field with the provided class visitor, when mixin field's add method is invoked"() {
+    @Test def void "should visit the field, when adding a visitor to the mixin field"() {
         ClassVisitor classVisitorMock = mock(ClassVisitor)
         when(classVisitorMock.visitField(anyInt(), anyString(),
                 anyString(), anyString(), any(Object))).thenReturn(null)
