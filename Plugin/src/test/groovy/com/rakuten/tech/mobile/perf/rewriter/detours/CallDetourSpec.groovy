@@ -38,7 +38,7 @@ public class CallDetourSpec {
         callDetour.detourDesc = "detourDesc"
         MethodVisitor methodVisitorMock = mock(MethodVisitor)
 
-        callDetour.rewrite(methodVisitorMock, (int)0, "java.net.URL", Object.class, "name", "desc", true)
+        callDetour.rewrite(methodVisitorMock, Opcodes.NOP, "java.net.URL", Object.class, "name", "desc", true)
 
         verify(methodVisitorMock).visitMethodInsn(eq(Opcodes.INVOKESTATIC), eq("com.rakuten.tech.mobile.perf.core.detours.URLDetours"), eq("name"), eq("detourDesc"), eq(false))
     }
