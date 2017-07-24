@@ -91,8 +91,8 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
         queue.rule().whenClass(ConfigurationRequest.class).returnNetworkResponse(200, config.content);
 
         provider.onCreate();
-
-        verify(prefs,times(2)).edit();
+        // Once for config cache and another for location cache
+        verify(prefs,times(1)).edit();
         String cachedResponse = prefs.getString("config_key", null);
         JSONAssert.assertEquals(config.content, cachedResponse, true);
     }
@@ -132,6 +132,8 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
         provider.onCreate();
 
         // no exception
+        // 0 request to Config API
+        // 1 request to Location API
         verify(queue, times(1)).add(any(Request.class));
     }
 

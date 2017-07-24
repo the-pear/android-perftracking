@@ -13,7 +13,6 @@ class EnvironmentInfo implements Observer {
     String network;
     private String country;
     private Observable observable;
-    private final Object lock = new Object();
 
 
     EnvironmentInfo(Context context, Observable observable) {
@@ -48,7 +47,7 @@ class EnvironmentInfo implements Observer {
     }
 
     public String getCountry() {
-        synchronized (lock) {
+        synchronized (this) {
             return this.country;
         }
     }
@@ -56,8 +55,8 @@ class EnvironmentInfo implements Observer {
     @Override
     public void update(Observable observable, Object value) {
         if (value instanceof String) {
-            synchronized (lock) {
-                this.country = (String)value;
+            synchronized (this) {
+                this.country = (String) value;
             }
         }
     }

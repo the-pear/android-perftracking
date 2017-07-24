@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 public class EnvironmentInfoSpec {
     @Mock TelephonyManager tm;
     @Mock Context ctx;
-    private ObservableLocation ov = new ObservableLocation();
+    private CachingObservable location = new CachingObservable(new Object());
     private final String simCountry = "test-sim-country";
     private final String networkOperator = "test-network-operator";
 
@@ -30,7 +30,7 @@ public class EnvironmentInfoSpec {
 
     @Test public void shouldReadCountryAndNetworkFromTelephonyManager() {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(tm);
-        EnvironmentInfo info = new EnvironmentInfo(ctx, ov);
+        EnvironmentInfo info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
         assertThat(info.getCountry()).isEqualTo(simCountry);
         assertThat(info.network).isEqualTo(networkOperator);
@@ -40,7 +40,7 @@ public class EnvironmentInfoSpec {
     @Test
     public void shouldFallbackToReadCountryFromLocaleIfTelephonyManagerIsNull() {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(null);
-        EnvironmentInfo info = new EnvironmentInfo(ctx, ov);
+        EnvironmentInfo info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
         assertThat(info.getCountry()).isEqualToIgnoringCase(Locale.getDefault().getCountry());
     }
@@ -52,7 +52,7 @@ public class EnvironmentInfoSpec {
         // prevent string literal from being "intern"ed so `== ""` is false in test setting, see
         // http://stackoverflow.com/questions/27473457/in-java-why-does-string-string-evaluate-to-true-inside-a-method-as-opposed
         when(tm.getSimCountryIso()).thenReturn(new String(""));
-        EnvironmentInfo info = new EnvironmentInfo(ctx, ov);
+        EnvironmentInfo info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
         assertThat(info.getCountry()).isEqualToIgnoringCase(Locale.getDefault().getCountry());
     }
@@ -61,7 +61,7 @@ public class EnvironmentInfoSpec {
     public void shouldNormalizeCountryCodeToLowercase() {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(null);
         Locale.setDefault(new Locale("testLanguage", "Test-Locale-Country", "testVariant"));
-        EnvironmentInfo info = new EnvironmentInfo(ctx, ov);
+        EnvironmentInfo info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
         assertThat(info.getCountry()).isEqualTo("test-locale-country");
 
@@ -69,7 +69,7 @@ public class EnvironmentInfoSpec {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(tm);
         when(tm.getSimCountryIso()).thenReturn("Test-Sim-Country");
 
-        info = new EnvironmentInfo(ctx, ov);
+        info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
         assertThat(info.getCountry()).isEqualTo("test-sim-country");
     }

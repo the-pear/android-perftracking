@@ -26,9 +26,6 @@
         <meta-data android:name="com.rakuten.tech.mobile.perf.SubscriptionKey"
             android:value="8775d40c7cf94ecb80d90ec5d4afe1c8" />
 
-        <meta-data android:name="com.rakuten.tech.mobile.perf.geo.SubscriptionKey"
-            android:value="2845831a3c1741f58502706369ab6498" />
-
     </application>
 
 </manifest>

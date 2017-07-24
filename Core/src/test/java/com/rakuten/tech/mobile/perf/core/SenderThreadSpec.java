@@ -177,7 +177,7 @@ public class SenderThreadSpec {
         @Mock OutputStream outputStream;
         @Mock HttpsURLConnection conn;
         @Mock Context ctx;
-        private ObservableLocation ov = new ObservableLocation();
+        private CachingObservable location = new CachingObservable(new Object());
         private EventWriter writer;
         private MeasurementBuffer buffer;
         private Runnable populateBufferRunnable;
@@ -192,8 +192,8 @@ public class SenderThreadSpec {
             config.eventHubUrl = ""; // url injected via constructor
             config.header = new HashMap<>();
 
-            envInfo = new EnvironmentInfo(ctx,ov);
-            envInfo.setCountry("test-land");
+            envInfo = new EnvironmentInfo(ctx, location);
+            location.publish("test-land");
             envInfo.network = "test-network";
             envInfo.device = "test-device";
 

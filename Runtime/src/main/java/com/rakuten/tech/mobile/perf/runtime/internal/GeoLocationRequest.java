@@ -17,7 +17,7 @@ import jp.co.rakuten.api.core.BaseRequest;
  */
 
 class GeoLocationRequest extends BaseRequest<GeoLocationResult> {
-    private static final String DEFAULT_URL_PREFIX = "https://mosdevjapaneast.azure-api.net/performance/geo/v1/location";
+    private static final String DEFAULT_URL_PREFIX = "https://api.apps.global.rakuten.com/relay/location/v1";
 
     GeoLocationRequest(@Nullable String urlPrefix, String subscriptionKey, @Nullable Response.Listener<GeoLocationResult> listener, @Nullable Response.ErrorListener errorListener) {
         super(listener, errorListener);
