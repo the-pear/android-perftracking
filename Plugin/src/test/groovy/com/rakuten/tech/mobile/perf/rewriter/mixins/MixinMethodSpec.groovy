@@ -42,12 +42,10 @@ public class MixinMethodSpec {
     }
 
     @Test def void "should invoke visit method on the provided class parameters, and visit instance fields if exists withing the method"() {
-        ClassNode classNode = jar.getClassNode("${mixinPkg}.ActivityMixin")
-        Mixin mixin = mixinLoader.loadMixin(classNode)
-        Class clazz = provider.getClass("${mixinPkg}.ActivityMixin")
-        ClassReader reader = jar.getClassReader("${mixinPkg}.ActivityMixin")
-        ClassVisitor visitor = mixin.rewrite(clazz, writer)
-        ClassVisitor visitorMock = spy(visitor)
+        def mixinName = "${mixinPkg}.ActivityMixin"
+        Mixin mixin = mixinLoader.loadMixin(jar.getClassNode(mixinName))
+        ClassVisitor visitorMock = spy(mixin.rewrite(provider.getClass(mixinName), writer))
+        ClassReader reader = jar.getClassReader(mixinName)
 
         reader.accept(visitorMock, 0)
 

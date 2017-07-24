@@ -16,7 +16,8 @@ public class MixinLoaderSpec {
     ClassNode classNode
     final String addFieldAnnotationDec = "Lcom/rakuten/tech/mobile/perf/core/annotations/AddField;"
     final String replaceMethodAnnotationDec = "Lcom/rakuten/tech/mobile/perf/core/annotations/ReplaceMethod;"
-    final String testName = "testFieldName"
+    final String testFieldName = "testFieldName"
+    final String testMethodName = "testMethodName"
 
     @Before def void setup() {
         mixinLoader = new MixinLoader(testLogger())
@@ -47,47 +48,47 @@ public class MixinLoaderSpec {
     }
 
     @Test def void "should create a mixin object with fields if the ClassNode contains visible annotations, but exclude null AnnotationNode"() {
-        classNode.fields = [createFieldNode(testName, [new AnnotationNode(addFieldAnnotationDec)], null),
+        classNode.fields = [createFieldNode(testFieldName, [new AnnotationNode(addFieldAnnotationDec)], null),
                             createFieldNode(null, null, null)]
 
         Mixin mixin = mixinLoader.loadMixin(classNode)
 
-        assert mixin.fields.get(0).name == testName
+        assert mixin.fields.get(0).name == testFieldName
         assert mixin.fields.size() == 1
     }
 
     @Test def void "should create a mixin object with fields if the ClassNode contains invisible annotation, but exclude null AnnotationNode"() {
-        classNode.fields = [createFieldNode(testName, null, [new AnnotationNode(addFieldAnnotationDec)]),
+        classNode.fields = [createFieldNode(testFieldName, null, [new AnnotationNode(addFieldAnnotationDec)]),
                             createFieldNode(null, null, null)]
 
         Mixin mixin = mixinLoader.loadMixin(classNode)
 
-        assert mixin.fields.get(0).name == testName
+        assert mixin.fields.get(0).name == testFieldName
         assert mixin.fields.size() == 1
     }
 
     @Test def void "should create a mixin object with fields if the ClassNode contains visible annotations, but exclude empty AnnotationNodeList"() {
-        classNode.fields = [createFieldNode(testName, [new AnnotationNode(addFieldAnnotationDec)], null),
+        classNode.fields = [createFieldNode(testFieldName, [new AnnotationNode(addFieldAnnotationDec)], null),
                             createFieldNode(null, [], null)]
 
         Mixin mixin = mixinLoader.loadMixin(classNode)
 
-        assert mixin.fields.get(0).name == testName
+        assert mixin.fields.get(0).name == testFieldName
         assert mixin.fields.size() == 1
     }
 
     @Test def void "should create a mixin object with fields if the ClassNode contains invisible annotation, but exclude empty AnnotationNodeList"() {
-        classNode.fields = [createFieldNode(testName, null, [new AnnotationNode(addFieldAnnotationDec)]),
+        classNode.fields = [createFieldNode(testFieldName, null, [new AnnotationNode(addFieldAnnotationDec)]),
                             createFieldNode(null, null, [])]
 
         Mixin mixin = mixinLoader.loadMixin(classNode)
 
-        assert mixin.fields.get(0).name == testName
+        assert mixin.fields.get(0).name == testFieldName
         assert mixin.fields.size() == 1
     }
 
     @Test def void "should create a mixin object with methods if the ClassNode contains visible annotations, but exclude null AnnotationNode"() {
-        classNode.methods = [createMethodNode("testFieldName", [new AnnotationNode(replaceMethodAnnotationDec)], null),
+        classNode.methods = [createMethodNode(testMethodName, [new AnnotationNode(replaceMethodAnnotationDec)], null),
                              createMethodNode(null, null, null)]
 
         int size = mixinLoader.loadMixin(classNode).methods.size()
@@ -96,7 +97,7 @@ public class MixinLoaderSpec {
     }
 
     @Test def void "should create a mixin object with methods if the ClassNode contains invisible annotation, but exclude null AnnotationNode"() {
-        classNode.methods = [createMethodNode("testFieldName", null, [new AnnotationNode(replaceMethodAnnotationDec)]),
+        classNode.methods = [createMethodNode(testMethodName, null, [new AnnotationNode(replaceMethodAnnotationDec)]),
                              createMethodNode(null, null, null)]
 
         int size = mixinLoader.loadMixin(classNode).methods.size()
@@ -105,7 +106,7 @@ public class MixinLoaderSpec {
     }
 
     @Test def void "should create a mixin object with methods if the ClassNode contains visible annotations, but exclude empty AnnotationNodeList"() {
-        classNode.methods = [createMethodNode("testFieldName", [new AnnotationNode(replaceMethodAnnotationDec)], null),
+        classNode.methods = [createMethodNode(testMethodName, [new AnnotationNode(replaceMethodAnnotationDec)], null),
                              createMethodNode(null, [], null)]
 
         int size = mixinLoader.loadMixin(classNode).methods.size()
@@ -114,7 +115,7 @@ public class MixinLoaderSpec {
     }
 
     @Test def void "should create a mixin object with methods if the ClassNode contains invisible annotation, but exclude empty AnnotationNodeList"() {
-        classNode.methods = [createMethodNode("testFieldName", null, [new AnnotationNode(replaceMethodAnnotationDec)]),
+        classNode.methods = [createMethodNode(testMethodName, null, [new AnnotationNode(replaceMethodAnnotationDec)]),
                              createMethodNode(null, null, [])]
 
         int size = mixinLoader.loadMixin(classNode).methods.size()
