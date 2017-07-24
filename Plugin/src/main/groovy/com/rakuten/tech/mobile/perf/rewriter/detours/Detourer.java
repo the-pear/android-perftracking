@@ -7,6 +7,7 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import com.android.annotations.VisibleForTesting;
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassProvider;
 
 public class Detourer {
@@ -16,7 +17,8 @@ public class Detourer {
         _provider = provider;
     }
 
-    private final HashMap<String, ArrayList<Detour>> _detours = new HashMap<String, ArrayList<Detour>>();
+    @SuppressWarnings("WeakerAccess") // visible for testing
+    final HashMap<String, ArrayList<Detour>> _detours = new HashMap<>();
 
     public void add(Detour detour) {
         String key = detour.matchMethod + detour.matchDesc;
