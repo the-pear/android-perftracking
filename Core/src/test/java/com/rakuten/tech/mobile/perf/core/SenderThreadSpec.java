@@ -177,7 +177,7 @@ public class SenderThreadSpec {
         @Mock OutputStream outputStream;
         @Mock HttpsURLConnection conn;
         @Mock Context ctx;
-        private CachingObservable location = new CachingObservable(new Object());
+        private CachingObservable location = new CachingObservable<String>(null);
         private EventWriter writer;
         private MeasurementBuffer buffer;
         private Runnable populateBufferRunnable;

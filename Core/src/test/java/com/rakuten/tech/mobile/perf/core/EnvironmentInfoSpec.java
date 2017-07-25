@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 public class EnvironmentInfoSpec {
     @Mock TelephonyManager tm;
     @Mock Context ctx;
-    private CachingObservable location = new CachingObservable(new Object());
+    private CachingObservable location = new CachingObservable<String>(null);
     private final String simCountry = "test-sim-country";
     private final String networkOperator = "test-network-operator";
 

@@ -27,7 +27,7 @@ public class TrackerShadow {
         return mockTracker;
     }
 
-    @Implementation public static void on(Context context, Config config,  CachingObservable observableLocation) { /* noop */ }
+    @Implementation public static void on(Context context, Config config,  CachingObservable<String> observableLocation) { /* noop */ }
 
     @Implementation public static void off() { /* noop */ }
 
