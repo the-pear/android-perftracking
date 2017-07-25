@@ -7,11 +7,15 @@ public class CachingObservable<T> extends Observable {
 
     private T value;
 
+    public CachingObservable() {
+        this(null);
+    }
+
     public CachingObservable(T v) {
         value = v;
     }
 
-    T getCachedValue() {
+    public T getCachedValue() {
         return value;
     }
 

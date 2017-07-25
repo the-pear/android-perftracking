@@ -12,12 +12,13 @@ class EnvironmentInfo implements Observer {
     String device;
     String network;
     private String country;
-    private Observable observable;
 
+    EnvironmentInfo(Context context, CachingObservable<String> locationObservable) {
 
-    EnvironmentInfo(Context context, Observable observable) {
-
-        this.observable = observable;
+        locationObservable.addObserver(this);
+        if (locationObservable.getCachedValue() != null) {
+            this.update(locationObservable, locationObservable.getCachedValue());
+        }
 
         this.device = Build.MODEL;
 
@@ -38,12 +39,7 @@ class EnvironmentInfo implements Observer {
         if (this.network == null || "".equals(this.network)) {
             this.network = "wifi";
         }
-        this.observable.addObserver(this);
 
-    }
-    // Required for unit tests
-    void setCountry(String country) {
-        this.country = country;
     }
 
     public String getCountry() {

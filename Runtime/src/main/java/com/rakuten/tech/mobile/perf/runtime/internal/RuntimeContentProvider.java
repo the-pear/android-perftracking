@@ -30,16 +30,13 @@ import java.util.Random;
 public class RuntimeContentProvider extends ContentProvider {
     private static final String TAG = RuntimeContentProvider.class.getSimpleName();
 
-    private Context mContext;
-    private RequestQueue mQueue;
-
     @Override
     public boolean onCreate() {
-        mContext = getContext();
+        Context mContext = getContext();
         if (mContext == null) return false;
         if (!AppPerformanceConfig.enabled) return false; // Return when instrumentation is disabled
 
-        mQueue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
+        RequestQueue mQueue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
         mQueue.start();
 
         String subscriptionkey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
@@ -47,8 +44,8 @@ public class RuntimeContentProvider extends ContentProvider {
         ConfigStore configStore = new ConfigStore(mContext, mQueue, subscriptionkey, urlPrefix);
         LocationStore locationStore = new LocationStore(mContext, mQueue, subscriptionkey, urlPrefix);
 
-        ConfigurationResult lastConfig = configStore.readConfigFromCache();
-        Config config = createConfig(mContext, lastConfig);
+        // Read last config from cache
+        Config config = createConfig(mContext, configStore.getObservable().getCachedValue());
         if (config != null) {
             // Initialise Tracking Manager
             TrackingManager.initialize(mContext, config, locationStore.getObservable());

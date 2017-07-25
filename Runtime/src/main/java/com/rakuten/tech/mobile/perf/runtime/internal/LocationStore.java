@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.content.SharedPreferences;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -22,27 +23,26 @@ class LocationStore extends Store<String> {
     private static final String LOCATION_KEY = "location_key";
     private static final int TIME_INTERVAL = 60 * 60 * 1000; // 1 HOUR in milli seconds
 
-    private Context mContext;
-    private RequestQueue mRequestQueue;
-    private String mSubScriptionKey;
-    private String mUrlPrefix;
-    private Handler handler;
+    private final RequestQueue mRequestQueue;
+    private final String mSubscriptionKey;
+    private final String mUrlPrefix;
+    private final SharedPreferences mPrefs;
+    private Handler mHandler;
 
-    LocationStore(Context context, RequestQueue requestQueue, String subScriptionKey, String urlPrefix) {
-        mContext = context;
+    LocationStore(Context context, RequestQueue requestQueue, String subscriptionKey, String urlPrefix) {
+        mPrefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         mRequestQueue = requestQueue;
-        mSubScriptionKey = subScriptionKey;
+        mSubscriptionKey = subscriptionKey;
         mUrlPrefix = urlPrefix;
-        String cachedLocation = readLocationFromCache();
-        observable = new CachingObservable<>(cachedLocation);
-        handler = new Handler(Looper.getMainLooper());
+        observable = new CachingObservable<>(readLocationFromCache());
+        mHandler = new Handler(Looper.getMainLooper());
         startLoadingLocationPeriodically();
     }
 
     private final Runnable periodicLocationCheck = new Runnable() {
         public void run() {
             if (Tracker.isTrackerRunning()) {
-                handler.postDelayed(this, TIME_INTERVAL);
+                mHandler.postDelayed(this, TIME_INTERVAL);
                 loadLocationFromApi();
             }
         }
@@ -50,16 +50,16 @@ class LocationStore extends Store<String> {
 
     private void startLoadingLocationPeriodically() {
         loadLocationFromApi();
-        handler.postDelayed(periodicLocationCheck, TIME_INTERVAL);
+        mHandler.postDelayed(periodicLocationCheck, TIME_INTERVAL);
     }
 
     private void loadLocationFromApi() {
 
-        if (mSubScriptionKey == null)
+        if (mSubscriptionKey == null)
             Log.d(TAG, "Cannot read metadata `com.rakuten.tech.mobile.perf.SubscriptionKey` from manifest, automated performance tracking will not work.");
 
         new GeoLocationRequest(mUrlPrefix,
-                mSubScriptionKey,
+                mSubscriptionKey,
                 new Response.Listener<GeoLocationResult>() {
                     @Override
                     public void onResponse(GeoLocationResult newLocation) {
@@ -69,28 +69,22 @@ class LocationStore extends Store<String> {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Throwable throwable = error;
-                String message = error.getClass().getName();
-                while (throwable.getMessage() == null && throwable.getCause() != null)
-                    throwable = throwable.getCause();
-                if (throwable.getMessage() != null) message = throwable.getMessage();
-                Log.d(TAG, "Error: " + message);
+                Log.d(TAG, "Error loading location", error);
             }
         }).queue(mRequestQueue);
     }
 
     private void writeLocationToCache(String locationName) {
-        if (mContext != null) {
-            mContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(LOCATION_KEY, locationName).apply();
+        if (mPrefs != null) {
+            mPrefs.edit().putString(LOCATION_KEY, locationName).apply();
         }
     }
 
     @Nullable
-    public String readLocationFromCache() {
+    private String readLocationFromCache() {
         String result = null;
-        if (mContext != null) {
-            result = mContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                    .getString(LOCATION_KEY, null);
+        if (mPrefs != null) {
+            result = mPrefs.getString(LOCATION_KEY, null);
         }
         return result;
     }

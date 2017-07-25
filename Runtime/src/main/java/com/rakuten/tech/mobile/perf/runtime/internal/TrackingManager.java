@@ -3,12 +3,12 @@ package com.rakuten.tech.mobile.perf.runtime.internal;
 import android.content.Context;
 import android.util.Log;
 
+import com.rakuten.tech.mobile.perf.core.CachingObservable;
 import com.rakuten.tech.mobile.perf.core.Config;
 import com.rakuten.tech.mobile.perf.core.Tracker;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Observable;
 
 /**
  * TrackingManager
@@ -27,8 +27,8 @@ public class TrackingManager {
         mTrackingData = new HashMap<>();
     }
 
-    synchronized static void initialize(Context context, Config config, Observable observable) {
-        Tracker.on(context, config, observable);
+    synchronized static void initialize(Context context, Config config, CachingObservable<String> locationObservable) {
+        Tracker.on(context, config, locationObservable);
         INSTANCE = new TrackingManager();
     }
 
