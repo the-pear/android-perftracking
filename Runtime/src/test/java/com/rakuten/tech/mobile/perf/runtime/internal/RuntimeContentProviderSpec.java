@@ -78,35 +78,12 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
         clearInvocations(TrackerShadow.mockTracker);
     }
 
-    @SuppressLint("CommitPrefEdits")
-    @Test public void shouldRequestConfigAndLocationOnEmptyCache() throws JSONException {
-        queue.rule().whenClass(ConfigurationRequest.class).returnNetworkResponse(200, config.content);
-        queue.rule().whenClass(GeoLocationRequest.class).returnNetworkResponse(200, location.content);
-        provider.onCreate();
-
-        queue.verify();
-    }
-
-    @SuppressLint("CommitPrefEdits")
-    @Test public void shouldCacheConfigAndLocationOnEmptyCache() throws JSONException {
-        queue.rule().whenClass(ConfigurationRequest.class).returnNetworkResponse(200, config.content);
-        queue.rule().whenClass(GeoLocationRequest.class).returnNetworkResponse(200, location.content);
-        provider.onCreate();
-        // once for config and another for location
-        verify(prefs,times(2)).edit();
-        String cachedResponse = prefs.getString("config_key", null);
-        JSONAssert.assertEquals(config.content, cachedResponse, true);
-        String cachedLocation = prefs.getString("location_key", null);
-        Assert.assertEquals("Tokyo", cachedLocation);
-    }
-
     @Test public void shouldNotStartTrackingOnEmptyCache() {
         provider.onCreate();
 
         assertThat(TrackingManager.INSTANCE).isNull();
         verify(TrackerShadow.mockTracker, never()).startMetric(anyString());
     }
-
 
     @SuppressLint("ApplySharedPref")
     @Test public void shouldStartTrackingAndLaunchMetricOnCachedConfig() {

@@ -26,7 +26,7 @@ public class TrackingManagerSpec extends RobolectricUnitSpec {
     @Mock Context context;
     @Mock Config config;
     @Mock MockTracker tracker;
-    private CachingObservable location = new CachingObservable(new Object());
+    private CachingObservable<String> location = new CachingObservable<String>(null);
 
     @Before public void init() {
         TrackingManager.initialize(context, config, location);

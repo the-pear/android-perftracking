@@ -177,7 +177,7 @@ public class SenderThreadSpec {
         @Mock OutputStream outputStream;
         @Mock HttpsURLConnection conn;
         @Mock Context ctx;
-        private CachingObservable location = new CachingObservable<String>(null);
+        private CachingObservable<String> location = new CachingObservable<String>(null);
         private EventWriter writer;
         private MeasurementBuffer buffer;
         private Runnable populateBufferRunnable;
@@ -193,7 +193,8 @@ public class SenderThreadSpec {
             config.header = new HashMap<>();
 
             envInfo = new EnvironmentInfo(ctx, location);
-            location.publish("test-land");
+            location.publish("test-region");
+            envInfo.country = "test-land";
             envInfo.network = "test-network";
             envInfo.device = "test-device";
 

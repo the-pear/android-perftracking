@@ -15,7 +15,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.rakuten.tech.mobile.perf.R;
-import com.rakuten.tech.mobile.perf.core.CachingObservable;
 import com.rakuten.tech.mobile.perf.core.Tracker;
 
 import java.util.Random;
@@ -29,37 +28,33 @@ class ConfigStore extends Store<ConfigurationResult> {
     private static final String CONFIG_KEY = "config_key";
     private static final int TIME_INTERVAL = 60 * 60 * 1000; // 1 HOUR in milli seconds
 
-    private final RequestQueue mRequestQueue;
-    private final String mSubscriptionKey;
-    private final String mUrlPrefix;
-    private final String mPackageName;
-    private final PackageManager mPackageManager;
-    private final SharedPreferences mPrefs;
-    private final Resources mRes;
-    private Handler mHandler;
+    private final RequestQueue requestQueue;
+    private final String subscriptionKey;
+    private final String urlPrefix;
+    private final String packageName;
+    private final PackageManager packageManager;
+    private final SharedPreferences prefs;
+    private final Resources res;
+    private Handler handler;
 
     ConfigStore(Context context, RequestQueue requestQueue, String subscriptionKey, String urlPrefix) {
-        mPackageManager = context.getPackageManager();
-        mPackageName = context.getPackageName();
-        mRes = context.getResources();
-        mPrefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        mRequestQueue = requestQueue;
-        mSubscriptionKey = subscriptionKey;
-        mUrlPrefix = urlPrefix;
-        observable = new CachingObservable<>(readConfigFromCache());
-        mHandler = new Handler(Looper.getMainLooper());
-        startLoadingConfigPeriodically();
-    }
-
-    private void startLoadingConfigPeriodically() {
+        packageManager = context.getPackageManager();
+        packageName = context.getPackageName();
+        res = context.getResources();
+        prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        this.requestQueue = requestQueue;
+        this.subscriptionKey = subscriptionKey;
+        this.urlPrefix = urlPrefix;
+        observable.publish(readConfigFromCache());
+        handler = new Handler(Looper.getMainLooper());
         loadConfigurationFromApi();
-        mHandler.postDelayed(periodicCheck, TIME_INTERVAL);
+        handler.postDelayed(periodicCheck, TIME_INTERVAL);
     }
 
     private final Runnable periodicCheck = new Runnable() {
         public void run() {
             if (Tracker.isTrackerRunning()) {
-                mHandler.postDelayed(this, TIME_INTERVAL);
+                handler.postDelayed(this, TIME_INTERVAL);
                 loadConfigurationFromApi();
             }
         }
@@ -69,22 +64,22 @@ class ConfigStore extends Store<ConfigurationResult> {
         ConfigurationParam param = null;
         try {
             param = new ConfigurationParam.Builder()
-                    .setAppId(mPackageName)
-                    .setAppVersion(mPackageManager.getPackageInfo(mPackageName, 0).versionName)
-                    .setCountryCode(mRes.getConfiguration().locale.getCountry())
+                    .setAppId(packageName)
+                    .setAppVersion(packageManager.getPackageInfo(packageName, 0).versionName)
+                    .setCountryCode(res.getConfiguration().locale.getCountry())
                     .setPlatform("android")
-                    .setSdkVersion(mRes.getString(R.string.perftracking__version))
+                    .setSdkVersion(res.getString(R.string.perftracking__version))
                     .build();
         } catch (PackageManager.NameNotFoundException e) {
             Log.d(TAG, e.getMessage());
         }
 
-        if (mSubscriptionKey == null)
+        if (subscriptionKey == null) {
             Log.d(TAG, "Cannot read metadata `com.rakuten.tech.mobile.perf.SubscriptionKey` from manifest, automated performance tracking will not work.");
-
+        }
         if (param != null) {
-            new ConfigurationRequest(mUrlPrefix,
-                    mSubscriptionKey,
+            new ConfigurationRequest(urlPrefix,
+                    subscriptionKey,
                     param, new Response.Listener<ConfigurationResult>() {
                 @Override
                 public void onResponse(ConfigurationResult newConfig) {
@@ -119,22 +114,19 @@ class ConfigStore extends Store<ConfigurationResult> {
                     if (throwable.getMessage() != null) message = throwable.getMessage();
                     Log.d(TAG, "Error: " + message);
                 }
-            }).queue(mRequestQueue);
+            }).queue(requestQueue);
         }
     }
 
     private void writeConfigToCache(ConfigurationResult result) {
-        if (mPrefs != null) {
-            mPrefs.edit().putString(CONFIG_KEY, new Gson().toJson(result)).apply();
+        if (prefs != null) {
+            prefs.edit().putString(CONFIG_KEY, new Gson().toJson(result)).apply();
         }
     }
 
     @Nullable
     private ConfigurationResult readConfigFromCache() {
-        String result = null;
-        if (mPrefs != null) {
-            result = mPrefs.getString(CONFIG_KEY, null);
-        }
+        String result = prefs != null ? prefs.getString(CONFIG_KEY, null) : null;
         return result != null ? new Gson().fromJson(result, ConfigurationResult.class) : null;
     }
 }

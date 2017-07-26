@@ -32,23 +32,23 @@ public class RuntimeContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        Context mContext = getContext();
-        if (mContext == null) return false;
+        Context context = getContext();
+        if (context == null) return false;
         if (!AppPerformanceConfig.enabled) return false; // Return when instrumentation is disabled
 
-        RequestQueue mQueue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
-        mQueue.start();
+        RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
+        queue.start();
 
         String subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
         String urlPrefix = getMetaData("com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix");
-        ConfigStore configStore = new ConfigStore(mContext, mQueue, subscriptionKey, urlPrefix);
-        LocationStore locationStore = new LocationStore(mContext, mQueue, subscriptionKey, urlPrefix);
+        ConfigStore configStore = new ConfigStore(context, queue, subscriptionKey, urlPrefix);
+        LocationStore locationStore = new LocationStore(context, queue, subscriptionKey, urlPrefix);
 
         // Read last config from cache
-        Config config = createConfig(mContext, configStore.getObservable().getCachedValue());
+        Config config = createConfig(context, configStore.getObservable().getCachedValue());
         if (config != null) {
             // Initialise Tracking Manager
-            TrackingManager.initialize(mContext, config, locationStore.getObservable());
+            TrackingManager.initialize(context, config, locationStore.getObservable());
             Metric.start(StandardMetric.LAUNCH.getValue());
         }
         return false;

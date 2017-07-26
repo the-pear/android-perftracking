@@ -74,7 +74,8 @@ public class ConfigStoreSpec extends RobolectricUnitSpec {
     @SuppressLint("CommitPrefEdits")
     @Test public void shouldRequestConfigOnEmptyCache() throws JSONException {
         queue.rule().whenClass(ConfigurationRequest.class).returnNetworkResponse(200, config.content);
-        configStore = new ConfigStore(context,queue,"",null);
+
+        configStore = new ConfigStore(context, queue, "", null);
 
         queue.verify();
     }
@@ -83,8 +84,9 @@ public class ConfigStoreSpec extends RobolectricUnitSpec {
     @Test public void shouldCacheConfigOnEmptyCache() throws JSONException {
         queue.rule().whenClass(ConfigurationRequest.class).returnNetworkResponse(200, config.content);
 
-        configStore = new ConfigStore(context,queue,"",null);
-        verify(prefs,times(1)).edit();
+        configStore = new ConfigStore(context, queue, "", null);
+
+        verify(prefs, times(1)).edit();
         String cachedResponse = prefs.getString("config_key", null);
         JSONAssert.assertEquals(config.content, cachedResponse, true);
     }
@@ -92,12 +94,11 @@ public class ConfigStoreSpec extends RobolectricUnitSpec {
     @Test public void shouldNotFailOnFailedConfigRequest() {
         queue.rule().whenClass(ConfigurationRequest.class).returnError(new VolleyError(new Throwable()));
 
-        configStore = new ConfigStore(context,queue,"",null);
+        configStore = new ConfigStore(context, queue, "", null);
 
         queue.verify();
     }
-
     @Test public void shouldDoWhatWhenSubscriptionKeyIsMissing() {
-        configStore = new ConfigStore(context,queue,"",null);
+        configStore = new ConfigStore(context, queue, null, null);
     }
 }

@@ -1,12 +1,9 @@
 package com.rakuten.tech.mobile.perf.runtime.internal;
 
-import android.net.Uri;
 import android.support.annotation.Nullable;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
@@ -23,25 +20,21 @@ class GeoLocationRequest extends BaseRequest<GeoLocationResult> {
         super(listener, errorListener);
         setMethod(Method.GET);
         setHeader("Ocp-Apim-Subscription-Key", subscriptionKey);
-        String prefix = urlPrefix != null ? urlPrefix : DEFAULT_URL_PREFIX;
-        Uri uri = Uri.parse(prefix);
-        setUrl(uri.toString());
+        setUrl(urlPrefix != null ? urlPrefix : DEFAULT_URL_PREFIX);
     }
-
 
     @Override
     protected GeoLocationResult parseResponse(String response) throws VolleyError {
         try {
-            JsonObject json = new JsonParser().parse(response).getAsJsonObject();
-            JsonArray jsonGeoLocationArray = json.getAsJsonObject().get("list").getAsJsonArray();
-            JsonObject jsonGeoLocationObject = jsonGeoLocationArray.get(0).getAsJsonObject();
+            String jsonSubdivisionNamesEnObject = new JsonParser().parse(response).getAsJsonObject()
+                    .get("list").getAsJsonArray()
+                    .get(0).getAsJsonObject()
+                    .get("subdivisions").getAsJsonArray()
+                    .get(0).getAsJsonObject()
+                    .get("names").getAsJsonObject()
+                    .get("en").getAsString();
 
-            JsonArray jsonSubdivisioinArray = jsonGeoLocationObject.getAsJsonObject().get("subdivisions").getAsJsonArray();
-            JsonObject jsonFirstSubdivisioinObject = jsonSubdivisioinArray.get(0).getAsJsonObject();
-            JsonObject jsonSubdivisioinNamesObject = jsonFirstSubdivisioinObject.get("names").getAsJsonObject();
-            String jsonSubdivisioinNamesEnObject = jsonSubdivisioinNamesObject.get("en").getAsString();
-
-            return new GeoLocationResult(jsonSubdivisioinNamesEnObject);
+            return new GeoLocationResult(jsonSubdivisionNamesEnObject);
         } catch (JsonSyntaxException e) {
             throw new VolleyError(e.getMessage(), e.getCause());
         }

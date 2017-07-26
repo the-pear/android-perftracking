@@ -57,7 +57,6 @@ public class LocationStoreSpec extends RobolectricUnitSpec {
         RequestQueueShadow.queue = spy(new MockedQueue());
         queue = RequestQueueShadow.queue;
         context = spy(RuntimeEnvironment.application);
-        //locationStore = spy(new LocationStore(context,queue,"",null));
         when(context.getPackageManager()).thenReturn(packageManager);
         prefs = spy(context.getSharedPreferences("app_performance", Context.MODE_PRIVATE));
         prefs.edit().clear().apply();
@@ -77,31 +76,37 @@ public class LocationStoreSpec extends RobolectricUnitSpec {
     @SuppressLint("CommitPrefEdits")
     @Test public void shouldRequestLocationOnEmptyCache() throws JSONException {
         queue.rule().whenClass(GeoLocationRequest.class).returnNetworkResponse(200, location.content);
-        locationStore = new LocationStore(context,queue,"",null);
+
+        locationStore = new LocationStore(context, queue, "", null);
+
         queue.verify();
     }
 
     @SuppressLint("CommitPrefEdits")
     @Test public void shouldCacheLocationOnEmptyCache() throws JSONException {
         queue.rule().whenClass(GeoLocationRequest.class).returnNetworkResponse(200, location.content);
-        locationStore = new LocationStore(context,queue,"",null);
-        verify(prefs,times(1)).edit();
 
+        locationStore = new LocationStore(context, queue, "", null);
+
+        verify(prefs, times(1)).edit();
         String cachedLocationResponse = prefs.getString("location_key", null);
-        Assert.assertEquals("Tokyo",cachedLocationResponse);
+        Assert.assertEquals("Tokyo", cachedLocationResponse);
     }
 
     @Test public void shouldNotFailOnFailedLocationRequest() {
         queue.rule().whenClass(GeoLocationRequest.class).returnError(new VolleyError(new Throwable()));
-        locationStore = new LocationStore(context,queue,"",null);
+
+        locationStore = new LocationStore(context, queue, "", null);
+
         queue.verify();
     }
-
 
     @Test public void shouldNotFailOnMissingPackageInfo() throws PackageManager.NameNotFoundException {
         doThrow(new PackageManager.NameNotFoundException())
                 .when(packageManager).getPackageInfo(anyString(), anyInt());
-        locationStore = new LocationStore(context,queue,"",null);
+
+        locationStore = new LocationStore(context, queue, "", null);
+
         // no exception
         verify(queue, times(1)).add(any(Request.class));
     }
