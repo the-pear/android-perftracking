@@ -11,7 +11,8 @@ import java.util.Observer;
 class EnvironmentInfo implements Observer {
     String device;
     String network;
-    private String country;
+    String country;
+    private String region = null;
 
     EnvironmentInfo(Context context, CachingObservable<String> locationObservable) {
 
@@ -42,9 +43,9 @@ class EnvironmentInfo implements Observer {
 
     }
 
-    public String getCountry() {
+    public String getRegion() {
         synchronized (this) {
-            return this.country;
+            return this.region;
         }
     }
 
@@ -52,7 +53,7 @@ class EnvironmentInfo implements Observer {
     public void update(Observable observable, Object value) {
         if (value instanceof String) {
             synchronized (this) {
-                this.country = (String) value;
+                this.region = (String) value;
             }
         }
     }

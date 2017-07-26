@@ -32,7 +32,7 @@ public class EnvironmentInfoSpec {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(tm);
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
-        assertThat(info.getCountry()).isEqualTo(simCountry);
+        assertThat(info.country).isEqualTo(simCountry);
         assertThat(info.network).isEqualTo(networkOperator);
         assertThat(info.device).isEqualTo(Build.MODEL);
     }
@@ -42,7 +42,7 @@ public class EnvironmentInfoSpec {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(null);
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
-        assertThat(info.getCountry()).isEqualToIgnoringCase(Locale.getDefault().getCountry());
+        assertThat(info.country).isEqualToIgnoringCase(Locale.getDefault().getCountry());
     }
 
     @SuppressWarnings("RedundantStringConstructorCall")
@@ -54,7 +54,7 @@ public class EnvironmentInfoSpec {
         when(tm.getSimCountryIso()).thenReturn(new String(""));
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
-        assertThat(info.getCountry()).isEqualToIgnoringCase(Locale.getDefault().getCountry());
+        assertThat(info.country).isEqualToIgnoringCase(Locale.getDefault().getCountry());
     }
 
     @Test
@@ -63,7 +63,7 @@ public class EnvironmentInfoSpec {
         Locale.setDefault(new Locale("testLanguage", "Test-Locale-Country", "testVariant"));
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
-        assertThat(info.getCountry()).isEqualTo("test-locale-country");
+        assertThat(info.country).isEqualTo("test-locale-country");
 
 
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(tm);
@@ -71,7 +71,7 @@ public class EnvironmentInfoSpec {
 
         info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
-        assertThat(info.getCountry()).isEqualTo("test-sim-country");
+        assertThat(info.country).isEqualTo("test-sim-country");
     }
 
 }

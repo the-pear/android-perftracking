@@ -42,7 +42,8 @@ public class EventWriterSpec {
         config.eventHubUrl = ""; // url injected via constructor
         config.header = new HashMap<>();
         envInfo = new EnvironmentInfo(ctx, location);
-        location.publish("test-land");
+        location.publish("test-region");
+        envInfo.country = "test-land";
         envInfo.network = "test-network";
         envInfo.device = "test-device";
 

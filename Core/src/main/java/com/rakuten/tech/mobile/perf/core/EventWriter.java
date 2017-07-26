@@ -63,14 +63,15 @@ class EventWriter {
                 _writer.append("\",\"device\":\"").append(_envInfo.device);
             }
 
-            if (_envInfo.getCountry() != null) {
-                _writer.append("\",\"country\":\"").append(_envInfo.getCountry());
+            if (_envInfo.country != null) {
+                _writer.append("\",\"country\":\"").append(_envInfo.country);
             }
 
             if (_envInfo.network != null) {
                 _writer.append("\",\"network\":\"").append(_envInfo.network);
             }
-
+            //Adding region value directly as it can be null too.
+            _writer.append("\",\"region\":\"").append(_envInfo.getRegion());
             _writer.append("\",\"measurements\":[");
             _measurements = 0;
 
