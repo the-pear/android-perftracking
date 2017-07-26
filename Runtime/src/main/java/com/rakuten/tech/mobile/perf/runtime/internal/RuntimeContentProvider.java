@@ -39,10 +39,10 @@ public class RuntimeContentProvider extends ContentProvider {
         RequestQueue mQueue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
         mQueue.start();
 
-        String subscriptionkey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
+        String subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
         String urlPrefix = getMetaData("com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix");
-        ConfigStore configStore = new ConfigStore(mContext, mQueue, subscriptionkey, urlPrefix);
-        LocationStore locationStore = new LocationStore(mContext, mQueue, subscriptionkey, urlPrefix);
+        ConfigStore configStore = new ConfigStore(mContext, mQueue, subscriptionKey, urlPrefix);
+        LocationStore locationStore = new LocationStore(mContext, mQueue, subscriptionKey, urlPrefix);
 
         // Read last config from cache
         Config config = createConfig(mContext, configStore.getObservable().getCachedValue());

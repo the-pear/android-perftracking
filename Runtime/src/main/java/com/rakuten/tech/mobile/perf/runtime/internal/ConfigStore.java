@@ -67,8 +67,6 @@ class ConfigStore extends Store<ConfigurationResult> {
 
     private void loadConfigurationFromApi() {
         ConfigurationParam param = null;
-
-
         try {
             param = new ConfigurationParam.Builder()
                     .setAppId(mPackageName)

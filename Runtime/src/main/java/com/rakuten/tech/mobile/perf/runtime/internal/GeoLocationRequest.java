@@ -30,16 +30,20 @@ class GeoLocationRequest extends BaseRequest<GeoLocationResult> {
 
 
     @Override
-    protected GeoLocationResult parseResponse(String response) throws JsonSyntaxException, VolleyError {
-        JsonObject json = new JsonParser().parse(response).getAsJsonObject();
-        JsonArray jsonGeoLocationArray = json.getAsJsonObject().get("list").getAsJsonArray();
-        JsonObject jsonGeoLocationObject = jsonGeoLocationArray.get(0).getAsJsonObject();
+    protected GeoLocationResult parseResponse(String response) throws VolleyError {
+        try {
+            JsonObject json = new JsonParser().parse(response).getAsJsonObject();
+            JsonArray jsonGeoLocationArray = json.getAsJsonObject().get("list").getAsJsonArray();
+            JsonObject jsonGeoLocationObject = jsonGeoLocationArray.get(0).getAsJsonObject();
 
-        JsonArray jsonSubdivisioinArray = jsonGeoLocationObject.getAsJsonObject().get("subdivisions").getAsJsonArray();
-        JsonObject jsonFirstSubdivisioinObject = jsonSubdivisioinArray.get(0).getAsJsonObject();
-        JsonObject jsonSubdivisioinNamesObject = jsonFirstSubdivisioinObject.get("names").getAsJsonObject();
-        String jsonSubdivisioinNamesEnObject = jsonSubdivisioinNamesObject.get("en").getAsString();
+            JsonArray jsonSubdivisioinArray = jsonGeoLocationObject.getAsJsonObject().get("subdivisions").getAsJsonArray();
+            JsonObject jsonFirstSubdivisioinObject = jsonSubdivisioinArray.get(0).getAsJsonObject();
+            JsonObject jsonSubdivisioinNamesObject = jsonFirstSubdivisioinObject.get("names").getAsJsonObject();
+            String jsonSubdivisioinNamesEnObject = jsonSubdivisioinNamesObject.get("en").getAsString();
 
-        return new GeoLocationResult(jsonSubdivisioinNamesEnObject);
+            return new GeoLocationResult(jsonSubdivisioinNamesEnObject);
+        } catch (JsonSyntaxException e) {
+            throw new VolleyError(e.getMessage(), e.getCause());
+        }
     }
 }

@@ -9,8 +9,8 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.android.volley.Request;
+import com.android.volley.VolleyError;
 import com.rakuten.tech.mobile.perf.runtime.RobolectricUnitSpec;
-import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
 import com.rakuten.tech.mobile.perf.runtime.TestData;
 import com.rakuten.tech.mobile.perf.runtime.shadow.RequestQueueShadow;
 import com.rakuten.tech.mobile.perf.runtime.shadow.TrackerShadow;
@@ -24,17 +24,14 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
-import org.skyscreamer.jsonassert.JSONAssert;
 
 import jp.co.rakuten.api.test.MockedQueue;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -44,24 +41,23 @@ import static org.mockito.Mockito.when;
         RequestQueueShadow.class, // prevent network requests from runtime side
         TrackerShadow.class // prevent network requests from core side
 })
-public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
+public class LocationStoreSpec extends RobolectricUnitSpec {
 
-    @Rule public TestData config = new TestData("configuration-api-response.json");
     @Rule public TestData location = new TestData("geolocation-api-response.json");
 
     @Mock PackageManager packageManager;
     /* Spy */ private SharedPreferences prefs;
+    /* Spy */ private Context context;
     /* Spy */private MockedQueue queue;
 
-    private RuntimeContentProvider provider;
+    private LocationStore locationStore;
 
     @SuppressLint("ApplySharedPref")
     @Before public void init() throws PackageManager.NameNotFoundException {
         RequestQueueShadow.queue = spy(new MockedQueue());
         queue = RequestQueueShadow.queue;
-        provider = spy(new RuntimeContentProvider());
-        Context context = spy(RuntimeEnvironment.application);
-        when(provider.getContext()).thenReturn(context);
+        context = spy(RuntimeEnvironment.application);
+        //locationStore = spy(new LocationStore(context,queue,"",null));
         when(context.getPackageManager()).thenReturn(packageManager);
         prefs = spy(context.getSharedPreferences("app_performance", Context.MODE_PRIVATE));
         prefs.edit().clear().apply();
@@ -79,79 +75,35 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
     }
 
     @SuppressLint("CommitPrefEdits")
-    @Test public void shouldRequestConfigAndLocationOnEmptyCache() throws JSONException {
-        queue.rule().whenClass(ConfigurationRequest.class).returnNetworkResponse(200, config.content);
+    @Test public void shouldRequestLocationOnEmptyCache() throws JSONException {
         queue.rule().whenClass(GeoLocationRequest.class).returnNetworkResponse(200, location.content);
-        provider.onCreate();
-
+        locationStore = new LocationStore(context,queue,"",null);
         queue.verify();
     }
 
     @SuppressLint("CommitPrefEdits")
-    @Test public void shouldCacheConfigAndLocationOnEmptyCache() throws JSONException {
-        queue.rule().whenClass(ConfigurationRequest.class).returnNetworkResponse(200, config.content);
+    @Test public void shouldCacheLocationOnEmptyCache() throws JSONException {
         queue.rule().whenClass(GeoLocationRequest.class).returnNetworkResponse(200, location.content);
-        provider.onCreate();
-        // once for config and another for location
-        verify(prefs,times(2)).edit();
-        String cachedResponse = prefs.getString("config_key", null);
-        JSONAssert.assertEquals(config.content, cachedResponse, true);
-        String cachedLocation = prefs.getString("location_key", null);
-        Assert.assertEquals("Tokyo", cachedLocation);
+        locationStore = new LocationStore(context,queue,"",null);
+        verify(prefs,times(1)).edit();
+
+        String cachedLocationResponse = prefs.getString("location_key", null);
+        Assert.assertEquals("Tokyo",cachedLocationResponse);
     }
 
-    @Test public void shouldNotStartTrackingOnEmptyCache() {
-        provider.onCreate();
-
-        assertThat(TrackingManager.INSTANCE).isNull();
-        verify(TrackerShadow.mockTracker, never()).startMetric(anyString());
+    @Test public void shouldNotFailOnFailedLocationRequest() {
+        queue.rule().whenClass(GeoLocationRequest.class).returnError(new VolleyError(new Throwable()));
+        locationStore = new LocationStore(context,queue,"",null);
+        queue.verify();
     }
 
-
-    @SuppressLint("ApplySharedPref")
-    @Test public void shouldStartTrackingAndLaunchMetricOnCachedConfig() {
-        queue.rule().whenClass(ConfigurationRequest.class).returnNetworkResponse(200, config.content);
-        prefs.edit().putString("config_key", config.content).apply();
-
-        provider.onCreate();
-
-        assertThat(TrackingManager.INSTANCE).isNotNull();
-        verify(TrackerShadow.mockTracker, times(1)).startMetric(StandardMetric.LAUNCH.getValue());
-    }
 
     @Test public void shouldNotFailOnMissingPackageInfo() throws PackageManager.NameNotFoundException {
         doThrow(new PackageManager.NameNotFoundException())
                 .when(packageManager).getPackageInfo(anyString(), anyInt());
-
-        provider.onCreate();
-
+        locationStore = new LocationStore(context,queue,"",null);
+        // no exception
         verify(queue, times(1)).add(any(Request.class));
     }
 
-    @SuppressLint("ApplySharedPref")
-    @Test public void shouldStartTrackingEvenWhenPackageAndAppInfoIsMissing() throws PackageManager.NameNotFoundException {
-        prefs.edit().putString("config_key", config.content).apply();
-        doThrow(new PackageManager.NameNotFoundException())
-                .when(packageManager).getPackageInfo(anyString(), anyInt());
-        doThrow(new PackageManager.NameNotFoundException())
-                .when(packageManager).getApplicationInfo(anyString(), anyInt());
-
-        provider.onCreate();
-
-        assertThat(TrackingManager.INSTANCE).isNotNull();
-        verify(TrackerShadow.mockTracker, times(1)).startMetric(StandardMetric.LAUNCH.getValue());
-    }
-
-    @Test public void shouldDoWhatWhenSubscriptionKeyIsMissing() {
-        provider.onCreate();
-    }
-
-    @Test public void shouldNotImplementAnyContentProviderMethods() {
-        assertThat(provider.query(null, null, null, null, null)).isNull();
-        assertThat(provider.getType(null)).isNull();
-        assertThat(provider.insert(null, null)).isNull();
-        assertThat(provider.delete(null, null, null)).isEqualTo(0);
-        assertThat(provider.update(null, null, null, null)).isEqualTo(0);
-
-    }
 }
