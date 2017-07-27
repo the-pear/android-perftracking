@@ -38,6 +38,25 @@ public class EnvironmentInfoSpec {
     }
 
     @Test
+    public void shouldGetRegionFromLocationUpdate() {
+        String region = "Hyderabad";
+        EnvironmentInfo info = new EnvironmentInfo(ctx, location);
+
+        location.publish(region);
+
+        assertThat(info).isNotNull();
+        assertThat(info.getRegion()).isEqualTo(region);
+    }
+
+    @Test
+    public void shouldPointToDefaultRegionWhenLocationIsNotUpdated() {
+        EnvironmentInfo info = new EnvironmentInfo(ctx, location);
+
+        assertThat(info).isNotNull();
+        assertThat(info.getRegion()).isEqualTo(null);
+    }
+
+    @Test
     public void shouldFallbackToReadCountryFromLocaleIfTelephonyManagerIsNull() {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(null);
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);

@@ -14,7 +14,17 @@ import com.android.volley.VolleyError;
 import com.rakuten.tech.mobile.perf.core.Tracker;
 
 /**
- * LocationStore is an observable for location. This class handles requesting location, response caching and publishing to observers.
+ * LocationStore - Handles requesting location, response caching and publishing to observers.
+ * <p>
+ * Can be subscribed to location changes by creating an observer using `CachingObservable<String>` instance like,
+ * `Observer MyTestObserver = new MyTestObserver(CachingObservable<String> locationObservable);
+ * MyTestObserver(CachingObservable<String> locationObservable){
+ * locationObservable.addObserver(this);
+ * }`
+ * <p>
+ * Location is requested on every launch of the app i.e on starting at construction time and then hourly.
+ * <p>
+ * If location is already cached, while creating LocationStore instance store will emit cached location else no location will be emitted via its observable.
  */
 class LocationStore extends Store<String> {
     private final static String TAG = LocationStore.class.getSimpleName();
@@ -33,7 +43,7 @@ class LocationStore extends Store<String> {
         this.requestQueue = requestQueue;
         this.subscriptionKey = subscriptionKey;
         this.urlPrefix = urlPrefix;
-        observable.publish(readLocationFromCache());
+        getObservable().publish(readLocationFromCache());
         handler = new Handler(Looper.getMainLooper());
         loadLocationFromApi();
         handler.postDelayed(periodicLocationCheck, TIME_INTERVAL);
@@ -59,7 +69,7 @@ class LocationStore extends Store<String> {
                     @Override
                     public void onResponse(GeoLocationResult newLocation) {
                         writeLocationToCache(newLocation.getRegionName());
-                        observable.publish(newLocation.getRegionName());
+                        getObservable().publish(newLocation.getRegionName());
                     }
                 }, new Response.ErrorListener() {
             @Override

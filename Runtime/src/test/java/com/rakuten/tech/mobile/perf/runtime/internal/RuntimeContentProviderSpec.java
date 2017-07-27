@@ -15,16 +15,12 @@ import com.rakuten.tech.mobile.perf.runtime.TestData;
 import com.rakuten.tech.mobile.perf.runtime.shadow.RequestQueueShadow;
 import com.rakuten.tech.mobile.perf.runtime.shadow.TrackerShadow;
 
-import junit.framework.Assert;
-
-import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
-import org.skyscreamer.jsonassert.JSONAssert;
 
 import jp.co.rakuten.api.test.MockedQueue;
 
@@ -36,7 +32,6 @@ import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -47,7 +42,6 @@ import static org.mockito.Mockito.when;
 public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
 
     @Rule public TestData config = new TestData("configuration-api-response.json");
-    @Rule public TestData location = new TestData("geolocation-api-response.json");
 
     @Mock PackageManager packageManager;
     /* Spy */ private SharedPreferences prefs;
@@ -87,13 +81,12 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
 
     @SuppressLint("ApplySharedPref")
     @Test public void shouldStartTrackingAndLaunchMetricOnCachedConfig() {
-        queue.rule().whenClass(ConfigurationRequest.class).returnNetworkResponse(200, config.content);
         prefs.edit().putString("config_key", config.content).apply();
 
         provider.onCreate();
 
         assertThat(TrackingManager.INSTANCE).isNotNull();
-        verify(TrackerShadow.mockTracker, times(1)).startMetric(StandardMetric.LAUNCH.getValue());
+        verify(TrackerShadow.mockTracker).startMetric(StandardMetric.LAUNCH.getValue());
     }
 
     @Test public void shouldNotFailOnMissingPackageInfo() throws PackageManager.NameNotFoundException {
@@ -102,7 +95,7 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
 
         provider.onCreate();
 
-        verify(queue, times(1)).add(any(Request.class));
+        verify(queue).add(any(Request.class));
     }
 
     @SuppressLint("ApplySharedPref")
@@ -116,12 +109,9 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
         provider.onCreate();
 
         assertThat(TrackingManager.INSTANCE).isNotNull();
-        verify(TrackerShadow.mockTracker, times(1)).startMetric(StandardMetric.LAUNCH.getValue());
+        verify(TrackerShadow.mockTracker).startMetric(StandardMetric.LAUNCH.getValue());
     }
 
-    @Test public void shouldDoWhatWhenSubscriptionKeyIsMissing() {
-        provider.onCreate();
-    }
 
     @Test public void shouldNotImplementAnyContentProviderMethods() {
         assertThat(provider.query(null, null, null, null, null)).isNull();
