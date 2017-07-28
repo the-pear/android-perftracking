@@ -44,7 +44,6 @@ public class EnvironmentInfoSpec {
 
         location.publish(region);
 
-        assertThat(info).isNotNull();
         assertThat(info.getRegion()).isEqualTo(region);
     }
 
@@ -52,8 +51,17 @@ public class EnvironmentInfoSpec {
     public void shouldPointToDefaultRegionWhenLocationIsNotUpdated() {
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
 
-        assertThat(info).isNotNull();
         assertThat(info.getRegion()).isEqualTo(null);
+    }
+
+    @Test
+    public void shouldUseCachedLocationForInstanceCreation() {
+        String region = "Bangalore";
+        location.publish(region);
+
+        EnvironmentInfo info = new EnvironmentInfo(ctx, location);
+
+        assertThat(info.getRegion()).isEqualTo(region);
     }
 
     @Test

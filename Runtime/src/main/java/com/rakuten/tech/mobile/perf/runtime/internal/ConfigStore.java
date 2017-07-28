@@ -21,15 +21,21 @@ import java.util.Random;
 
 /**
  * ConfigStore - Handles requesting config, response caching and publishing to observers.
- * <p>
- * Can be subscribed to config changes by creating an observer using `CachingObservable<ConfigurationResult>` instance like,
- * `Observer MyTestObserver = new MyTestObserver(CachingObservable<ConfigurationResult> configObservable);
- * MyTestObserver(CachingObservable<ConfigurationResult> configObservable){
- * configObservable.addObserver(this);
- * }`
- * <p>
+ * Can be subscribed to config changes like below,
+ * <pre>
+ *     <code>
+ *         ConfigStore store = //...
+ *         store.getObservable().addObserver(new Observer() {
+ *            {@literal @}Override
+ *             public void update(Observable observable, Object value) {
+ *                  if (value instanceof ConfigurationResult) {
+ *                      // use new value
+ *                  }
+ *             }
+ *         });
+ *     </code>
+ * </pre>
  * Config is requested on every launch of the app i.e on starting at construction time and then hourly.
- * <p>
  * If config is already cached, while creating ConfigStore instance store will emit cached config else no config will be emitted via its observable.
  */
 class ConfigStore extends Store<ConfigurationResult> {
@@ -45,7 +51,7 @@ class ConfigStore extends Store<ConfigurationResult> {
     private final PackageManager packageManager;
     private final SharedPreferences prefs;
     private final Resources res;
-    private Handler handler;
+    private final Handler handler;
 
     ConfigStore(Context context, RequestQueue requestQueue, String subscriptionKey, String urlPrefix) {
         packageManager = context.getPackageManager();
@@ -61,6 +67,7 @@ class ConfigStore extends Store<ConfigurationResult> {
         handler.postDelayed(periodicCheck, TIME_INTERVAL);
     }
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final Runnable periodicCheck = new Runnable() {
         public void run() {
             if (Tracker.isTrackerRunning()) {
@@ -116,13 +123,7 @@ class ConfigStore extends Store<ConfigurationResult> {
                 public void onErrorResponse(VolleyError error) {
                     // DeInitialize Tracking Manager as we couldn't able to get new config from api
                     TrackingManager.deinitialize();
-
-                    Throwable throwable = error;
-                    String message = error.getClass().getName();
-                    while (throwable.getMessage() == null && throwable.getCause() != null)
-                        throwable = throwable.getCause();
-                    if (throwable.getMessage() != null) message = throwable.getMessage();
-                    Log.d(TAG, "Error: " + message);
+                    Log.d(TAG, "Error loading configuration", error);
                 }
             }).queue(requestQueue);
         }

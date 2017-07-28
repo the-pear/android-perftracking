@@ -15,15 +15,21 @@ import com.rakuten.tech.mobile.perf.core.Tracker;
 
 /**
  * LocationStore - Handles requesting location, response caching and publishing to observers.
- * <p>
- * Can be subscribed to location changes by creating an observer using `CachingObservable<String>` instance like,
- * `Observer MyTestObserver = new MyTestObserver(CachingObservable<String> locationObservable);
- * MyTestObserver(CachingObservable<String> locationObservable){
- * locationObservable.addObserver(this);
- * }`
- * <p>
+ * Can be subscribed to location changes like below,
+ * <pre>
+ *     <code>
+ *         LocationStore store = //...
+ *         store.getObservable().addObserver(new Observer() {
+ *            {@literal @}Override
+ *             public void update(Observable observable, Object value) {
+ *                  if (value instanceof String) {
+ *                      // use new value
+ *                  }
+ *             }
+ *         });
+ *     </code>
+ * </pre>
  * Location is requested on every launch of the app i.e on starting at construction time and then hourly.
- * <p>
  * If location is already cached, while creating LocationStore instance store will emit cached location else no location will be emitted via its observable.
  */
 class LocationStore extends Store<String> {
@@ -36,7 +42,7 @@ class LocationStore extends Store<String> {
     private final String subscriptionKey;
     private final String urlPrefix;
     private final SharedPreferences prefs;
-    private Handler handler;
+    private final Handler handler;
 
     LocationStore(Context context, RequestQueue requestQueue, String subscriptionKey, String urlPrefix) {
         prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
@@ -49,6 +55,7 @@ class LocationStore extends Store<String> {
         handler.postDelayed(periodicLocationCheck, TIME_INTERVAL);
     }
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final Runnable periodicLocationCheck = new Runnable() {
         public void run() {
             if (Tracker.isTrackerRunning()) {

@@ -81,7 +81,7 @@ public class LocationStoreSpec extends RobolectricUnitSpec {
         assertThat(storeValue).isEqualTo(prefsValue);
     }
 
-    @Test public void shouldUseDefaultLocationOnEmptyCacheForInstanceCreation() throws JSONException {
+    @Test public void shouldUseNullLocationOnEmptyCacheForInstanceCreation() throws JSONException {
         locationStore = new LocationStore(context, queue, "", null);
 
         String storeValue = locationStore.getObservable().getCachedValue();

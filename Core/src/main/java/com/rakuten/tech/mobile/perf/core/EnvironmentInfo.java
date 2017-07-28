@@ -43,7 +43,7 @@ class EnvironmentInfo implements Observer {
 
     }
 
-    public String getRegion() {
+    String getRegion() {
         synchronized (this) {
             return this.region;
         }

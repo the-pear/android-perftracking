@@ -1,13 +1,13 @@
 package com.rakuten.tech.mobile.perf.runtime.internal;
 
 class GeoLocationResult {
-    private String regionName;
+    private final String regionName;
 
     GeoLocationResult(String name) {
         regionName = name;
     }
 
-    public String getRegionName() {
+    String getRegionName() {
         return regionName;
     }
 }

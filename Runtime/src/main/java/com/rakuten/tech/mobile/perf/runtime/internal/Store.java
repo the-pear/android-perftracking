@@ -9,14 +9,14 @@ import com.rakuten.tech.mobile.perf.core.CachingObservable;
  */
 class Store<T> {
     @NonNull
-    private CachingObservable<T> observable;
+    private final CachingObservable<T> observable;
 
     Store() {
         observable = new CachingObservable<>(null);
     }
 
     @NonNull
-    public CachingObservable<T> getObservable() {
+    CachingObservable<T> getObservable() {
         return observable;
     }
 

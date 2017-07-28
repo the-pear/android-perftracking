@@ -87,7 +87,7 @@ public class ConfigStoreSpec extends RobolectricUnitSpec {
         JSONAssert.assertEquals(config.content, new Gson().toJson(cachedResponse), true);
     }
 
-    @Test public void shouldUseDefaultConfigOnEmptyCacheOnInstanceCreation() throws JSONException {
+    @Test public void shouldUseNullConfigOnEmptyCacheOnInstanceCreation() throws JSONException {
         // EmptyCache
         configStore = new ConfigStore(context, queue, "", null);
 
