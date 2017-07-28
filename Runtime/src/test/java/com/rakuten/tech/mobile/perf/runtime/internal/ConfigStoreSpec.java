@@ -27,6 +27,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -105,4 +106,16 @@ public class ConfigStoreSpec extends RobolectricUnitSpec {
     @Test public void shouldDoWhatWhenSubscriptionKeyIsMissing() {
         configStore = new ConfigStore(context, queue, null, null);
     }
+
+    @Test public void shouldCreateConfigEvenWhenPackageIsMissing() throws PackageManager.NameNotFoundException, JSONException {
+        prefs.edit().putString("config_key", config.content).apply();
+        doThrow(new PackageManager.NameNotFoundException())
+                .when(packageManager).getPackageInfo(anyString(), anyInt());
+
+        configStore = new ConfigStore(context, queue, null, null);
+
+        ConfigurationResult cachedResponse = configStore.getObservable().getCachedValue();
+        JSONAssert.assertEquals(config.content, new Gson().toJson(cachedResponse), true);
+    }
+
 }

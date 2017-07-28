@@ -1,14 +1,13 @@
 package com.rakuten.tech.mobile.perf.runtime.internal;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.android.volley.Request;
+import com.google.gson.Gson;
 import com.rakuten.tech.mobile.perf.runtime.RobolectricUnitSpec;
 import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
 import com.rakuten.tech.mobile.perf.runtime.TestData;
@@ -37,19 +36,18 @@ import static org.mockito.Mockito.when;
 
 @Config(shadows = {
         RequestQueueShadow.class, // prevent network requests from runtime side
-        TrackerShadow.class // prevent network requests from core side
+        TrackerShadow.class, // prevent network requests from core side
+        StoreShadow.class // fake cache
 })
 public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
 
     @Rule public TestData config = new TestData("configuration-api-response.json");
 
     @Mock PackageManager packageManager;
-    /* Spy */ private SharedPreferences prefs;
     /* Spy */private MockedQueue queue;
 
     private RuntimeContentProvider provider;
 
-    @SuppressLint("ApplySharedPref")
     @Before public void init() throws PackageManager.NameNotFoundException {
         RequestQueueShadow.queue = spy(new MockedQueue());
         queue = RequestQueueShadow.queue;
@@ -57,10 +55,6 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
         Context context = spy(RuntimeEnvironment.application);
         when(provider.getContext()).thenReturn(context);
         when(context.getPackageManager()).thenReturn(packageManager);
-        prefs = spy(context.getSharedPreferences("app_performance", Context.MODE_PRIVATE));
-        prefs.edit().clear().apply();
-        clearInvocations(prefs);
-        when(context.getSharedPreferences(anyString(), anyInt())).thenReturn(prefs);
         PackageInfo pkgInfo = new PackageInfo();
         pkgInfo.versionName = "testVersion";
         when(packageManager.getPackageInfo(anyString(), anyInt())).thenReturn(pkgInfo);
@@ -73,15 +67,16 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
     }
 
     @Test public void shouldNotStartTrackingOnEmptyCache() {
+        StoreShadow.cachedContent = null;
+
         provider.onCreate();
 
         assertThat(TrackingManager.INSTANCE).isNull();
         verify(TrackerShadow.mockTracker, never()).startMetric(anyString());
     }
 
-    @SuppressLint("ApplySharedPref")
     @Test public void shouldStartTrackingAndLaunchMetricOnCachedConfig() {
-        prefs.edit().putString("config_key", config.content).apply();
+        StoreShadow.cachedContent = new Gson().fromJson(config.content, ConfigurationResult.class);
 
         provider.onCreate();
 
@@ -98,9 +93,8 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
         verify(queue).add(any(Request.class));
     }
 
-    @SuppressLint("ApplySharedPref")
     @Test public void shouldStartTrackingEvenWhenPackageAndAppInfoIsMissing() throws PackageManager.NameNotFoundException {
-        prefs.edit().putString("config_key", config.content).apply();
+        StoreShadow.cachedContent = new Gson().fromJson(config.content, ConfigurationResult.class);
         doThrow(new PackageManager.NameNotFoundException())
                 .when(packageManager).getPackageInfo(anyString(), anyInt());
         doThrow(new PackageManager.NameNotFoundException())
@@ -119,6 +113,5 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
         assertThat(provider.insert(null, null)).isNull();
         assertThat(provider.delete(null, null, null)).isEqualTo(0);
         assertThat(provider.update(null, null, null, null)).isEqualTo(0);
-
     }
 }
