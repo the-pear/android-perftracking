@@ -48,7 +48,7 @@ public class EnvironmentInfoSpec {
     }
 
     @Test
-    public void shouldPointToDefaultRegionWhenLocationIsNotUpdated() {
+    public void shouldPointToNullRegionWhenLocationIsNotUpdated() {
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
 
         assertThat(info.getRegion()).isEqualTo(null);
