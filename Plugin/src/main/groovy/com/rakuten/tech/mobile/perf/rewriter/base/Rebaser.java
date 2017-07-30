@@ -11,7 +11,8 @@ import com.rakuten.tech.mobile.perf.rewriter.classes.ClassProvider;
 
 public class Rebaser {
     private final ClassJar _jar;
-    private final HashMap<String, Base> _bases = new HashMap<String, Base>();
+    @SuppressWarnings("WeakerAccess") // visible for testing
+    final HashMap<String, Base> _bases = new HashMap<String, Base>();
     private final ClassProvider _provider;
     private final Logger _log;
 
