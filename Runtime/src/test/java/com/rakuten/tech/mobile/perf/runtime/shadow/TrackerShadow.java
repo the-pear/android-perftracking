@@ -2,9 +2,10 @@ package com.rakuten.tech.mobile.perf.runtime.shadow;
 
 import android.content.Context;
 
+import com.rakuten.tech.mobile.perf.core.CachingObservable;
 import com.rakuten.tech.mobile.perf.core.Config;
-import com.rakuten.tech.mobile.perf.core.Tracker;
 import com.rakuten.tech.mobile.perf.core.MockTracker;
+import com.rakuten.tech.mobile.perf.core.Tracker;
 
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
@@ -26,7 +27,7 @@ public class TrackerShadow {
         return mockTracker;
     }
 
-    @Implementation public static void on(Context context, Config config) { /* noop */ }
+    @Implementation public static void on(Context context, Config config,  CachingObservable<String> observableLocation) { /* noop */ }
 
     @Implementation public static void off() { /* noop */ }
 

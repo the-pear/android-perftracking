@@ -1,8 +1,9 @@
 package com.rakuten.tech.mobile.perf.core;
 
+import android.content.Context;
+
 import org.json.JSONException;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,6 +29,8 @@ public class EventWriterSpec {
     @Mock URL url;
     @Mock OutputStream outputStream;
     @Mock HttpsURLConnection conn;
+    @Mock Context ctx;
+    private CachingObservable<String> location = new CachingObservable<String>(null);
     private EventWriter writer;
 
     @Before public void initMocks() throws IOException {
@@ -38,8 +41,8 @@ public class EventWriterSpec {
         config.debug = true;
         config.eventHubUrl = ""; // url injected via constructor
         config.header = new HashMap<>();
-
-        envInfo = new EnvironmentInfo();
+        envInfo = new EnvironmentInfo(ctx, location);
+        location.publish("test-region");
         envInfo.country = "test-land";
         envInfo.network = "test-network";
         envInfo.device = "test-device";
@@ -103,7 +106,6 @@ public class EventWriterSpec {
 
     @Rule public TestData emptyNoEnvJson = new TestData("no_measurement_no_env.json");
     @Test public void shouldHandleNullsInEnvInfo() throws IOException, JSONException {
-        envInfo.country = null;
         envInfo.device = null;
         envInfo.network = null;
 

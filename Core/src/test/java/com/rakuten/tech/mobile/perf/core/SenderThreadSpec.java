@@ -1,5 +1,7 @@
 package com.rakuten.tech.mobile.perf.core;
 
+import android.content.Context;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -174,6 +176,8 @@ public class SenderThreadSpec {
         @Mock URL url;
         @Mock OutputStream outputStream;
         @Mock HttpsURLConnection conn;
+        @Mock Context ctx;
+        private CachingObservable<String> location = new CachingObservable<String>(null);
         private EventWriter writer;
         private MeasurementBuffer buffer;
         private Runnable populateBufferRunnable;
@@ -188,7 +192,8 @@ public class SenderThreadSpec {
             config.eventHubUrl = ""; // url injected via constructor
             config.header = new HashMap<>();
 
-            envInfo = new EnvironmentInfo();
+            envInfo = new EnvironmentInfo(ctx, location);
+            location.publish("test-region");
             envInfo.country = "test-land";
             envInfo.network = "test-network";
             envInfo.device = "test-device";

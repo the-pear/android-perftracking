@@ -1,5 +1,7 @@
 {
   "app": "app",
+  "country": "test-land",
+  "region": "test-region",
   "measurements": [],
   "version": "test-version"
 }

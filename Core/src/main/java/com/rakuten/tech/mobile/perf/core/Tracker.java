@@ -21,13 +21,13 @@ public class Tracker {
 	 * @param context Instance of android.content.Context.
 	 * @param config Performance tracking configuration.
 	 */
-	public static synchronized void on(Context context, Config config) {
+	public static synchronized void on(Context context, Config config, CachingObservable<String> locationObservable) {
 		Debug debug = config.debug ? new Debug() : null;
 		MeasurementBuffer buffer = new MeasurementBuffer();
 		Current current = new Current();
 		_tracker = new TrackerImpl(buffer, current, debug);
-		EnvironmentInfo envInfo = EnvironmentInfo.get(context);
-		EventWriter writer = new EventWriter(config, envInfo);
+        EnvironmentInfo envInfo = new EnvironmentInfo(context, locationObservable);
+        EventWriter writer = new EventWriter(config, envInfo);
 		Sender sender = new Sender(buffer, current, writer, debug);
 		_senderThread = new SenderThread(sender);
 		_senderThread.start();

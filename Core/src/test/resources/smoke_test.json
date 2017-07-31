@@ -1,6 +1,7 @@
 {
   "app": "app",
   "country": "test-land",
+  "region": "test-region",
   "device": "test-device",
   "measurements": [
     {

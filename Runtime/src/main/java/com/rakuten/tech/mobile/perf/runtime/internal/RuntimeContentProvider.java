@@ -8,22 +8,15 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.NoCache;
-import com.google.gson.Gson;
-import com.rakuten.tech.mobile.perf.R;
 import com.rakuten.tech.mobile.perf.core.Config;
-import com.rakuten.tech.mobile.perf.core.Tracker;
 import com.rakuten.tech.mobile.perf.runtime.Metric;
 import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
 
@@ -36,109 +29,29 @@ import java.util.Random;
 
 public class RuntimeContentProvider extends ContentProvider {
     private static final String TAG = RuntimeContentProvider.class.getSimpleName();
-    private static final String PREFS = "app_performance";
-    private static final String CONFIG_KEY = "config_key";
-    private static final int TIME_INTERVAL = 60 * 60 * 1000; // 1 HOUR in milli seconds
-
-    private Handler handler;
-    private Context mContext;
-    private RequestQueue mQueue;
 
     @Override
     public boolean onCreate() {
-        mContext = getContext();
-        if (mContext == null) return false;
+        Context context = getContext();
+        if (context == null) return false;
         if (!AppPerformanceConfig.enabled) return false; // Return when instrumentation is disabled
 
-        mQueue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
-        mQueue.start();
-
-        // Load data from last configuration
-        ConfigurationResult lastConfig = readConfigFromCache();
-        Config config = createConfig(mContext, lastConfig);
-        if (config != null) {
-            // Initialise Tracking Manager
-            TrackingManager.initialize(mContext, config); // TODO Config class should be a builder and have all the values set properly
-            Metric.start(StandardMetric.LAUNCH.getValue());
-        }
-        // Get latest configuration
-        loadConfigurationFromApi(mContext, mQueue);
-
-        handler = new Handler(Looper.getMainLooper());
-        handler.postDelayed(periodicCheck, TIME_INTERVAL);
-        return false;
-    }
-
-
-    private final Runnable periodicCheck = new Runnable() {
-        public void run() {
-            if (Tracker.isTrackerRunning()) {
-                handler.postDelayed(this, TIME_INTERVAL);
-                loadConfigurationFromApi(mContext, mQueue);
-            }
-        }
-    };
-
-    private void loadConfigurationFromApi(Context context, RequestQueue queue) {
-        ConfigurationParam param = null;
-
-        PackageManager packageManager = context.getPackageManager();
-        String packageName = context.getPackageName();
-        try {
-            param = new ConfigurationParam.Builder()
-                    .setAppId(packageName)
-                    .setAppVersion(packageManager.getPackageInfo(packageName, 0).versionName)
-                    .setCountryCode(context.getResources().getConfiguration().locale.getCountry())
-                    .setPlatform("android")
-                    .setSdkVersion(context.getResources().getString(R.string.perftracking__version))
-                    .build();
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.d(TAG, e.getMessage());
-        }
+        RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
+        queue.start();
 
         String subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
+        String urlPrefix = getMetaData("com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix");
+        ConfigStore configStore = new ConfigStore(context, queue, subscriptionKey, urlPrefix);
+        LocationStore locationStore = new LocationStore(context, queue, subscriptionKey, urlPrefix);
 
-        if (subscriptionKey == null)
-            Log.d(TAG, "Cannot read metadata `com.rakuten.tech.mobile.perf.SubscriptionKey` from manifest, automated performance tracking will not work.");
-
-        if (param != null) {
-            new ConfigurationRequest(getMetaData("com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix"),
-                    subscriptionKey,
-                    param, new Response.Listener<ConfigurationResult>() {
-                @Override
-                public void onResponse(ConfigurationResult newConfig) {
-                    if (newConfig == null && Tracker.isTrackerRunning() == true) {
-                        TrackingManager.deinitialize();
-                    }
-
-                    ConfigurationResult prevConfig = readConfigFromCache();
-                    boolean shouldRollDice = (newConfig != null && Tracker.isTrackerRunning() == true && prevConfig == null)
-                            || (prevConfig != null && newConfig != null && newConfig.getEnablePercent() < prevConfig.getEnablePercent());
-
-                    if (shouldRollDice) {
-                        double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
-                        if (randomNumber > newConfig.getEnablePercent()) {
-                            // DeInitialize Tracking Manager
-                            TrackingManager.deinitialize();
-                        }
-                    }
-                    writeConfigToCache(newConfig);
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    // DeInitialize Tracking Manager as we couldn't able to get new config from api
-                    TrackingManager.deinitialize();
-
-                    Throwable throwable = error;
-                    String message = error.getClass().getName();
-                    while (throwable.getMessage() == null && throwable.getCause() != null)
-                        throwable = throwable.getCause();
-                    if (throwable.getMessage() != null) message = throwable.getMessage();
-                    Log.d(TAG, "Error: " + message);
-                }
-            }).queue(queue);
+        // Read last config from cache
+        Config config = createConfig(context, configStore.getObservable().getCachedValue());
+        if (config != null) {
+            // Initialise Tracking Manager
+            TrackingManager.initialize(context, config, locationStore.getObservable());
+            Metric.start(StandardMetric.LAUNCH.getValue());
         }
+        return false;
     }
 
     /**
@@ -207,23 +120,6 @@ public class RuntimeContentProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         return 0;
-    }
-
-    private void writeConfigToCache(ConfigurationResult result) {
-        if (getContext() != null) {
-            getContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(CONFIG_KEY, new Gson().toJson(result)).apply();
-        }
-    }
-
-    @Nullable
-    private ConfigurationResult readConfigFromCache() {
-        Context context = getContext();
-        String result = null;
-        if (context != null) {
-            result = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-                    .getString(CONFIG_KEY, null);
-        }
-        return result != null ? new Gson().fromJson(result, ConfigurationResult.class) : null;
     }
 
     private String getMetaData(String key) {
