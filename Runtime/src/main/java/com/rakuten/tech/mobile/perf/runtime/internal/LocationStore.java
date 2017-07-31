@@ -11,6 +11,8 @@ import android.util.Log;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.gson.Gson;
+import com.rakuten.tech.mobile.perf.core.LocationData;
 import com.rakuten.tech.mobile.perf.core.Tracker;
 
 /**
@@ -22,7 +24,7 @@ import com.rakuten.tech.mobile.perf.core.Tracker;
  *         store.getObservable().addObserver(new Observer() {
  *            {@literal @}Override
  *             public void update(Observable observable, Object value) {
- *                  if (value instanceof String) {
+ *                  if (value instanceof LocationData) {
  *                      // use new value
  *                  }
  *             }
@@ -32,7 +34,7 @@ import com.rakuten.tech.mobile.perf.core.Tracker;
  * Location is requested on every launch of the app i.e on starting at construction time and then hourly.
  * If location is already cached, while creating LocationStore instance store will emit cached location else no location will be emitted via its observable.
  */
-class LocationStore extends Store<String> {
+class LocationStore extends Store<LocationData> {
     private final static String TAG = LocationStore.class.getSimpleName();
     private static final String PREFS = "app_performance";
     private static final String LOCATION_KEY = "location_key";
@@ -75,8 +77,9 @@ class LocationStore extends Store<String> {
                 new Response.Listener<GeoLocationResult>() {
                     @Override
                     public void onResponse(GeoLocationResult newLocation) {
-                        writeLocationToCache(newLocation.getRegionName());
-                        getObservable().publish(newLocation.getRegionName());
+                        LocationData locationData = new LocationData(newLocation.getCountryName(), newLocation.getRegionName());
+                        writeLocationToCache(locationData);
+                        getObservable().publish(locationData);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -86,15 +89,16 @@ class LocationStore extends Store<String> {
         }).queue(requestQueue);
     }
 
-    private void writeLocationToCache(String locationName) {
+    private void writeLocationToCache(LocationData result) {
         if (prefs != null) {
-            prefs.edit().putString(LOCATION_KEY, locationName).apply();
+            prefs.edit().putString(LOCATION_KEY, new Gson().toJson(result)).apply();
         }
     }
 
     @Nullable
-    private String readLocationFromCache() {
-        return prefs != null ? prefs.getString(LOCATION_KEY, null) : null;
+    private LocationData readLocationFromCache() {
+        String result = prefs != null ? prefs.getString(LOCATION_KEY, null) : null;
+        return result != null ? new Gson().fromJson(result, LocationData.class) : null;
     }
 
 }

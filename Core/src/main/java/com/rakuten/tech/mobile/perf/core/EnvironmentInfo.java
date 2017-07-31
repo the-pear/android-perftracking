@@ -11,15 +11,12 @@ import java.util.Observer;
 class EnvironmentInfo implements Observer {
     String device;
     String network;
-    String country;
+    private String country = null;
     private String region = null;
 
-    EnvironmentInfo(Context context, CachingObservable<String> locationObservable) {
+    EnvironmentInfo(Context context, CachingObservable<LocationData> locationObservable) {
 
         locationObservable.addObserver(this);
-        if (locationObservable.getCachedValue() != null) {
-            this.update(locationObservable, locationObservable.getCachedValue());
-        }
 
         this.device = Build.MODEL;
 
@@ -41,6 +38,16 @@ class EnvironmentInfo implements Observer {
             this.network = "wifi";
         }
 
+        if (locationObservable.getCachedValue() != null) {
+            this.update(locationObservable, locationObservable.getCachedValue());
+        }
+
+    }
+
+    String getCountry() {
+        synchronized (this) {
+            return this.country;
+        }
     }
 
     String getRegion() {
@@ -51,9 +58,10 @@ class EnvironmentInfo implements Observer {
 
     @Override
     public void update(Observable observable, Object value) {
-        if (value instanceof String) {
+        if (value instanceof LocationData) {
             synchronized (this) {
-                this.region = (String) value;
+                this.region = ((LocationData) value).getRegion();
+                this.country = ((LocationData) value).getCountry();
             }
         }
     }

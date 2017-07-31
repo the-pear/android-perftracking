@@ -17,7 +17,7 @@ import static org.mockito.Mockito.when;
 public class EnvironmentInfoSpec {
     @Mock TelephonyManager tm;
     @Mock Context ctx;
-    private CachingObservable<String> location = new CachingObservable<String>(null);
+    private CachingObservable<LocationData> location = new CachingObservable<LocationData>(null);
     private final String simCountry = "test-sim-country";
     private final String networkOperator = "test-network-operator";
 
@@ -32,36 +32,40 @@ public class EnvironmentInfoSpec {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(tm);
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
-        assertThat(info.country).isEqualTo(simCountry);
+        assertThat(info.getCountry()).isEqualTo(simCountry);
         assertThat(info.network).isEqualTo(networkOperator);
         assertThat(info.device).isEqualTo(Build.MODEL);
     }
 
     @Test
-    public void shouldGetRegionFromLocationUpdate() {
-        String region = "Hyderabad";
-        EnvironmentInfo info = new EnvironmentInfo(ctx, location);
-
-        location.publish(region);
-
-        assertThat(info.getRegion()).isEqualTo(region);
-    }
-
-    @Test
-    public void shouldPointToNullRegionWhenLocationIsNotUpdated() {
+    public void shouldPointToDefaultCountryAndRegionWhenLocationIsNotUpdated() {
+        Locale.setDefault(new Locale("testLanguage", "Test-Locale-Country", "testVariant"));
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
 
         assertThat(info.getRegion()).isEqualTo(null);
+        assertThat(info.getCountry()).isEqualTo("test-locale-country");
+    }
+
+    @Test
+    public void shouldGetCountryAndRegionFromLocationUpdate() {
+        LocationData locationData = new LocationData("IN", "Hyderabad");
+        EnvironmentInfo info = new EnvironmentInfo(ctx, location);
+
+        location.publish(locationData);
+
+        assertThat(info.getCountry()).isEqualTo(locationData.getCountry());
+        assertThat(info.getRegion()).isEqualTo(locationData.getRegion());
     }
 
     @Test
     public void shouldUseCachedLocationForInstanceCreation() {
-        String region = "Bangalore";
-        location.publish(region);
+        LocationData cachedData = new LocationData("JP", "Tokyo");
+        location.publish(cachedData);
 
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
 
-        assertThat(info.getRegion()).isEqualTo(region);
+        assertThat(info.getCountry()).isEqualTo(cachedData.getCountry());
+        assertThat(info.getRegion()).isEqualTo(cachedData.getRegion());
     }
 
     @Test
@@ -69,7 +73,7 @@ public class EnvironmentInfoSpec {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(null);
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
-        assertThat(info.country).isEqualToIgnoringCase(Locale.getDefault().getCountry());
+        assertThat(info.getCountry()).isEqualToIgnoringCase(Locale.getDefault().getCountry());
     }
 
     @SuppressWarnings("RedundantStringConstructorCall")
@@ -81,7 +85,7 @@ public class EnvironmentInfoSpec {
         when(tm.getSimCountryIso()).thenReturn(new String(""));
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
-        assertThat(info.country).isEqualToIgnoringCase(Locale.getDefault().getCountry());
+        assertThat(info.getCountry()).isEqualToIgnoringCase(Locale.getDefault().getCountry());
     }
 
     @Test
@@ -90,7 +94,7 @@ public class EnvironmentInfoSpec {
         Locale.setDefault(new Locale("testLanguage", "Test-Locale-Country", "testVariant"));
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
-        assertThat(info.country).isEqualTo("test-locale-country");
+        assertThat(info.getCountry()).isEqualTo("test-locale-country");
 
 
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(tm);
@@ -98,7 +102,7 @@ public class EnvironmentInfoSpec {
 
         info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
-        assertThat(info.country).isEqualTo("test-sim-country");
+        assertThat(info.getCountry()).isEqualTo("test-sim-country");
     }
 
 }

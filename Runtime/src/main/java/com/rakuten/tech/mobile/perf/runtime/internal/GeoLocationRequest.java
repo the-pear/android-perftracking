@@ -34,7 +34,13 @@ class GeoLocationRequest extends BaseRequest<GeoLocationResult> {
                     .get("names").getAsJsonObject()
                     .get("en").getAsString();
 
-            return new GeoLocationResult(jsonSubdivisionNamesEnObject);
+            String jsonCountryIsoCodeObject = new JsonParser().parse(response).getAsJsonObject()
+                    .get("list").getAsJsonArray()
+                    .get(0).getAsJsonObject()
+                    .get("country").getAsJsonObject()
+                    .get("iso_code").getAsString();
+
+            return new GeoLocationResult(jsonCountryIsoCodeObject, jsonSubdivisionNamesEnObject);
         } catch (JsonSyntaxException e) {
             throw new VolleyError(e.getMessage(), e.getCause());
         }

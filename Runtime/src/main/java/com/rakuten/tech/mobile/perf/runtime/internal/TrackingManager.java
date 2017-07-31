@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.rakuten.tech.mobile.perf.core.CachingObservable;
+import com.rakuten.tech.mobile.perf.core.LocationData;
 import com.rakuten.tech.mobile.perf.core.Config;
 import com.rakuten.tech.mobile.perf.core.Tracker;
 
@@ -27,7 +28,7 @@ public class TrackingManager {
         mTrackingData = new HashMap<>();
     }
 
-    synchronized static void initialize(Context context, Config config, CachingObservable<String> locationObservable) {
+    synchronized static void initialize(Context context, Config config, CachingObservable<LocationData> locationObservable) {
         Tracker.on(context, config, locationObservable);
         INSTANCE = new TrackingManager();
     }
