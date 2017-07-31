@@ -8,6 +8,9 @@ import org.junit.Before
 import org.junit.Test
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Opcodes
+import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.LocalVariableNode
+import org.objectweb.asm.tree.MethodNode
 
 import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
 import static com.rakuten.tech.mobile.perf.TestUtil.testLogger
@@ -61,6 +64,22 @@ class MaterializationSpec {
         Base baseStub = spy(new BaseLoader().loadBase(jar.getClassNode("com.rakuten.tech.mobile.perf.core.base.WebViewClientBase")))
         baseStub.internalName = "android/webkit/WebViewClient"
         materialization = new Materialization(baseStub, index++, provider, testLogger());
+        ClassJarMaker classJarMakerMock = mock(ClassJarMaker)
+
+        materialization.materialize(classJarMakerMock)
+
+        //verify(classJarMakerMock).add(anyString(), any(byte[]))
+        //TODO: have to validate encountered exception "groovy.lang.GroovyRuntimeException: Ambiguous method overloading"
+    }
+
+    @Test void "should call add method on input ClassJarMaker object after visiting method and its local variables"() {
+        ClassJar jar = new ClassJar(resourceFile("user-testUI.jar"))
+        Base base = new BaseLoader().loadBase(jar.getClassNode("com.rakuten.tech.mobile.perf.core.base.WebViewClientBase"))
+        base.internalName = "android/webkit/WebViewClient"
+        materialization = new Materialization(base, index++, provider, testLogger());
+        List<LocalVariableNode> localVariables = base.cn.methods.get(2).localVariables
+        localVariables.get(2).signature = "Landroid/webkit/WebViewClient/testSignature"
+        localVariables.get(1).signature = "testSignature"
         ClassJarMaker classJarMakerMock = mock(ClassJarMaker)
 
         materialization.materialize(classJarMakerMock)
