@@ -4,9 +4,12 @@ The Performance Tracking module enables applications to measure the time taken f
 Each scenario/metric lists various method, network call measurements. Performance Tracking even provides api's for starting custom measurements.
 
 ## Table of Contents
-
 * [Install Perf Tracking SDK](#install)
 * [Customize Tracking](#customize)
+* [Control Instrumentation/Tracking](#control)
+* [Enable Debug Logs](#debug)
+* [Switching Environment](#debug)
+* [How to Confirm Performance Tracking SDK Integration](#integration)
 * [Changelog](#changelog)
 
 ##  <a name="install"></a> Installation procedure
@@ -15,8 +18,7 @@ Each scenario/metric lists various method, network call measurements. Performanc
 
 Your app must be registered in the [Relay Portal](https://rs-portal-web-prd-japaneast-wa.azurewebsites.net/) to use the App Performance Tracking feature.
 Request for an App Performance Tracking Subscription Key through the [API Portal](https://remsapijapaneast.portal.azure-api.net) with your application's package name.
-
-If you have any questions, please visit our [Developer Portal](https://developers.rakuten.com/hc/en-us) or you may contact us through the [Inquiry Form](https://developers.rakuten.com/hc/en-us/requests/new?ticket_form_id=399907)
+If you have any questions, please visit our [Developer Portal](https://developers.rakuten.com/hc/en-us/categories/115001441467-Relay) or you may contact us through the [Inquiry Form](https://developers.rakuten.com/hc/en-us/requests/new?ticket_form_id=399907)
 
 ### #1 Add dependency to buildscript
 
@@ -26,7 +28,7 @@ buildscript {
         maven { url 'http://artifactory.raksdtd.com/artifactory/libs-release' }
     }
     dependencies {
-        classpath 'com.rakuten.tech.mobile.perf:plugin:0.1.0'
+        classpath 'com.rakuten.tech.mobile.perf:plugin:0.1.1'
     }
 }
 
@@ -48,7 +50,8 @@ You must provide Configuration api's subscription key as metadata in application
 
 ### #3 Build Application
 
-The SDK instruments the application at compile time (currently in build types other than `debug`). So when you build your app you will see a `transformClassesWithPerfTracking` task
+SDK instruments the application at compile time (currently in build types other than `debug`). To control application instrumentation or tracking see [Control Instrumentation](#control).
+So when you build your app you will see a `transformClassesWithPerfTracking` task
 
 ```bash
 $ ./gradlew assembleRelease
@@ -65,7 +68,7 @@ $ ./gradlew assembleRelease
 BUILD SUCCESSFUL
 ```
 
-Now your application is ready to automatically track the launch metrcis, network requests, view lifecycle methods, runnables, webview loads, onClick listeners, threads, volley's hurl stack and many more. To add custom measurement and structure them around metrics see [Customize Tracking](#customize). 
+Now your application is ready to automatically track the launch metrics, network requests, view lifecycle methods, runnables, webview loads, onClick listeners, threads, volley's hurl stack and many more. To add custom measurement and structure them around metrics see [Customize Tracking](#customize).
 
 You will see your measurements in the [Relay Portal](https://rs-portal-web-prd-japaneast-wa.azurewebsites.net/) under Features > App Performance. If you obfuscate your app you can upload the `mapping.txt` in the portal and the tracking data will be deobfuscated for you.
 
@@ -106,7 +109,7 @@ Metrics terminate automatically according to a set of rules described below. Tha
 **What makes a metric start:**
 
 * The `StandardMetric.LAUNCH` metric is started automatically by the SDK 
-* Other metrics are started by tha app by calling `Metric#startMetric(String)`
+* Other metrics are started by the app by calling `Metric#startMetric(String)`
 
 **What makes a metric keep going:**
 
@@ -121,7 +124,92 @@ Metrics terminate automatically according to a set of rules described below. Tha
 * Timeout of 10 seconds
 * A new metric is started start
 
+## <a name="debug"></a> Enable Debug Logs
+
+```xml
+  <manifest>
+      <application>
+          <meta-data android:name="com.rakuten.tech.mobile.perf.debug"
+                     android:value="true" />
+      </application>
+  </manifest>
+```
+
+You can see logs by filtering with tag "Performance Tracking"
+
+## <a name="debug"></a> Switching Environment to STG/DEV
+
+### DEV
+
+```xml
+  <manifest>
+      <application>
+          <meta-data android:name="com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix"
+                     android:value="https://perf-config-api-dev-japaneast-wa.azurewebsites.net/api/v1" />
+      </application>
+  </manifest>
+```
+
+### STG
+
+```xml
+  <manifest>
+      <application>
+          <meta-data android:name="com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix"
+                     android:value="https://api.apps.global.rakuten.com/stg/performance/config/v1" />
+      </application>
+  </manifest>
+```
+
+## <a name="control"></a> Control Instrumentation
+
+As mentioned above SDK instruments the application at compile time. Currently instrumentation is disabled in `debug` build type, which means tracking is disabled in `debug` build by default.
+You can enable/disable the instrumentation/tracking at build time in different build types by adding following code to application's build.gradle. Here `enable` denotes instrumentation/tracking control switch at build time.
+
+```
+performanceTracking {
+    release {
+        enable = true
+    }
+    debug {
+        enable = true
+    }
+    qa {
+        enable = false
+    }
+}
+```
+
+## <a name="integration"></a> Confirm the Performance Tracking integration
+### Check for Build
+
+* Make sure `transformClassesWithPerfTrackingXXX` tasks are successful without any error during build process.
+* If your build gets failed because of any error in `transformClassesWithPerfTrackingXXX` tasks you can contact us through [Inquiry Form](https://developers.rakuten.com/hc/en-us/requests/new?ticket_form_id=399907)
+* You can proceed with build by disabling instrumentation/tracking as shown [Control Instrumentation](#control)
+
+### Run your App
+
+* On first run of your app after integrating Performance Tracking the module will only fetch and store its configuration data, it **will not** send metric data. On subsequent runs the module will track and send metrics and measurements if the previously received configuration is valid and the enable percentage check succeeds.
+
+### Check Configuration
+
+* Using charles or any other network capture software you can verify whether configuration loaded successfully or not?
+* Look for `https://api.apps.global.rakuten.com` in charles and check if Response code if `200 OK` for successful configuration.
+* If Response code is not 200, then please check your subscription key in AndroidManifest.xml.
+* You can even verify this by enabling debug logs as shown in [Enable Debug Logs](#debug). You will see "Error loading configuration" log in failure scenario.
+
+### Check Sending data to eventhub
+
+* Tracking data of your app will get reflected in the relay portal after few hours.
+* By using charles or any network capture software you can confirm whether tracking data is send to eventhub or not before it gets reflected in relay portal.
+* Look for `https://perf-eventhub-prd-japaneast.servicebus.windows.net` in charles and check Response code is `201 Created` for `measurements`
+* You can even verify this by enabling debug logs as shown in [Enable Debug Logs](#debug). You will see "SEND_METRIC" AND "SEND" in logs.
+
 ## <a name="changelog"></a> Changelog
+
+### 0.1.1
+
+- Post MVP Release
 
 ### 0.1.0
 
