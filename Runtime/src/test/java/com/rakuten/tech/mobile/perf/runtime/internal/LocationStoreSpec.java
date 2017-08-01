@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 
 import com.android.volley.VolleyError;
+import com.google.gson.Gson;
+import com.rakuten.tech.mobile.perf.core.LocationData;
 import com.rakuten.tech.mobile.perf.runtime.RobolectricUnitSpec;
 import com.rakuten.tech.mobile.perf.runtime.TestData;
 import com.rakuten.tech.mobile.perf.runtime.shadow.RequestQueueShadow;
@@ -62,29 +64,31 @@ public class LocationStoreSpec extends RobolectricUnitSpec {
     }
 
     @Test public void shouldCacheLocationOnEmptyCache() throws JSONException {
-        String expectedValue = "Tokyo";
+        LocationData expectedValue = new LocationData("JP", "Tokyo");
         queue.rule().whenClass(GeoLocationRequest.class).returnNetworkResponse(200, location.content);
 
         locationStore = new LocationStore(context, queue, "", null);
 
-        String storeValue = locationStore.getObservable().getCachedValue();
-        assertThat(storeValue).isEqualTo(expectedValue);
+        LocationData storeValue = locationStore.getObservable().getCachedValue();
+        assertThat(storeValue.country).isEqualTo(expectedValue.country);
+        assertThat(storeValue.region).isEqualTo(expectedValue.region);
     }
 
     @Test public void shouldUseCachedLocationForInstanceCreation() throws JSONException {
-        String prefsValue = "Tokyo";
-        prefs.edit().putString("location_key", prefsValue).apply();
+        LocationData prefsValue = new LocationData("JP", "Tokyo");
+        prefs.edit().putString("location_key", new Gson().toJson(prefsValue)).apply();
 
         locationStore = new LocationStore(context, queue, "", null);
 
-        String storeValue = locationStore.getObservable().getCachedValue();
-        assertThat(storeValue).isEqualTo(prefsValue);
+        LocationData storeValue = locationStore.getObservable().getCachedValue();
+        assertThat(storeValue.country).isEqualTo(prefsValue.country);
+        assertThat(storeValue.region).isEqualTo(prefsValue.region);
     }
 
     @Test public void shouldUseNullLocationOnEmptyCacheForInstanceCreation() throws JSONException {
         locationStore = new LocationStore(context, queue, "", null);
 
-        String storeValue = locationStore.getObservable().getCachedValue();
+        LocationData storeValue = locationStore.getObservable().getCachedValue();
         assertThat(storeValue).isEqualTo(null);
     }
 

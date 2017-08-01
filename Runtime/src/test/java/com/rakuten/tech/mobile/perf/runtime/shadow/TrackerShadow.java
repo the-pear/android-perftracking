@@ -3,6 +3,7 @@ package com.rakuten.tech.mobile.perf.runtime.shadow;
 import android.content.Context;
 
 import com.rakuten.tech.mobile.perf.core.CachingObservable;
+import com.rakuten.tech.mobile.perf.core.LocationData;
 import com.rakuten.tech.mobile.perf.core.Config;
 import com.rakuten.tech.mobile.perf.core.MockTracker;
 import com.rakuten.tech.mobile.perf.core.Tracker;
@@ -27,7 +28,7 @@ public class TrackerShadow {
         return mockTracker;
     }
 
-    @Implementation public static void on(Context context, Config config,  CachingObservable<String> observableLocation) { /* noop */ }
+    @Implementation public static void on(Context context, Config config,  CachingObservable<LocationData> observableLocation) { /* noop */ }
 
     @Implementation public static void off() { /* noop */ }
 

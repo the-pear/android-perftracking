@@ -63,8 +63,8 @@ class EventWriter {
                 _writer.append("\",\"device\":\"").append(_envInfo.device);
             }
 
-            if (_envInfo.country != null) {
-                _writer.append("\",\"country\":\"").append(_envInfo.country);
+            if (_envInfo.getCountry() != null) {
+                _writer.append("\",\"country\":\"").append(_envInfo.getCountry());
             }
 
             if (_envInfo.getRegion() != null) {

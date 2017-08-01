@@ -30,7 +30,7 @@ public class EventWriterSpec {
     @Mock OutputStream outputStream;
     @Mock HttpsURLConnection conn;
     @Mock Context ctx;
-    private CachingObservable<String> location = new CachingObservable<String>(null);
+    private CachingObservable<LocationData> location = new CachingObservable<LocationData>(null);
     private EventWriter writer;
 
     @Before public void initMocks() throws IOException {
@@ -42,8 +42,7 @@ public class EventWriterSpec {
         config.eventHubUrl = ""; // url injected via constructor
         config.header = new HashMap<>();
         envInfo = new EnvironmentInfo(ctx, location);
-        location.publish("test-region");
-        envInfo.country = "test-land";
+        location.publish(new LocationData("test-land", "test-region"));
         envInfo.network = "test-network";
         envInfo.device = "test-device";
 

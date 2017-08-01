@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.rakuten.tech.mobile.perf.core.CachingObservable;
 import com.rakuten.tech.mobile.perf.core.Config;
+import com.rakuten.tech.mobile.perf.core.LocationData;
 import com.rakuten.tech.mobile.perf.core.MockTracker;
 import com.rakuten.tech.mobile.perf.runtime.RobolectricUnitSpec;
 import com.rakuten.tech.mobile.perf.runtime.shadow.TrackerShadow;
@@ -26,7 +27,7 @@ public class TrackingManagerSpec extends RobolectricUnitSpec {
     @Mock Context context;
     @Mock Config config;
     @Mock MockTracker tracker;
-    private CachingObservable<String> location = new CachingObservable<String>(null);
+    private CachingObservable<LocationData> location = new CachingObservable<LocationData>(null);
 
     @Before public void init() {
         TrackingManager.initialize(context, config, location);

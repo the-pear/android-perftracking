@@ -21,7 +21,7 @@ public class Tracker {
 	 * @param context Instance of android.content.Context.
 	 * @param config Performance tracking configuration.
 	 */
-	public static synchronized void on(Context context, Config config, CachingObservable<String> locationObservable) {
+	public static synchronized void on(Context context, Config config, CachingObservable<LocationData> locationObservable) {
 		Debug debug = config.debug ? new Debug() : null;
 		MeasurementBuffer buffer = new MeasurementBuffer();
 		Current current = new Current();
