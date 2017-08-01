@@ -35,7 +35,6 @@ public class EventWriterSpec {
 
     @Before public void initMocks() throws IOException {
         MockitoAnnotations.initMocks(this);
-        LocationData sampleLocation = new LocationData("test-land", "test-region");
         config = new Config();
         config.app = "app";
         config.version = "test-version";
@@ -43,7 +42,7 @@ public class EventWriterSpec {
         config.eventHubUrl = ""; // url injected via constructor
         config.header = new HashMap<>();
         envInfo = new EnvironmentInfo(ctx, location);
-        location.publish(sampleLocation);
+        location.publish(new LocationData("test-land", "test-region"));
         envInfo.network = "test-network";
         envInfo.device = "test-device";
 

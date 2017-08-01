@@ -60,8 +60,8 @@ class EnvironmentInfo implements Observer {
     public void update(Observable observable, Object value) {
         if (value instanceof LocationData) {
             synchronized (this) {
-                this.region = ((LocationData) value).getRegion();
-                this.country = ((LocationData) value).getCountry();
+                this.region = ((LocationData) value).region;
+                this.country = ((LocationData) value).country;
             }
         }
     }

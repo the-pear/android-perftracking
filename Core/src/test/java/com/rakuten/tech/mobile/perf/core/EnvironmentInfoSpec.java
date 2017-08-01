@@ -53,8 +53,8 @@ public class EnvironmentInfoSpec {
 
         location.publish(locationData);
 
-        assertThat(info.getCountry()).isEqualTo(locationData.getCountry());
-        assertThat(info.getRegion()).isEqualTo(locationData.getRegion());
+        assertThat(info.getCountry()).isEqualTo(locationData.country);
+        assertThat(info.getRegion()).isEqualTo(locationData.region);
     }
 
     @Test
@@ -64,8 +64,8 @@ public class EnvironmentInfoSpec {
 
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
 
-        assertThat(info.getCountry()).isEqualTo(cachedData.getCountry());
-        assertThat(info.getRegion()).isEqualTo(cachedData.getRegion());
+        assertThat(info.getCountry()).isEqualTo(cachedData.country);
+        assertThat(info.getRegion()).isEqualTo(cachedData.region);
     }
 
     @Test

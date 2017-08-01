@@ -26,7 +26,7 @@ class GeoLocationRequest extends BaseRequest<GeoLocationResult> {
     @Override
     protected GeoLocationResult parseResponse(String response) throws VolleyError {
         try {
-            String jsonSubdivisionNamesEnObject = new JsonParser().parse(response).getAsJsonObject()
+            String subdivisionNamesEn = new JsonParser().parse(response).getAsJsonObject()
                     .get("list").getAsJsonArray()
                     .get(0).getAsJsonObject()
                     .get("subdivisions").getAsJsonArray()
@@ -34,13 +34,13 @@ class GeoLocationRequest extends BaseRequest<GeoLocationResult> {
                     .get("names").getAsJsonObject()
                     .get("en").getAsString();
 
-            String jsonCountryIsoCodeObject = new JsonParser().parse(response).getAsJsonObject()
+            String countryIsoCode = new JsonParser().parse(response).getAsJsonObject()
                     .get("list").getAsJsonArray()
                     .get(0).getAsJsonObject()
                     .get("country").getAsJsonObject()
                     .get("iso_code").getAsString();
 
-            return new GeoLocationResult(jsonCountryIsoCodeObject, jsonSubdivisionNamesEnObject);
+            return new GeoLocationResult(countryIsoCode, subdivisionNamesEn);
         } catch (JsonSyntaxException e) {
             throw new VolleyError(e.getMessage(), e.getCause());
         }

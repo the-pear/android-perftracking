@@ -70,8 +70,8 @@ public class LocationStoreSpec extends RobolectricUnitSpec {
         locationStore = new LocationStore(context, queue, "", null);
 
         LocationData storeValue = locationStore.getObservable().getCachedValue();
-        assertThat(storeValue.getCountry()).isEqualTo(expectedValue.getCountry());
-        assertThat(storeValue.getRegion()).isEqualTo(expectedValue.getRegion());
+        assertThat(storeValue.country).isEqualTo(expectedValue.country);
+        assertThat(storeValue.region).isEqualTo(expectedValue.region);
     }
 
     @Test public void shouldUseCachedLocationForInstanceCreation() throws JSONException {
@@ -81,8 +81,8 @@ public class LocationStoreSpec extends RobolectricUnitSpec {
         locationStore = new LocationStore(context, queue, "", null);
 
         LocationData storeValue = locationStore.getObservable().getCachedValue();
-        assertThat(storeValue.getCountry()).isEqualTo(prefsValue.getCountry());
-        assertThat(storeValue.getRegion()).isEqualTo(prefsValue.getRegion());
+        assertThat(storeValue.country).isEqualTo(prefsValue.country);
+        assertThat(storeValue.region).isEqualTo(prefsValue.region);
     }
 
     @Test public void shouldUseNullLocationOnEmptyCacheForInstanceCreation() throws JSONException {
