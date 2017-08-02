@@ -18,7 +18,7 @@ public class EnvironmentInfoSpec {
     @Mock TelephonyManager tm;
     @Mock Context ctx;
     private CachingObservable<LocationData> location = new CachingObservable<LocationData>(null);
-    private final String simCountry = "test-sim-country";
+    private final String simCountry = "TEST-SIM-COUNTRY";
     private final String networkOperator = "test-network-operator";
 
     @Before public void initMocks() {
@@ -43,7 +43,7 @@ public class EnvironmentInfoSpec {
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
 
         assertThat(info.getRegion()).isEqualTo(null);
-        assertThat(info.getCountry()).isEqualTo("test-locale-country");
+        assertThat(info.getCountry()).isEqualTo("TEST-LOCALE-COUNTRY");
     }
 
     @Test
@@ -89,20 +89,20 @@ public class EnvironmentInfoSpec {
     }
 
     @Test
-    public void shouldNormalizeCountryCodeToLowercase() {
+    public void shouldNormalizeCountryCodeToUppercase() {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(null);
         Locale.setDefault(new Locale("testLanguage", "Test-Locale-Country", "testVariant"));
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
-        assertThat(info.getCountry()).isEqualTo("test-locale-country");
+        assertThat(info.getCountry()).isEqualTo("TEST-LOCALE-COUNTRY");
 
 
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(tm);
-        when(tm.getSimCountryIso()).thenReturn("Test-Sim-Country");
+        when(tm.getSimCountryIso()).thenReturn("TEST-SIM-COUNTRY");
 
         info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
-        assertThat(info.getCountry()).isEqualTo("test-sim-country");
+        assertThat(info.getCountry()).isEqualTo("TEST-SIM-COUNTRY");
     }
 
 }
