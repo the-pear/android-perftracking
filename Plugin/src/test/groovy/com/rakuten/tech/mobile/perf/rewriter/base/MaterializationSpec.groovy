@@ -61,7 +61,7 @@ class MaterializationSpec {
                 eq("android/accounts/AccountAuthenticatorActivity"), aryEq(verifyArray))
     }
 
-    @Test void "should call add method on input ClassJarMaker object after visiting class"() {
+    @Test void "should materialize and add the class to ClassJarMaker"() {
         ClassJar jar = new ClassJar(resourceFile("user-testUI.jar"))
         Base baseStub = spy(new BaseLoader().loadBase(jar.getClassNode("com.rakuten.tech.mobile.perf.core.base.WebViewClientBase")))
         baseStub.internalName = "android/webkit/WebViewClient"
@@ -75,7 +75,7 @@ class MaterializationSpec {
         assert new ClassJar(tempJarFile).hasClass(materialization.name)
     }
 
-    @Test void "should call add method on input ClassJarMaker object after visiting method and its local variables"() {
+    @Test void "should materialize and add the class to ClassJarMaker, after visiting methods and its local variables"() {
         ClassJar jar = new ClassJar(resourceFile("user-testUI.jar"))
         Base base = new BaseLoader().loadBase(jar.getClassNode("com.rakuten.tech.mobile.perf.core.base.WebViewClientBase"))
         base.internalName = "android/webkit/WebViewClient"
