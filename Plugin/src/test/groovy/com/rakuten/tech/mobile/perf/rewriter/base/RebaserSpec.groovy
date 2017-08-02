@@ -38,8 +38,8 @@ class RebaserSpec {
         assert rebaser._bases.size() == 1
     }
 
-    @Test void "should return a different visitor object, if rebaser has a empty base list"() {
-        ClassVisitor classVisitor = rebaser.rewrite(ActivityBase.class, visitor)
+    @Test void "should return same visitor object, if rebaser has a empty base list"() {
+        ClassVisitor classVisitor = rebaser.rewrite(ActivityBase, visitor)
 
         assert classVisitor == visitor
     }
@@ -47,7 +47,7 @@ class RebaserSpec {
     @Test void "should return a different visitor object, if base object is added to rebaser"() {
         rebaser.add(base)
 
-        ClassVisitor classVisitor = rebaser.rewrite(ActivityBase.class, visitor)
+        ClassVisitor classVisitor = rebaser.rewrite(ActivityBase, visitor)
 
         assert classVisitor != visitor
     }
@@ -56,7 +56,7 @@ class RebaserSpec {
         Base baseMock = spy(base)
         rebaser.add(baseMock)
 
-        visitor = rebaser.rewrite(ActivityBase.class, visitor)
+        visitor = rebaser.rewrite(ActivityBase, visitor)
 
         assert baseMock.materializations.size() == 1
     }

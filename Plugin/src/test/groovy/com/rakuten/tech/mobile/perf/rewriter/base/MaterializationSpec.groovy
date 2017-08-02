@@ -8,15 +8,12 @@ import org.junit.Before
 import org.junit.Test
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.LocalVariableNode
-import org.objectweb.asm.tree.MethodNode
 
 import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
 import static com.rakuten.tech.mobile.perf.TestUtil.testLogger
 import static org.mockito.AdditionalMatchers.aryEq
-import static org.mockito.ArgumentMatchers.anyInt
-import static org.mockito.ArgumentMatchers.eq
+import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 class MaterializationSpec {
@@ -68,7 +65,7 @@ class MaterializationSpec {
 
         materialization.materialize(classJarMakerMock)
 
-        //verify(classJarMakerMock).add(anyString(), any(byte[]))
+        verify(classJarMakerMock).add(anyString(), any(byte[]))
         //TODO: have to validate encountered exception "groovy.lang.GroovyRuntimeException: Ambiguous method overloading"
     }
 
