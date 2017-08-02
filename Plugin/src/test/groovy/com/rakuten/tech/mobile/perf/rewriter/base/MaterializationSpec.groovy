@@ -5,7 +5,9 @@ import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJarMaker
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassProvider
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassWriter
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.LocalVariableNode
@@ -13,10 +15,13 @@ import org.objectweb.asm.tree.LocalVariableNode
 import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
 import static com.rakuten.tech.mobile.perf.TestUtil.testLogger
 import static org.mockito.AdditionalMatchers.aryEq
-import static org.mockito.ArgumentMatchers.*
-import static org.mockito.Mockito.*
+import static org.mockito.ArgumentMatchers.anyInt
+import static org.mockito.ArgumentMatchers.eq
+import static org.mockito.Mockito.spy
+import static org.mockito.Mockito.verify
 
 class MaterializationSpec {
+    @Rule public final TemporaryFolder tempDir = new TemporaryFolder()
     def index = 1
     File jar
     Materialization materialization
@@ -61,12 +66,13 @@ class MaterializationSpec {
         Base baseStub = spy(new BaseLoader().loadBase(jar.getClassNode("com.rakuten.tech.mobile.perf.core.base.WebViewClientBase")))
         baseStub.internalName = "android/webkit/WebViewClient"
         materialization = new Materialization(baseStub, index++, provider, testLogger());
-        ClassJarMaker classJarMakerMock = mock(ClassJarMaker)
+        File tempJarFile = tempDir.newFile("temp.jar")
+        ClassJarMaker classJarMaker = new ClassJarMaker(tempJarFile)
 
-        materialization.materialize(classJarMakerMock)
+        materialization.materialize(classJarMaker)
 
-        //verify(classJarMakerMock).add(anyString(), any(byte[]))
-        //TODO: have to validate encountered exception "groovy.lang.GroovyRuntimeException: Ambiguous method overloading"
+        classJarMaker.Close()
+        assert new ClassJar(tempJarFile).hasClass(materialization.name)
     }
 
     @Test void "should call add method on input ClassJarMaker object after visiting method and its local variables"() {
@@ -77,11 +83,12 @@ class MaterializationSpec {
         List<LocalVariableNode> localVariables = base.cn.methods.get(2).localVariables
         localVariables.get(2).signature = "Landroid/webkit/WebViewClient/testSignature"
         localVariables.get(1).signature = "testSignature"
-        ClassJarMaker classJarMakerMock = mock(ClassJarMaker)
+        File tempJarFile = tempDir.newFile("temp.jar")
+        ClassJarMaker classJarMaker = new ClassJarMaker(tempJarFile)
 
-        materialization.materialize(classJarMakerMock)
+        materialization.materialize(classJarMaker)
 
-        //verify(classJarMakerMock).add(anyString(), any(byte[]))
-        //TODO: have to validate encountered exception "groovy.lang.GroovyRuntimeException: Ambiguous method overloading"
+        classJarMaker.Close()
+        assert new ClassJar(tempJarFile).hasClass(materialization.name)
     }
 }
