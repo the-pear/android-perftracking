@@ -31,7 +31,7 @@ public class DummyRewriterSpec {
         assert temp.hasClass("com.rakuten.tech.mobile.perf.core.mixins.ActivityMixin")
     }
 
-    @Test def void "should rewrite the enable value and add the class file to output JAR"() {
+    @Test def void "should rewrite AppPerformanceConfig classs, set enable value to false and add to output JAR"() {
         dummyRewriter.input = resourceFile("TestAppPerformanceConfig.jar").absolutePath
 
         dummyRewriter.rewrite()

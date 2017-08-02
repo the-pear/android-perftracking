@@ -5,6 +5,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.FieldNode
 
 import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile;
 
@@ -27,5 +29,20 @@ public class PerformanceTrackingRewriterSpec {
         ClassJar temp = new ClassJar(new File(performanceTrackingRewriter.outputJar));
         assert !temp.hasClass("com.rakuten.tech.mobile.perf.core.base.ActivityBase")
         assert !temp.hasClass("com.rakuten.tech.mobile.perf.core.mixins.ActivityMixin")
+    }
+
+    @Test def void "should rewrite AppPerformanceConfig classs, set enable value to true and add to output JAR"() {
+        performanceTrackingRewriter.input = resourceFile("TestAppPerformanceConfig.jar").absolutePath
+
+        performanceTrackingRewriter.rewrite()
+
+        ClassJar temp = new ClassJar(new File(performanceTrackingRewriter.outputJar));
+        ClassNode classNode = temp.getClassNode("com.rakuten.tech.mobile.perf.runtime.internal.AppPerformanceConfig")
+        List<FieldNode> fieldNodeList = classNode.fields
+        for (FieldNode fieldNode : fieldNodeList) {
+            if (fieldNode.name == "enabled") {
+                assert fieldNode.value == 1
+            }
+        }
     }
 }
