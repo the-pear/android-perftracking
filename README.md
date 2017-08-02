@@ -8,7 +8,6 @@ Each scenario/metric lists various method, network call measurements. Performanc
 * [Customize Tracking](#customize)
 * [Control Instrumentation/Tracking](#control)
 * [Enable Debug Logs](#debug)
-* [Switching Environment](#debug)
 * [How to Confirm Performance Tracking SDK Integration](#integration)
 * [Changelog](#changelog)
 
@@ -51,7 +50,7 @@ You must provide Configuration api's subscription key as metadata in application
 ### #3 Build Application
 
 SDK instruments the application at compile time (currently in build types other than `debug`). To control application instrumentation or tracking see [Control Instrumentation](#control).
-So when you build your app you will see a `transformClassesWithPerfTracking` task
+So when you build your app you will see a `transformClassesWithPerfTrackingXxx` task
 
 ```bash
 $ ./gradlew assembleRelease
@@ -135,31 +134,7 @@ Metrics terminate automatically according to a set of rules described below. Tha
   </manifest>
 ```
 
-You can see logs by filtering with tag "Performance Tracking"
-
-## <a name="debug"></a> Switching Environment to STG/DEV
-
-### DEV
-
-```xml
-  <manifest>
-      <application>
-          <meta-data android:name="com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix"
-                     android:value="https://perf-config-api-dev-japaneast-wa.azurewebsites.net/api/v1" />
-      </application>
-  </manifest>
-```
-
-### STG
-
-```xml
-  <manifest>
-      <application>
-          <meta-data android:name="com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix"
-                     android:value="https://api.apps.global.rakuten.com/stg/performance/config/v1" />
-      </application>
-  </manifest>
-```
+You can see logs by filtering with "Performance Tracking" tag.
 
 ## <a name="control"></a> Control Instrumentation
 
@@ -184,8 +159,8 @@ performanceTracking {
 ### Check for Build
 
 * Make sure `transformClassesWithPerfTrackingXXX` tasks are successful without any error during build process.
-* If your build gets failed because of any error in `transformClassesWithPerfTrackingXXX` tasks you can contact us through [Inquiry Form](https://developers.rakuten.com/hc/en-us/requests/new?ticket_form_id=399907)
-* You can proceed with build by disabling instrumentation/tracking as shown [Control Instrumentation](#control)
+* If your build gets failed because of any error in `transformClassesWithPerfTrackingXXX` tasks you can contact us through [Inquiry Form](https://developers.rakuten.com/hc/en-us/requests/new?ticket_form_id=399907).
+* You can proceed with build by disabling instrumentation/tracking as shown [Control Instrumentation](#control).
 
 ### Run your App
 
@@ -202,7 +177,7 @@ performanceTracking {
 
 * Tracking data of your app will get reflected in the relay portal after few hours.
 * By using charles or any network capture software you can confirm whether tracking data is send to eventhub or not before it gets reflected in relay portal.
-* Look for `https://perf-eventhub-prd-japaneast.servicebus.windows.net` in charles and check Response code is `201 Created` for `measurements`
+* Look for `https://perf-eventhub-prd-japaneast.servicebus.windows.net` in charles and check Response code is `201 Created` for `measurements`.
 * You can even verify this by enabling debug logs as shown in [Enable Debug Logs](#debug). You will see "SEND_METRIC" AND "SEND" in logs.
 
 ## <a name="changelog"></a> Changelog
