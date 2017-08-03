@@ -9,16 +9,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.objectweb.asm.ClassReader
-import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.LocalVariableNode
 
 import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
 import static com.rakuten.tech.mobile.perf.TestUtil.testLogger
-import static org.mockito.AdditionalMatchers.aryEq
-import static org.mockito.ArgumentMatchers.anyInt
-import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.Mockito.spy
-import static org.mockito.Mockito.verify
 
 class MaterializationSpec {
     @Rule public final TemporaryFolder tempDir = new TemporaryFolder()
@@ -32,11 +27,9 @@ class MaterializationSpec {
     Base base
     ClassProvider provider
 
-    // Step 1: select class to rewrite in materialization:
     String targetClass = "jp.co.rakuten.sdtd.user.authenticator.AuthenticatorFederatedActivity"
 
     @Before void setup() {
-        // Step 2: define a base class description
         base = new Base();
         def classpath = resourceFile("user-TestUI.jar").absolutePath + File.pathSeparator +
                 resourceFile("android23.jar").absolutePath
@@ -52,13 +45,10 @@ class MaterializationSpec {
 
     @Test void "should insert super class in inheritance hierarchy"() {
         def visitor = spy(materialization.rewrite(clazz, writer))
-        // Step 3: debug Materialization as it rewrites the target class
+
         reader.accept(visitor, 0)
 
-        String[] verifyArray = ["com/android/volley/Response\$ErrorListener", "android/view/View\$OnClickListener"]
-        verify(visitor).visit(eq(Opcodes.V1_7), anyInt(),
-                eq("jp/co/rakuten/sdtd/user/authenticator/AuthenticatorFederatedActivity"), eq(null),
-                eq("android/accounts/AccountAuthenticatorActivity"), aryEq(verifyArray))
+        assert materialization.internalSuperName == "android/accounts/AccountAuthenticatorActivity"
     }
 
     @Test void "should materialize and add the class to ClassJarMaker"() {
@@ -66,21 +56,7 @@ class MaterializationSpec {
         Base baseStub = spy(new BaseLoader().loadBase(jar.getClassNode("com.rakuten.tech.mobile.perf.core.base.WebViewClientBase")))
         baseStub.internalName = "android/webkit/WebViewClient"
         materialization = new Materialization(baseStub, index++, provider, testLogger());
-        File tempJarFile = tempDir.newFile("temp.jar")
-        ClassJarMaker classJarMaker = new ClassJarMaker(tempJarFile)
-
-        materialization.materialize(classJarMaker)
-
-        classJarMaker.Close()
-        assert new ClassJar(tempJarFile).hasClass(materialization.name)
-    }
-
-    @Test void "should materialize and add the class to ClassJarMaker, after visiting methods and its local variables"() {
-        ClassJar jar = new ClassJar(resourceFile("user-testUI.jar"))
-        Base base = new BaseLoader().loadBase(jar.getClassNode("com.rakuten.tech.mobile.perf.core.base.WebViewClientBase"))
-        base.internalName = "android/webkit/WebViewClient"
-        materialization = new Materialization(base, index++, provider, testLogger());
-        List<LocalVariableNode> localVariables = base.cn.methods.get(2).localVariables
+        List<LocalVariableNode> localVariables = baseStub.cn.methods.get(2).localVariables
         localVariables.get(2).signature = "Landroid/webkit/WebViewClient/testSignature"
         localVariables.get(1).signature = "testSignature"
         File tempJarFile = tempDir.newFile("temp.jar")
