@@ -7,6 +7,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.FieldNode
+import org.objectweb.asm.tree.MethodNode
 
 import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile;
 
@@ -27,22 +28,36 @@ public class DummyRewriterSpec {
         dummyRewriter.rewrite()
 
         ClassJar temp = new ClassJar(new File(dummyRewriter.outputJar));
-        assert temp.hasClass("com.rakuten.tech.mobile.perf.core.base.ActivityBase")
-        assert temp.hasClass("com.rakuten.tech.mobile.perf.core.mixins.ActivityMixin")
+        ClassNode classNode = temp.getClassNode("jp.co.rakuten.sdtd.user.ui.BaseActivity")
+        List<MethodNode> methodNodes = classNode.methods
+        boolean hasMethod = false
+        for (MethodNode methodNode : methodNodes) {
+            if (methodNode.name == "com_rakuten_tech_mobile_perf_onCreate") {
+                hasMethod = true
+            }
+        }
+        assert !hasMethod
     }
 
-    @Test def void "should rewrite AppPerformanceConfig classs, set enable value to false and add to output JAR"() {
+    @Test def void "should rewrite AppPerformanceConfig class, set enable value to false and add to output JAR"() {
         dummyRewriter.input = resourceFile("TestAppPerformanceConfig.jar").absolutePath
 
         dummyRewriter.rewrite()
 
         ClassJar temp = new ClassJar(new File(dummyRewriter.outputJar));
+        assert temp.hasClass("com.rakuten.tech.mobile.perf.runtime.internal.AppPerformanceConfig")
         ClassNode classNode = temp.getClassNode("com.rakuten.tech.mobile.perf.runtime.internal.AppPerformanceConfig")
+        assert classNode.fields.size() > 0
         List<FieldNode> fieldNodeList = classNode.fields
+        boolean hasEnabledField = false
+        boolean isEnableFieldFalse = true
         for (FieldNode fieldNode : fieldNodeList) {
             if (fieldNode.name == "enabled") {
-                assert fieldNode.value == 0
+                hasEnabledField = true
+                isEnableFieldFalse = fieldNode.value
             }
         }
+        assert hasEnabledField
+        assert !isEnableFieldFalse
     }
 }
