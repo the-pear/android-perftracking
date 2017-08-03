@@ -30,6 +30,10 @@ class EnvironmentInfo implements Observer {
             this.country = Locale.getDefault().getCountry();
         }
 
+        if (this.country != null) {
+            this.country = this.country.toUpperCase();
+        }
+
         if (this.network == null || "".equals(this.network)) {
             this.network = "wifi";
         }
