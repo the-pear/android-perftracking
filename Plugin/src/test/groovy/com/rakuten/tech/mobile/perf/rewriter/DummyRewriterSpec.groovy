@@ -6,10 +6,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.tree.FieldNode
-import org.objectweb.asm.tree.MethodNode
 
-import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile;
+import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
 
 public class DummyRewriterSpec {
     @Rule public final TemporaryFolder projectDir = new TemporaryFolder()
