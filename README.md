@@ -6,9 +6,9 @@ Each scenario/metric lists various method, network call measurements. Performanc
 ## Table of Contents
 * [Install Perf Tracking SDK](#install)
 * [Customize Tracking](#customize)
-* [Control Instrumentation/Tracking](#control)
+* [Configure Tracking](#configure)
 * [Enable Debug Logs](#debug)
-* [How to Confirm Performance Tracking SDK Integration](#integration)
+* [Confirm Performance Tracking SDK Integration](#integration)
 * [Changelog](#changelog)
 
 ##  <a name="install"></a> Installation procedure
@@ -49,8 +49,8 @@ You must provide Configuration api's subscription key as metadata in application
 
 ### #3 Build Application
 
-SDK instruments the application at compile time (currently in build types other than `debug`). To control application instrumentation or tracking see [Control Instrumentation](#control).
-So when you build your app you will see a `transformClassesWithPerfTrackingXxx` task
+The SDK instruments the application at compile time (in build types other than `debug`). To configure application tracking see [Configure Tracking](#configure).
+So when you build your app you will see a `transformClassesWithPerfTrackingFor<BuildType>` task
 
 ```bash
 $ ./gradlew assembleRelease
@@ -136,10 +136,11 @@ Metrics terminate automatically according to a set of rules described below. Tha
 
 You can see logs by filtering with "Performance Tracking" tag.
 
-## <a name="control"></a> Control Instrumentation
+## <a name="configure"></a> Configure Tracking
 
-As mentioned above SDK instruments the application at compile time. Currently instrumentation is disabled in `debug` build type, which means tracking is disabled in `debug` build by default.
-You can enable/disable the instrumentation/tracking at build time in different build types by adding following code to application's build.gradle. Here `enable` denotes instrumentation/tracking control switch at build time.
+The SDK instruments the application at compile time. Instrumentation is disabled in `debug` build type, which means performance is not tracked in `debug` builds by default.
+You can enable/disable the tracking at build time in different build types in your application's build.gradle.
+If `enable` is `true` the application's code will be instrumented at compile time and performance will be tracked at runtime. If `enable` is `false` your application is compiled and runs just like it would without the SDK.
 
 ```
 performanceTracking {
@@ -156,34 +157,30 @@ performanceTracking {
 ```
 
 ## <a name="integration"></a> Confirm the Performance Tracking integration
+
 ### Check for Build
 
-* Make sure `transformClassesWithPerfTrackingXXX` tasks are successful without any error during build process.
-* If your build gets failed because of any error in `transformClassesWithPerfTrackingXXX` tasks you can contact us through [Inquiry Form](https://developers.rakuten.com/hc/en-us/requests/new?ticket_form_id=399907).
-* You can proceed with build by disabling instrumentation/tracking as shown [Control Instrumentation](#control).
+* Confirm `transformClassesWithPerfTrackingXXX` tasks are successful without any error during build process.
+* If your build fails because of any error in `transformClassesWithPerfTrackingXXX` tasks please contact us through [Inquiry Form](https://developers.rakuten.com/hc/en-us/requests/new?ticket_form_id=399907).
+* You can disable tracking as shown in [Configure Tracking](#configure).
 
 ### Run your App
 
-* On first run of your app after integrating Performance Tracking the module will only fetch and store its configuration data, it **will not** send metric data. On subsequent runs the module will track and send metrics and measurements if the previously received configuration is valid and the enable percentage check succeeds.
+On first run of your app after integrating Performance Tracking the module will fetch and store its configuration data, it **will not** send metric data yet. On subsequent runs the module will track performance and send metrics and measurements if the previously received configuration is valid and the enable percentage check succeeds.
 
 ### Check Configuration
 
-* Using charles or any other network capture software you can verify whether configuration loaded successfully or not?
-* Look for `https://api.apps.global.rakuten.com` in charles and check if Response code if `200 OK` for successful configuration.
-* If Response code is not 200, then please check your subscription key in AndroidManifest.xml.
-* You can even verify this by enabling debug logs as shown in [Enable Debug Logs](#debug). You will see "Error loading configuration" log in failure scenario.
+You can verify this by enabling debug logs as shown in [Enable Debug Logs](#debug). You will see "Error loading configuration" log in failure scenario.
 
 ### Check Sending data to eventhub
 
-* Tracking data of your app will get reflected in the relay portal after few hours.
-* By using charles or any network capture software you can confirm whether tracking data is send to eventhub or not before it gets reflected in relay portal.
-* Look for `https://perf-eventhub-prd-japaneast.servicebus.windows.net` in charles and check Response code is `201 Created` for `measurements`.
+* Performance Tracking data of your app will reflect in the relay portal after few hours.
 * You can even verify this by enabling debug logs as shown in [Enable Debug Logs](#debug). You will see "SEND_METRIC" AND "SEND" in logs.
 
 ## <a name="changelog"></a> Changelog
 
 ### 0.1.1
-
+//TODO: List all the JIRA tickets included in this version.
 - Post MVP Release
 
 ### 0.1.0
