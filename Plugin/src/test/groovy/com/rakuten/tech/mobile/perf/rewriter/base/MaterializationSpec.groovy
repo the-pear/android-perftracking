@@ -9,7 +9,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.objectweb.asm.ClassReader
-import org.objectweb.asm.tree.LocalVariableNode
 
 import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
 import static com.rakuten.tech.mobile.perf.TestUtil.testLogger
@@ -56,9 +55,6 @@ class MaterializationSpec {
         Base baseStub = spy(new BaseLoader().loadBase(jar.getClassNode("com.rakuten.tech.mobile.perf.core.base.WebViewClientBase")))
         baseStub.internalName = "android/webkit/WebViewClient"
         materialization = new Materialization(baseStub, index++, provider, testLogger());
-        List<LocalVariableNode> localVariables = baseStub.cn.methods.get(2).localVariables
-        localVariables.get(2).signature = "Landroid/webkit/WebViewClient/testSignature"
-        localVariables.get(1).signature = "testSignature"
         File tempJarFile = tempDir.newFile("temp.jar")
         ClassJarMaker classJarMaker = new ClassJarMaker(tempJarFile)
 
