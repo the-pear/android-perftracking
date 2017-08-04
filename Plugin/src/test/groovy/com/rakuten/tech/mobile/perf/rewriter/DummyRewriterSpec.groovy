@@ -29,14 +29,8 @@ public class DummyRewriterSpec {
 
         ClassJar temp = new ClassJar(new File(dummyRewriter.outputJar));
         ClassNode classNode = temp.getClassNode("jp.co.rakuten.sdtd.user.ui.BaseActivity")
-        List<MethodNode> methodNodes = classNode.methods
-        boolean hasMethod = false
-        for (MethodNode methodNode : methodNodes) {
-            if (methodNode.name == "com_rakuten_tech_mobile_perf_onCreate") {
-                hasMethod = true
-            }
-        }
-        assert !hasMethod
+        def instrumentedMethod = classNode.methods.find { it.name == "com_rakuten_tech_mobile_perf_onCreate" }
+        assert !instrumentedMethod
     }
 
     @Test def void "should rewrite AppPerformanceConfig class, set enable value to false and add to output JAR"() {
@@ -48,16 +42,8 @@ public class DummyRewriterSpec {
         assert temp.hasClass("com.rakuten.tech.mobile.perf.runtime.internal.AppPerformanceConfig")
         ClassNode classNode = temp.getClassNode("com.rakuten.tech.mobile.perf.runtime.internal.AppPerformanceConfig")
         assert classNode.fields.size() > 0
-        List<FieldNode> fieldNodeList = classNode.fields
-        boolean hasEnabledField = false
-        boolean isEnableFieldFalse = true
-        for (FieldNode fieldNode : fieldNodeList) {
-            if (fieldNode.name == "enabled") {
-                hasEnabledField = true
-                isEnableFieldFalse = fieldNode.value
-            }
-        }
-        assert hasEnabledField
-        assert !isEnableFieldFalse
+        def enabled = classNode.fields.find { it.name == "enabled" }
+        assert enabled
+        assert !enabled.value
     }
 }
