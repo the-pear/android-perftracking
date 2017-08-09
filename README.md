@@ -139,7 +139,7 @@ You can see logs by filtering with "Performance Tracking" tag.
 ## <a name="configure"></a> Configure Tracking
 
 The SDK instruments the application at compile time. Instrumentation is disabled in `debug` build type, which means performance is not tracked in `debug` builds by default.
-You can enable/disable the tracking at build time in different build types in your application's build.gradle.
+You can enable/disable the tracking at build time in different build types in your application's `build.gradle`.
 If `enable` is `true` the application's code will be instrumented at compile time and performance will be tracked at runtime. If `enable` is `false` your application is compiled and runs just like it would without the SDK.
 
 ```
@@ -180,8 +180,13 @@ You can verify this by enabling debug logs as shown in [Enable Debug Logs](#debu
 ## <a name="changelog"></a> Changelog
 
 ### 0.1.1
-//TODO: List all the JIRA tickets included in this version.
-- Post MVP Release
+
+- Fixed Missing country and network operator info in tracking data [REM-20886](https://jira.rakuten-it.com/jira/browse/REM-20886) 
+- Added build switch to turn Instrumentation on/off [REM-20957](https://jira.rakuten-it.com/jira/browse/REM-20957) 
+- Fixed events are tracked even when instrumentation is disabled [REM-21479](https://jira.rakuten-it.com/jira/browse/REM-21479) 
+- Changed location information to Prefecture [REM-21577](https://jira.rakuten-it.com/jira/browse/REM-21577)
+- Send location information to proper field [REM-22770](https://jira.rakuten-it.com/jira/browse/REM-22770)
+- Provide documentation on how to confirm Performance Tracking SDK integration  [REM-22634](https://jira.rakuten-it.com/jira/browse/REM-22634)
 
 ### 0.1.0
 
