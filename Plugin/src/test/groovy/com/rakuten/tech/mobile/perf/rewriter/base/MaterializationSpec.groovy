@@ -26,16 +26,16 @@ class MaterializationSpec {
     Base base
     ClassProvider provider
 
-    String targetClass = "jp.co.rakuten.sdtd.user.authenticator.AuthenticatorFederatedActivity"
+    String targetClass = "com.rakuten.sample.MainActivity"
 
     @Before void setup() {
         base = new Base();
         def classpath = resourceFile("user-TestUI.jar").absolutePath + File.pathSeparator +
-                resourceFile("android23.jar").absolutePath
+                resourceFile("android23.jar").absolutePath + File.pathSeparator + resourceFile("SampleApp.jar")
         provider = new ClassProvider(classpath);
 
         clazz = provider.getClass(targetClass)
-        reader = new ClassJar(resourceFile("user-TestUI.jar")).getClassReader(targetClass)
+        reader = new ClassJar(resourceFile("SampleApp.jar")).getClassReader(targetClass)
         writer = new ClassWriter(provider, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
 
         materialization = new Materialization(base, index++, provider, testLogger());
@@ -47,7 +47,7 @@ class MaterializationSpec {
 
         reader.accept(visitor, 0)
 
-        assert materialization.internalSuperName == "android/accounts/AccountAuthenticatorActivity"
+        assert materialization.internalSuperName == "android/app/Activity"
     }
 
     @Test void "should materialize and add the class to ClassJarMaker"() {
