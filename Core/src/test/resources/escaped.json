@@ -7,51 +7,61 @@
     {
       "url": "http://example.com:80/page1\".html",
       "metric": "test-metric",
+      "start_time": 0,
       "time": 999
     },
     {
       "url": "http://example.com:80/page1\"[.html",
       "metric": "test-metric",
+      "start_time": 0,
       "time": 999
     },
     {
       "url": "http://example.com:80/page1\"{.html",
       "metric": "test-metric",
+      "start_time": 0,
       "time": 999
     },
     {
       "url": "http://example.com:80/page1\",.html",
       "metric": "test-metric",
+      "start_time": 0,
       "time": 999
     },
     {
       "url": "http://example.com:80/page1'}'.html",
       "metric": "test-metric",
+      "start_time": 0,
       "time": 999
     },
     {
       "url": "http://example.com:80/page1\".html",
       "metric": "test-metric",
+      "start_time": 0,
       "time": 999
     },
     {
       "url": "http://example.com:80/page1\"[.html",
       "metric": "test-metric",
+      "start_time": 0,
       "time": 999
     },
     {
       "url": "http://example.com:80/page1\"{.html",
       "metric": "test-metric",
+      "start_time": 0,
       "time": 999
     },
     {
       "url": "http://example.com:80/page1\",.html",
       "metric": "test-metric",
+      "start_time": 0,
       "time": 999
     },
     {
       "url": "http://example.com:80/page1'}'.html",
       "metric": "test-metric",
+      "start_time": 0,
       "time": 999
     }
   ],

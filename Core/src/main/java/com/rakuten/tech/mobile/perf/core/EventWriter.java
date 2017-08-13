@@ -95,6 +95,7 @@ class EventWriter {
                 _writer
                         .append("{\"metric\":\"").append(metric.id)
                         .append("\",\"urls\":").append(Integer.toString(metric.urls))
+                        .append(",\"start_time\":").append(Integer.toString((int) metric.startTime))
                         .append(",\"time\":").append(Integer.toString((int) ((metric.endTime - metric.startTime) / 1000000)))
                         .append('}');
                 _measurements++;
@@ -153,6 +154,7 @@ class EventWriter {
                 if (metricId != null) {
                     _writer.append(",\"metric\":\"").append(metricId).append('"');
                 }
+                _writer.append(",\"start_time\":").append(Integer.toString((int) (m.startTime / 1000000)));
                 _writer.append(",\"time\":").append(Integer.toString((int) ((m.endTime - m.startTime) / 1000000))).append('}');
                 _measurements++;
             } catch (Exception e) {
