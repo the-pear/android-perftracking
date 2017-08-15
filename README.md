@@ -69,7 +69,7 @@ BUILD SUCCESSFUL
 
 Now your application is ready to automatically track the launch metrics, network requests, view lifecycle methods, runnables, webview loads, onClick listeners, threads, volley's hurl stack and many more. To add custom measurement and structure them around metrics see [Customize Tracking](#customize).
 
-You will see your measurements in the [Relay Portal](https://rs-portal-web-prd-japaneast-wa.azurewebsites.net/) under Features > App Performance. If you obfuscate your app you can upload the `mapping.txt` in the portal and the tracking data will be deobfuscated for you.
+You will see your measurements in the [Relay Portal](https://rs-portal-web-prd-japaneast-wa.azurewebsites.net/), navigate to your Service and click on the "App Performance" feature.  Note that there is a few hours of delay before the data is reflected in Relay. If you obfuscate your app you can upload the `mapping.txt` in the portal and the tracking data will be deobfuscated for you.
 
 ## <a name="customize"></a> Customize Tracking
 
