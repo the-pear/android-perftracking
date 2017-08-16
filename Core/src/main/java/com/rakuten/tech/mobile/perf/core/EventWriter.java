@@ -95,7 +95,7 @@ class EventWriter {
                 _writer
                         .append("{\"metric\":\"").append(metric.id)
                         .append("\",\"urls\":").append(Integer.toString(metric.urls))
-                        .append(",\"start_time\":").append(Integer.toString((int) metric.startTime))
+                        .append(",\"start_time\":").append(Integer.toString((int) (metric.startTime / 1000000)))
                         .append(",\"time\":").append(Integer.toString((int) ((metric.endTime - metric.startTime) / 1000000)))
                         .append('}');
                 _measurements++;
