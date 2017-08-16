@@ -29,7 +29,8 @@ class MaterializationSpec {
     String targetClass = "com.rakuten.sample.MainActivity"
 
     @Before void setup() {
-        base = new Base();
+        ClassJar classJar = new ClassJar(resourceFile("user-testUI.jar"))
+        base = new BaseLoader().loadBase(classJar.getClassNode("com.rakuten.tech.mobile.perf.core.base.ActivityBase"))
         def classpath = resourceFile("user-TestUI.jar").absolutePath + File.pathSeparator +
                 resourceFile("android23.jar").absolutePath + File.pathSeparator + resourceFile("SampleApp.jar")
         provider = new ClassProvider(classpath);
@@ -43,11 +44,18 @@ class MaterializationSpec {
     }
 
     @Test void "should insert super class in inheritance hierarchy"() {
-        def visitor = spy(materialization.rewrite(clazz, writer))
-
+        def visitor = materialization.rewrite(clazz, writer)
+        def outputJar = tempDir.newFile('out.jar')
+        ClassJarMaker outputMaker = new ClassJarMaker(outputJar)
         reader.accept(visitor, 0)
 
+        materialization.materialize(outputMaker)
+
+        outputMaker.add(targetClass, writer.toByteArray())
+        outputMaker.Close()
+        def rewrittenClass = new ClassProvider(outputJar.absolutePath).getClass(targetClass)
         assert materialization.internalSuperName == "android/app/Activity"
+        assert rewrittenClass.getSuperclass().name.replace(".","/") == materialization.internalName
     }
 
     @Test void "should materialize and add the class to ClassJarMaker"() {
