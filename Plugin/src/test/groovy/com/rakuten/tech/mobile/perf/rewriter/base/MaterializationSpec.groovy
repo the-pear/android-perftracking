@@ -1,16 +1,21 @@
 package com.rakuten.tech.mobile.perf.rewriter.base
 
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJar
+import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJarMaker
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassProvider
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassWriter
-import org.gradle.api.logging.Logging
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TemporaryFolder
 import org.objectweb.asm.ClassReader
 
-import static com.rakuten.tech.mobile.perf.TestUtil.*
+import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
+import static com.rakuten.tech.mobile.perf.TestUtil.testLogger
+import static org.mockito.Mockito.spy
 
 class MaterializationSpec {
+    @Rule public final TemporaryFolder tempDir = new TemporaryFolder()
     def index = 1
     File jar
     Materialization materialization
@@ -18,31 +23,52 @@ class MaterializationSpec {
     Class clazz
     ClassWriter writer
     ClassReader reader
+    Base base
+    ClassProvider provider
 
-    // Step 1: select class to rewrite in materialization:
-    String targetClass = "jp.co.rakuten.sdtd.user.authenticator.AuthenticatorFederatedActivity"
+    String targetClass = "com.rakuten.sample.MainActivity"
 
     @Before void setup() {
-        // Step 2: define a base class description
-        def base = new Base();
+        ClassJar classJar = new ClassJar(resourceFile("user-testUI.jar"))
+        base = new BaseLoader().loadBase(classJar.getClassNode("com.rakuten.tech.mobile.perf.core.base.ActivityBase"))
         def classpath = resourceFile("user-TestUI.jar").absolutePath + File.pathSeparator +
-                resourceFile("android23.jar").absolutePath
-        def provider = new ClassProvider(classpath);
-        def logger = Logging.getLogger("test")
+                resourceFile("android23.jar").absolutePath + File.pathSeparator + resourceFile("SampleApp.jar")
+        provider = new ClassProvider(classpath);
 
         clazz = provider.getClass(targetClass)
-        reader = new ClassJar(resourceFile("user-TestUI.jar")).getClassReader(targetClass)
+        reader = new ClassJar(resourceFile("SampleApp.jar")).getClassReader(targetClass)
         writer = new ClassWriter(provider, ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
 
-        materialization = new Materialization(base, index++, provider, logger);
+        materialization = new Materialization(base, index++, provider, testLogger());
         jar = resourceFile("user-TestUI.jar");
     }
 
     @Test void "should insert super class in inheritance hierarchy"() {
         def visitor = materialization.rewrite(clazz, writer)
-        // Step 3: debug Materialization as it rewrites the target class
+        def outputJar = tempDir.newFile('out.jar')
+        ClassJarMaker outputMaker = new ClassJarMaker(outputJar)
         reader.accept(visitor, 0)
-        // TODO add verifications
+
+        materialization.materialize(outputMaker)
+
+        outputMaker.add(targetClass, writer.toByteArray())
+        outputMaker.Close()
+        def rewrittenClass = new ClassProvider(outputJar.absolutePath).getClass(targetClass)
+        assert materialization.internalSuperName == "android/app/Activity"
+        assert rewrittenClass.getSuperclass().name.replace(".","/") == materialization.internalName
     }
 
+    @Test void "should materialize and add the class to ClassJarMaker"() {
+        ClassJar jar = new ClassJar(resourceFile("user-testUI.jar"))
+        Base baseStub = spy(new BaseLoader().loadBase(jar.getClassNode("com.rakuten.tech.mobile.perf.core.base.WebViewClientBase")))
+        baseStub.internalName = "android/webkit/WebViewClient"
+        materialization = new Materialization(baseStub, index++, provider, testLogger());
+        File tempJarFile = tempDir.newFile("temp.jar")
+        ClassJarMaker classJarMaker = new ClassJarMaker(tempJarFile)
+
+        materialization.materialize(classJarMaker)
+
+        classJarMaker.Close()
+        assert new ClassJar(tempJarFile).hasClass(materialization.name)
+    }
 }
