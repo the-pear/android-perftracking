@@ -110,10 +110,11 @@ public class TrackerImplSpec {
         // no exception
     }
 
-    @Test public void shouldNotProlongMetricAfterTimeout() {
+    @Test public void shouldNotProlongMetricAfterTimeout() throws InterruptedException {
         tracker.startMetric("testMetric");
         Metric m = metric.get();
-        m.startTime = m.startTime - (Metric.MAX_TIME+1); // pretend it is an old metric
+        m.startTime = m.startTime - (Metric.MAX_TIME); // pretend it is an old metric
+        Thread.sleep(1);
         tracker.prolongMetric();
 
         assertThat(metric.get()).isNull();

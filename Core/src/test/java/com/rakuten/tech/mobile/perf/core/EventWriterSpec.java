@@ -377,6 +377,77 @@ public class EventWriterSpec {
         JSONAssert.assertEquals(smokeTestJson.content, writtenString, true);
     }
 
+    @Rule public TestData smokeTestNonZeroJson = new TestData("smoke_test_non_zero.json");
+    @Test public void smokeTestNonZeroStartValue() throws IOException, JSONException {
+        Metric metric = new Metric();
+        metric.startTime = 1L;
+        metric.endTime = 999;
+        metric.id = "test-metric";
+        metric.urls = 999;
+
+        writer.begin();
+        writer.write(metric);
+        writer.write(metric);
+
+        Measurement measurement = new Measurement();
+        measurement.type = Measurement.METHOD;
+        measurement.a = "TestClass";
+        measurement.b = "testMethod";
+        measurement.startTime = 1L;
+        measurement.endTime = 999;
+
+        writer.write(measurement, metric.id);
+
+        measurement = new Measurement();
+        measurement.type = Measurement.URL;
+        measurement.a = "https://rakuten.co.jp1/some/path?and=some&url=params";
+        measurement.b = "VERB";
+        measurement.startTime = 1L;
+        measurement.endTime = 999;
+
+        writer.write(measurement, metric.id);
+
+        measurement = new Measurement();
+        measurement.type = Measurement.URL;
+        measurement.a = "https://rakuten.co.jp2/some/path?and=some&url=params";
+        measurement.b = "VERB";
+        measurement.startTime = 1L;
+        measurement.endTime = 999;
+
+        writer.write(measurement, null);
+
+        measurement = new Measurement();
+        measurement.type = Measurement.URL;
+        measurement.a = "https://rakuten.co.jp3/some/path?and=some&url=params";
+        measurement.b = null;
+        measurement.startTime = 1L;
+        measurement.endTime = 999;
+
+        writer.write(measurement, null);
+
+        measurement = new Measurement();
+        measurement.type = Measurement.CUSTOM;
+        measurement.a = "custom-measurement";
+        measurement.startTime = 1L;
+        measurement.endTime = 999;
+
+        writer.write(measurement, metric.id);
+
+        measurement = new Measurement();
+        measurement.type = Measurement.URL;
+        measurement.a = new URL("https://amazon.co.jp/other/path?and=some&url=params");
+        measurement.b = "BERV";
+        measurement.startTime = 1L;
+        measurement.endTime = 100;
+
+        writer.write(measurement, metric.id);
+
+        writer.end();
+
+        String writtenString = extractWrittenString(outputStream);
+        JSONAssert.assertEquals(smokeTestNonZeroJson.content, writtenString, true);
+    }
+
     // helpers
 
     private String extractWrittenString(OutputStream outputStream) throws IOException {

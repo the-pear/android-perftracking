@@ -4,9 +4,9 @@ import android.util.Log;
 
 class Debug {
 
+    private static final String TAG = "Performance Tracking";
 
-    public void log(String msg) {
-        final String TAG = "Performance Tracking";
+    private void log(String msg) {
         Log.d(TAG, msg);
     }
 
