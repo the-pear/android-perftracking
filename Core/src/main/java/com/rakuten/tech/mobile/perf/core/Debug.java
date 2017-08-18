@@ -3,9 +3,10 @@ package com.rakuten.tech.mobile.perf.core;
 import android.util.Log;
 
 class Debug {
-    private final String TAG = "Performance Tracking";
+
 
     public void log(String msg) {
+        final String TAG = "Performance Tracking";
         Log.d(TAG, msg);
     }
 
@@ -18,7 +19,7 @@ class Debug {
         s.append(",endTime=").append(metric.endTime);
 
         if (metric.endTime > metric.startTime) {
-            s.append(",time=").append((metric.endTime - metric.startTime) / 1000000).append("ms");
+            s.append(",time=").append((metric.endTime - metric.startTime)).append("ms");
         }
 
         s.append(",urls=").append(metric.urls);
@@ -45,7 +46,7 @@ class Debug {
         s.append(",endTime=").append(m.endTime);
 
         if (m.endTime > m.startTime) {
-            s.append(",time=").append((m.endTime - m.startTime) / 1000000).append("ms");
+            s.append(",time=").append((m.endTime - m.startTime)).append("ms");
         }
 
         if (metricId != null) {

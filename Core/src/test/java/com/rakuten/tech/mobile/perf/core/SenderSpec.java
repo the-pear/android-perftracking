@@ -25,14 +25,12 @@ public class SenderSpec {
     private MeasurementBuffer measurementBuffer;
     private Current current;
     @Mock EventWriter eventWriter;
-    private Debug debug;
 
     @Before public void init() {
         MockitoAnnotations.initMocks(this);
         measurementBuffer = new MeasurementBuffer();
-        debug = new Debug();
         current = new Current();
-        sender = new Sender(measurementBuffer, current, eventWriter, debug);
+        sender = new Sender(measurementBuffer, current, eventWriter, new Debug());
     }
 
     @Test public void shouldSendMeasurements() throws IOException {
@@ -216,7 +214,7 @@ public class SenderSpec {
             Measurement measurement = measurementBuffer.next();
             measurement.type = Measurement.CUSTOM;
             measurement.a = "custom-measurement";
-            measurement.startTime = System.nanoTime();
+            measurement.startTime = System.currentTimeMillis();
             measurement.endTime = 0L;
         }
     }
@@ -268,7 +266,7 @@ public class SenderSpec {
                 measurement.type = Measurement.METRIC;
                 Metric metric = new Metric();
                 metric.id = "custom-metric";
-                measurement.startTime = System.nanoTime();
+                measurement.startTime = System.currentTimeMillis();
                 measurement.endTime = 999 * 1000000L;
                 measurement.a = metric;
             }

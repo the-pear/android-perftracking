@@ -7,7 +7,7 @@ public class Measurement {
     static final byte URL = 3;
     static final byte CUSTOM = 4;
 
-    static final long MAX_TIME = 30000000000L; // 30 s
+    static final long MAX_TIME = 30000L; // 30 s
 
     int trackingId;
     byte type;
