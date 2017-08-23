@@ -35,6 +35,8 @@ public class EnvironmentInfoSpec {
         assertThat(info.getCountry()).isEqualTo(simCountry);
         assertThat(info.network).isEqualTo(networkOperator);
         assertThat(info.device).isEqualTo(Build.MODEL);
+        assertThat(info.osname).isEqualTo("Android");
+        assertThat(info.osversion).isEqualTo(Build.VERSION.RELEASE);
     }
 
     @Test

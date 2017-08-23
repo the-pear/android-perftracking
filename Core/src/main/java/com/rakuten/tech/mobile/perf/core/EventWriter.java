@@ -74,6 +74,15 @@ class EventWriter {
             if (_envInfo.network != null) {
                 _writer.append("\",\"network\":\"").append(_envInfo.network);
             }
+
+            if (_envInfo.osname != null) {
+                _writer.append("\",\"os\":\"").append(_envInfo.osname);
+            }
+
+            if (_envInfo.osversion != null) {
+                _writer.append("\",\"os_version\":\"").append(_envInfo.osversion);
+            }
+
             _writer.append("\",\"measurements\":[");
             _measurements = 0;
 
