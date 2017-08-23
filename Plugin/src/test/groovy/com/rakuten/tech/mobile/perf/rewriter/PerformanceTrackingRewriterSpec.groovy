@@ -7,9 +7,6 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.objectweb.asm.tree.ClassNode
 
-import java.util.jar.JarEntry
-import java.util.jar.JarFile
-
 import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
 
 public class PerformanceTrackingRewriterSpec {
@@ -46,26 +43,5 @@ public class PerformanceTrackingRewriterSpec {
         def enabled = classNode.fields.find { it.name == "enabled" }
         assert enabled
         assert enabled.value
-    }
-
-    @Test def void "should confirm the outputjars are same with and without ensureDir code"() {
-        performanceTrackingRewriter.rewrite()
-
-        try {
-            JarFile withEnsureDirJar = new JarFile(resourceFile("TestWithEnsure.jar").absolutePath)
-            JarFile withoutEnsureDirJar = new JarFile(performanceTrackingRewriter.outputJar)
-
-            Enumeration entryEnumeration = withEnsureDirJar.entries()
-            while (entryEnumeration.hasMoreElements()) {
-                JarEntry jarEntryFromWithEnsureDirJar = (JarEntry) entryEnumeration.nextElement()
-                JarEntry jarEntryFromWithoutEnsureDirJar = withoutEnsureDirJar.getJarEntry(jarEntryFromWithEnsureDirJar.getName())
-                assert jarEntryFromWithoutEnsureDirJar != null
-            }
-            withEnsureDirJar.close()
-            withoutEnsureDirJar.close()
-
-        } catch (IOException e) {
-            assert false: "Failed to open Jar file"
-        }
     }
 }
