@@ -74,7 +74,6 @@ public class ClassJarMaker {
 
     public void add(String name, InputStream input) {
         try {
-            ensureDirs(name);
             JarEntry entry = new JarEntry(name.replace('.', '/') + ".class");
             _output.putNextEntry(entry);
 
@@ -97,7 +96,6 @@ public class ClassJarMaker {
 
     public void add(String name, byte[] data) {
         try {
-            ensureDirs(name);
             JarEntry entry = new JarEntry(name.replace('.', '/') + ".class");
             _output.putNextEntry(entry);
             _output.write(data);
@@ -118,17 +116,4 @@ public class ClassJarMaker {
         }
     }
 
-    private void ensureDirs(String name) throws IOException {
-        String[] pieces = name.split(".");
-        String dir = "";
-        for (int i = 0; i < pieces.length - 1; i++) {
-            dir += pieces[i] + "/";
-            if (!_dirs.contains(dir)) {
-                JarEntry entry = new JarEntry(dir);
-                _output.putNextEntry(entry);
-                _output.closeEntry();
-                _dirs.add(dir);
-            }
-        }
-    }
 }
