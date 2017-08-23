@@ -3,6 +3,8 @@
   "country": "test-land",
   "region": "test-region",
   "device": "test-device",
+  "os": "test-android",
+  "os_version": "test-os-version",
   "measurements": [
     {
       "metric": "test-metric",

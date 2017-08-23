@@ -2,6 +2,8 @@
   "app": "app",
   "country": "test-land",
   "region": "test-region",
+  "os": "test-android",
+  "os_version": "test-os-version",
   "measurements": [],
   "version": "test-version"
 }
