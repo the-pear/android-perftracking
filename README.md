@@ -27,7 +27,7 @@ buildscript {
         maven { url 'http://artifactory.raksdtd.com/artifactory/libs-release' }
     }
     dependencies {
-        classpath 'com.rakuten.tech.mobile.perf:plugin:0.1.1'
+        classpath 'com.rakuten.tech.mobile.perf:plugin:0.2.0'
     }
 }
 
@@ -41,7 +41,7 @@ You must provide Configuration api's subscription key as metadata in application
 ```xml
 <manifest>
     <application>
-        <meta-data android:name="com.rakuten.tech.mobile.perf.SubscriptionKey"
+        <meta-data android:name="com.rakuten.tech.mobile.relay.SubscriptionKey"
                    android:value="subscriptionKey" />
     </application>
 </manifest>
@@ -183,6 +183,7 @@ You can verify this by enabling debug logs as shown in [Enable Debug Logs](#debu
 
 - Send OS name and OS version information in tracking data [REM-23143](https://jira.rakuten-it.com/jira/browse/REM-23143) 
 - Send measurement start timestamp in tracking data [REM-22694](https://jira.rakuten-it.com/jira/browse/REM-22694) 
+- Changes Subscription Key Manifest namespace from `com.rakuten.tech.mobile.perf` to `com.rakuten.tech.mobile.relay`
 
 ### 0.1.1
 

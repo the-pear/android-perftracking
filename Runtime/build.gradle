@@ -50,6 +50,7 @@ dependencies {
     compile files('libs/Core.jar')
     compile "com.android.support:support-annotations:$CONFIG.versions.android.libraries.support"
     compile 'jp.co.rakuten.api:core:1.2.0'
+    compile 'com.rakuten.tech.mobile.relay:relay-util:0.0.1'
 }
 
 apply from: "test.gradle"
