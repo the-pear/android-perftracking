@@ -94,9 +94,9 @@ class EventWriter {
                 }
                 _writer
                         .append("{\"metric\":\"").append(metric.id)
-                        .append("\",\"urls\":").append(Integer.toString(metric.urls))
-                        .append(",\"start\":").append(Integer.toString((int) metric.startTime))
-                        .append(",\"time\":").append(Integer.toString((int) (metric.endTime - metric.startTime)))
+                        .append("\",\"urls\":").append(Long.toString(metric.urls))
+                        .append(",\"start\":").append(Long.toString(metric.startTime))
+                        .append(",\"time\":").append(Long.toString(metric.endTime - metric.startTime))
                         .append('}');
                 _measurements++;
             } catch (Exception e) {
@@ -154,8 +154,8 @@ class EventWriter {
                 if (metricId != null) {
                     _writer.append(",\"metric\":\"").append(metricId).append('"');
                 }
-                _writer.append(",\"start\":").append(Integer.toString((int) (m.startTime)));
-                _writer.append(",\"time\":").append(Integer.toString((int) (m.endTime - m.startTime))).append('}');
+                _writer.append(",\"start\":").append(Long.toString(m.startTime));
+                _writer.append(",\"time\":").append(Long.toString(m.endTime - m.startTime)).append('}');
                 _measurements++;
             } catch (Exception e) {
                 if (_config.debug) {
