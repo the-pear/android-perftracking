@@ -1,26 +1,12 @@
-buildscript {
-    repositories {
-        maven {
-            url ARTIFACTORY_RELEASE
-        }
-    }
-    dependencies {
-        classpath 'jp.co.rakuten.sdtd.plugin:artifactory:1.2.0'
-        classpath 'jp.co.rakuten.sdtd.plugin:javadoc:1.2.4'
-        classpath 'com.dicedmelon.gradle:jacoco-android:0.1.1'
-    }
-}
-
-// --- ANDROID --
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion Integer.parseInt(project.ANDROID_BUILD_SDK_VERSION)
-    buildToolsVersion ANDROID_BUILD_TOOLS_VERSION
+    compileSdkVersion CONFIG.versions.android.sdk.compile
+    buildToolsVersion CONFIG.versions.android.tools
 
     defaultConfig {
-        minSdkVersion project.ANDROID_MIN_SDK_VERSION
-        targetSdkVersion Integer.parseInt(project.ANDROID_BUILD_TARGET_SDK_VERSION)
+        minSdkVersion CONFIG.versions.android.sdk.min
+        targetSdkVersion CONFIG.versions.android.sdk.target
         versionName project.MODULE_VERSION
         resValue 'string', 'perftracking__version', project.MODULE_VERSION
     }
@@ -62,8 +48,8 @@ dependencies {
     copyJar project(':Core')
 
     compile files('libs/Core.jar')
-    compile 'com.android.support:support-annotations:23.1.1'
-    compile 'jp.co.rakuten.api:core:1.0.1'
+    compile "com.android.support:support-annotations:$CONFIG.versions.android.libraries.support"
+    compile 'jp.co.rakuten.api:core:1.2.0'
 }
 
 apply from: "test.gradle"
