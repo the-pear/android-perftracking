@@ -45,6 +45,7 @@ public class EventWriterSpec {
         location.publish(new LocationData("test-land", "test-region"));
         envInfo.network = "test-network";
         envInfo.device = "test-device";
+        envInfo.osversion = "7.1.1";
 
         when(url.openConnection()).thenReturn(conn);
         when(conn.getOutputStream()).thenReturn(outputStream);

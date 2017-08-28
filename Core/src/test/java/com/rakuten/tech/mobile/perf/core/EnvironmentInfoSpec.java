@@ -27,14 +27,22 @@ public class EnvironmentInfoSpec {
         when(tm.getNetworkOperatorName()).thenReturn(networkOperator);
     }
 
-
-    @Test public void shouldReadCountryAndNetworkFromTelephonyManager() {
+    @Test
+    public void shouldReadCountryAndNetworkFromTelephonyManager() {
         when(ctx.getSystemService(Context.TELEPHONY_SERVICE)).thenReturn(tm);
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
         assertThat(info.getCountry()).isEqualTo(simCountry);
         assertThat(info.network).isEqualTo(networkOperator);
+    }
+
+    @Test
+    public void shouldValidateDeviceInfo() {
+        EnvironmentInfo info = new EnvironmentInfo(ctx, location);
+        assertThat(info).isNotNull();
         assertThat(info.device).isEqualTo(Build.MODEL);
+        assertThat(info.osname).isEqualTo("android");
+        assertThat(info.osversion).isEqualTo(Build.VERSION.RELEASE);
     }
 
     @Test

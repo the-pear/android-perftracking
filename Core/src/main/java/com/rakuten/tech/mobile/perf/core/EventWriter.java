@@ -52,7 +52,6 @@ class EventWriter {
             _conn.setUseCaches(false);
             _conn.setDoInput(false);
             _conn.setDoOutput(true);
-            //conn.setConnectTimeout(10000);
             _conn.connect();
 
             _writer = new BufferedWriter(new OutputStreamWriter(_conn.getOutputStream()));
@@ -74,6 +73,15 @@ class EventWriter {
             if (_envInfo.network != null) {
                 _writer.append("\",\"network\":\"").append(_envInfo.network);
             }
+
+            if (_envInfo.osname != null) {
+                _writer.append("\",\"os\":\"").append(_envInfo.osname);
+            }
+
+            if (_envInfo.osversion != null) {
+                _writer.append("\",\"os_version\":\"").append(_envInfo.osversion);
+            }
+
             _writer.append("\",\"measurements\":[");
             _measurements = 0;
 
