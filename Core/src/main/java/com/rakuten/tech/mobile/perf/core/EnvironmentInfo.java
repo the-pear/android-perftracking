@@ -11,6 +11,7 @@ import java.util.Observer;
 class EnvironmentInfo implements Observer {
     String device;
     String network;
+    final String osname;
     String osversion;
     private String country = null;
     private String region = null;
@@ -19,6 +20,7 @@ class EnvironmentInfo implements Observer {
 
         locationObservable.addObserver(this);
 
+        this.osname = "android";
         this.device = Build.MODEL;
         this.osversion = Build.VERSION.RELEASE;
 

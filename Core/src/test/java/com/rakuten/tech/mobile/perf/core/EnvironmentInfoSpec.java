@@ -41,6 +41,7 @@ public class EnvironmentInfoSpec {
         EnvironmentInfo info = new EnvironmentInfo(ctx, location);
         assertThat(info).isNotNull();
         assertThat(info.device).isEqualTo(Build.MODEL);
+        assertThat(info.osname).isEqualTo("android");
         assertThat(info.osversion).isEqualTo(Build.VERSION.RELEASE);
     }
 

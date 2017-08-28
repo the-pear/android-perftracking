@@ -56,8 +56,7 @@ class EventWriter {
 
             _writer = new BufferedWriter(new OutputStreamWriter(_conn.getOutputStream()));
             _writer.append("{\"app\":\"").append(_config.app)
-                    .append("\",\"version\":\"").append(_config.version)
-                    .append("\",\"os\":\"").append("android");
+                    .append("\",\"version\":\"").append(_config.version);
 
             if (_envInfo.device != null) {
                 _writer.append("\",\"device\":\"").append(_envInfo.device);
@@ -73,6 +72,10 @@ class EventWriter {
 
             if (_envInfo.network != null) {
                 _writer.append("\",\"network\":\"").append(_envInfo.network);
+            }
+
+            if (_envInfo.osname != null) {
+                _writer.append("\",\"os\":\"").append(_envInfo.osname);
             }
 
             if (_envInfo.osversion != null) {
