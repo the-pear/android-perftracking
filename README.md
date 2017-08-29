@@ -179,6 +179,11 @@ You can verify this by enabling debug logs as shown in [Enable Debug Logs](#debu
 
 ## <a name="changelog"></a> Changelog
 
+### 0.2.0 (In Progress)
+
+- Send OS name and OS version information in tracking data [REM-23143](https://jira.rakuten-it.com/jira/browse/REM-23143) 
+- Send measurement start timestamp in tracking data [REM-22694](https://jira.rakuten-it.com/jira/browse/REM-22694) 
+
 ### 0.1.1
 
 - Fixed Missing country and network operator info in tracking data [REM-20886](https://jira.rakuten-it.com/jira/browse/REM-20886) 
