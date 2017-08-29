@@ -2,7 +2,7 @@ package com.rakuten.tech.mobile.perf.core;
 
 public class Metric {
 
-    static final long MAX_TIME = 10000000000L; // 10 s
+    static final long MAX_TIME = 10000L; // 10 s
 
     String id;
     long startTime;
@@ -11,6 +11,7 @@ public class Metric {
 
     /**
      * deep copy values of `this` struct into newly allocated struct
+     *
      * @return deep copy of `this`
      */
     Metric copy() {

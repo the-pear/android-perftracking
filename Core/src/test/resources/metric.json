@@ -8,6 +8,7 @@
   "measurements": [
     {
       "metric": "test-metric",
+      "start": 0,
       "time": 999,
       "urls": 999
     }

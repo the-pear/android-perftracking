@@ -8,42 +8,50 @@
   "measurements": [
     {
       "metric": "test-metric",
+      "start":0,
       "time": 999,
       "urls": 999
     },
     {
       "metric": "test-metric",
+      "start":0,
       "time": 999,
       "urls": 999
     },
     {
       "method": "TestClass.testMethod",
       "metric": "test-metric",
-      "time": 999
+      "start":1,
+      "time": 998
     },
     {
       "url": "https://rakuten.co.jp1/some/path",
       "metric": "test-metric",
-      "time": 999,
+      "start":10,
+      "time": 989,
       "verb": "VERB"
     },
     {
       "url": "https://rakuten.co.jp2/some/path",
-      "time": 999,
+      "start":11,
+      "time": 988,
       "verb": "VERB"
     },
     {
       "url": "https://rakuten.co.jp3/some/path",
-      "time": 999
+      "start":100,
+      "time": 899
     },
     {
       "custom": "custom-measurement",
       "metric": "test-metric",
-      "time": 999
+      "start":101,
+      "time": 898
     },
     {
       "url": "https://amazon.co.jp/other/path",
       "metric": "test-metric",
+      "start":0,
       "time": 100,
       "verb": "BERV"
     }

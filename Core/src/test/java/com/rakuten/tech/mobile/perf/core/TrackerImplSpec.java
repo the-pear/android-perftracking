@@ -28,7 +28,7 @@ public class TrackerImplSpec {
     private TrackerImpl tracker;
 
     private class MockBuffer extends MeasurementBuffer {
-        List<Measurement> measurements = new LinkedList<>();
+        final List<Measurement> measurements = new LinkedList<>();
 
         @Override public Measurement next() {
             Measurement m = new Measurement();
@@ -58,8 +58,9 @@ public class TrackerImplSpec {
 
     // metrics
 
-    @Test public void shouldInitializeMetricOnStartMetric() {
-        long beforeStart = System.nanoTime();
+    @Test public void shouldInitializeMetricOnStartMetric() throws InterruptedException {
+        long beforeStart = System.currentTimeMillis();
+        Thread.sleep(1);
         tracker.startMetric("some metric");
 
         assertThat(metric.get()).isNotNull();
@@ -109,22 +110,22 @@ public class TrackerImplSpec {
         // no exception
     }
 
-    @Test public void shouldNotProlongMetricAfterTimeout() {
+    @Test public void shouldNotProlongMetricAfterTimeout() throws InterruptedException {
         tracker.startMetric("testMetric");
         Metric m = metric.get();
-        m.startTime = m.startTime - Metric.MAX_TIME; // pretend it is an old metric
+        m.startTime = m.startTime - (Metric.MAX_TIME); // pretend it is an old metric
+        Thread.sleep(1);
         tracker.prolongMetric();
 
         assertThat(metric.get()).isNull();
     }
 
     @Test public void shouldUpdateEndTimeOnProlongMetric() throws InterruptedException {
-        long beforeStart = System.nanoTime();
+        long beforeStart = System.currentTimeMillis();
         tracker.startMetric("some metric");
         Thread.sleep(100);
         tracker.prolongMetric();
-
-        assertThat(metric.get().endTime).isGreaterThan(beforeStart + 100*1000);
+        assertThat(metric.get().endTime).isGreaterThan(beforeStart + 100);
     }
 
     @Test public void shouldNotUpdateEndTimeOnEndMetric() throws InterruptedException {
@@ -163,7 +164,7 @@ public class TrackerImplSpec {
     @Test public void shouldUpdateExistingMethodMeasurement() throws InterruptedException {
         int id = tracker.startMethod(new Object(), "testMethod");
         Thread.sleep(10);
-        long beforeEnd = System.nanoTime();
+        long beforeEnd = System.currentTimeMillis();
         tracker.endMethod(id);
 
         verify(buffer, times(1)).next();
@@ -190,7 +191,7 @@ public class TrackerImplSpec {
     @Test public void shouldUpdateExistingUrlMeasurement() throws InterruptedException, MalformedURLException {
         int id = tracker.startUrl(new URL("https://rakuten.co.jp"), "GET");
         Thread.sleep(10);
-        long beforeEnd = System.nanoTime();
+        long beforeEnd = System.currentTimeMillis();
         tracker.endUrl(id);
 
         verify(buffer, times(1)).next();
@@ -234,7 +235,7 @@ public class TrackerImplSpec {
     @Test public void shouldUpdateExistingCustomMeasurement() throws InterruptedException {
         int id = tracker.startCustom("testId");
         Thread.sleep(10);
-        long beforeEnd = System.nanoTime();
+        long beforeEnd = System.currentTimeMillis();
         tracker.endCustom(id);
 
         verify(buffer, times(1)).next();

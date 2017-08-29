@@ -9,6 +9,7 @@
     {
       "method": "TestClass.testMethod",
       "metric": "test-metric",
+      "start": 0,
       "time": 999
     }
   ],

@@ -9,6 +9,7 @@
     {
       "url": "https://rakuten.co.jp/some/path",
       "metric": "test-metric",
+      "start": 0,
       "time": 999,
       "verb": "VERB"
     }

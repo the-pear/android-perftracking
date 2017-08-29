@@ -30,7 +30,7 @@ public class EventWriterSpec {
     @Mock OutputStream outputStream;
     @Mock HttpsURLConnection conn;
     @Mock Context ctx;
-    private CachingObservable<LocationData> location = new CachingObservable<LocationData>(null);
+    final private CachingObservable<LocationData> location = new CachingObservable<>(null);
     private EventWriter writer;
 
     @Before public void initMocks() throws IOException {
@@ -120,7 +120,7 @@ public class EventWriterSpec {
     @Test public void shouldWriteSingleMetric() throws IOException, JSONException {
         Metric metric = new Metric();
         metric.startTime = 0L;
-        metric.endTime = 999 * 1000000L;
+        metric.endTime = 999;
         metric.id = "test-metric";
         metric.urls = 999;
 
@@ -139,7 +139,7 @@ public class EventWriterSpec {
         measurement.a = "TestClass";
         measurement.b = "testMethod";
         measurement.startTime = 0L;
-        measurement.endTime = 999 * 1000000L;
+        measurement.endTime = 999;
 
         writer.begin();
         writer.write(measurement, "test-metric");
@@ -156,7 +156,7 @@ public class EventWriterSpec {
         measurement.a = new URL("https://rakuten.co.jp/some/path?and=some&url=params");
         measurement.b = "VERB";
         measurement.startTime = 0L;
-        measurement.endTime = 999 * 1000000L;
+        measurement.endTime = 999;
 
         writer.begin();
         writer.write(measurement, "test-metric");
@@ -172,7 +172,7 @@ public class EventWriterSpec {
         measurement.a = "https://rakuten.co.jp/some/path?and=some&url=params";
         measurement.b = "VERB";
         measurement.startTime = 0L;
-        measurement.endTime = 999 * 1000000L;
+        measurement.endTime = 999;
 
         writer.begin();
         writer.write(measurement, "test-metric");
@@ -188,7 +188,7 @@ public class EventWriterSpec {
         measurement.type = Measurement.CUSTOM;
         measurement.a = "custom-measurement";
         measurement.startTime = 0L;
-        measurement.endTime = 999 * 1000000L;
+        measurement.endTime = 999;
 
         writer.begin();
         writer.write(measurement, "test-metric");
@@ -228,7 +228,7 @@ public class EventWriterSpec {
         measurement.type = Measurement.CUSTOM;
         measurement.a = "";
         measurement.startTime = 0L;
-        measurement.endTime = 999 * 1000000L;
+        measurement.endTime = 999;
         writer.write(measurement, "");
         // no exceptions
     }
@@ -239,7 +239,7 @@ public class EventWriterSpec {
         measurement.a = null;
         measurement.b = null;
         measurement.startTime = 0L;
-        measurement.endTime = 999 * 1000000L;
+        measurement.endTime = 999;
         writer.begin();
         writer.write(measurement, null);
         measurement.type = Measurement.METHOD;
@@ -253,7 +253,7 @@ public class EventWriterSpec {
 
         Metric metric = new Metric();
         metric.startTime = 0L;
-        metric.endTime = 999 * 1000000L;
+        metric.endTime = 999;
         metric.id = null;
         metric.urls = 999;
         writer.write(metric);
@@ -275,7 +275,7 @@ public class EventWriterSpec {
         measurement.type = Measurement.URL;
         measurement.a = new URL("http://example.com:80/page1\".html");
         measurement.startTime = 0L;
-        measurement.endTime = 999 * 1000000L;
+        measurement.endTime = 999;
 
         writer.begin();
         writer.write(measurement, "test-metric");
@@ -311,7 +311,7 @@ public class EventWriterSpec {
     @Test public void smokeTest() throws IOException, JSONException {
         Metric metric = new Metric();
         metric.startTime = 0L;
-        metric.endTime = 999 * 1000000L;
+        metric.endTime = 999;
         metric.id = "test-metric";
         metric.urls = 999;
 
@@ -323,8 +323,8 @@ public class EventWriterSpec {
         measurement.type = Measurement.METHOD;
         measurement.a = "TestClass";
         measurement.b = "testMethod";
-        measurement.startTime = 0L;
-        measurement.endTime = 999 * 1000000L;
+        measurement.startTime = 1L;
+        measurement.endTime = 999;
 
         writer.write(measurement, metric.id);
 
@@ -332,8 +332,8 @@ public class EventWriterSpec {
         measurement.type = Measurement.URL;
         measurement.a = "https://rakuten.co.jp1/some/path?and=some&url=params";
         measurement.b = "VERB";
-        measurement.startTime = 0L;
-        measurement.endTime = 999 * 1000000L;
+        measurement.startTime = 10L;
+        measurement.endTime = 999;
 
         writer.write(measurement, metric.id);
 
@@ -341,8 +341,8 @@ public class EventWriterSpec {
         measurement.type = Measurement.URL;
         measurement.a = "https://rakuten.co.jp2/some/path?and=some&url=params";
         measurement.b = "VERB";
-        measurement.startTime = 0L;
-        measurement.endTime = 999 * 1000000L;
+        measurement.startTime = 11L;
+        measurement.endTime = 999;
 
         writer.write(measurement, null);
 
@@ -350,16 +350,16 @@ public class EventWriterSpec {
         measurement.type = Measurement.URL;
         measurement.a = "https://rakuten.co.jp3/some/path?and=some&url=params";
         measurement.b = null;
-        measurement.startTime = 0L;
-        measurement.endTime = 999 * 1000000L;
+        measurement.startTime = 100L;
+        measurement.endTime = 999;
 
         writer.write(measurement, null);
 
         measurement = new Measurement();
         measurement.type = Measurement.CUSTOM;
         measurement.a = "custom-measurement";
-        measurement.startTime = 0L;
-        measurement.endTime = 999 * 1000000L;
+        measurement.startTime = 101L;
+        measurement.endTime = 999;
 
         writer.write(measurement, metric.id);
 
@@ -368,7 +368,7 @@ public class EventWriterSpec {
         measurement.a = new URL("https://amazon.co.jp/other/path?and=some&url=params");
         measurement.b = "BERV";
         measurement.startTime = 0L;
-        measurement.endTime = 100 * 1000000L;
+        measurement.endTime = 100;
 
         writer.write(measurement, metric.id);
 

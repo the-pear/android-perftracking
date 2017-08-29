@@ -90,7 +90,7 @@ class EventWriter {
                 Log.d(TAG, e.getMessage());
             }
             disconnect();
-            if(e instanceof IOException) throw e;
+            if (e instanceof IOException) throw e;
         }
     }
 
@@ -102,8 +102,9 @@ class EventWriter {
                 }
                 _writer
                         .append("{\"metric\":\"").append(metric.id)
-                        .append("\",\"urls\":").append(Integer.toString(metric.urls))
-                        .append(",\"time\":").append(Integer.toString((int) ((metric.endTime - metric.startTime) / 1000000)))
+                        .append("\",\"urls\":").append(Long.toString(metric.urls))
+                        .append(",\"start\":").append(Long.toString(metric.startTime))
+                        .append(",\"time\":").append(Long.toString(metric.endTime - metric.startTime))
                         .append('}');
                 _measurements++;
             } catch (Exception e) {
@@ -111,7 +112,7 @@ class EventWriter {
                     Log.d(TAG, e.getMessage());
                 }
                 disconnect();
-                if(e instanceof IOException) throw e;
+                if (e instanceof IOException) throw e;
             }
         }
     }
@@ -161,14 +162,17 @@ class EventWriter {
                 if (metricId != null) {
                     _writer.append(",\"metric\":\"").append(metricId).append('"');
                 }
-                _writer.append(",\"time\":").append(Integer.toString((int) ((m.endTime - m.startTime) / 1000000))).append('}');
+                _writer.append(",\"start\":").append(Long.toString(m.startTime));
+                _writer.append(",\"time\":").append(Long.toString(m.endTime - m.startTime)).append('}');
                 _measurements++;
             } catch (Exception e) {
                 if (_config.debug) {
                     Log.d(TAG, e.getMessage());
                 }
                 disconnect();
-                if(e instanceof IOException) throw e;
+                if (e instanceof IOException) {
+                    throw e;
+                }
             }
         }
     }
@@ -189,7 +193,9 @@ class EventWriter {
             if (_config.debug) {
                 Log.d(TAG, e.getMessage());
             }
-            if(e instanceof EventHubException) throw e;
+            if (e instanceof EventHubException) {
+                throw e;
+            }
         } finally {
             disconnect();
         }
@@ -200,7 +206,7 @@ class EventWriter {
             _conn.disconnect();
             _conn = null;
         }
-        if(_writer != null) {
+        if (_writer != null) {
             try {
                 _writer.close();
             } catch (IOException e) {
