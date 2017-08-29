@@ -1,20 +1,27 @@
+import com.rakuten.tech.tool.CheckGradleFilesForSnapshotDependencies
+
 buildscript {
+    apply from: "config/index.gradle"
     repositories {
+        artifactoryRelease()
         jcenter()
+        maven { url 'https://maven.google.com' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath "com.android.tools.build:gradle:$CONFIG.versions.android.plugin"
+        classpath 'jp.co.rakuten.sdtd.plugin:artifactory:1.2.0'
+        classpath 'jp.co.rakuten.sdtd.plugin:javadoc:1.2.4'
+        classpath 'com.dicedmelon.gradle:jacoco-android:0.1.1'
+        classpath "net.saliman:gradle-cobertura-plugin:2.4.0"
     }
 }
 
 allprojects {
     repositories {
-        maven {
-            url ARTIFACTORY_SNAPSHOT
-        }
-        maven {
-            url ARTIFACTORY_RELEASE
-        }
+        artifactoryRelease()
+        artifactorySnapshot()
+        maven { url 'https://maven.google.com' }
+        jcenter()
     }
 }
 
@@ -22,7 +29,7 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-task preReleaseCheck(type: com.rakuten.tech.tool.CheckGradleFilesForSnapshotDependencies) {
+task preReleaseCheck(type: CheckGradleFilesForSnapshotDependencies) {
      exclude = [
         ~/.*\/Example\/.*\.gradle/,
         ~/.*\/config\/.*\.gradle/,

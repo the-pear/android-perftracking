@@ -11,7 +11,7 @@ import org.robolectric.annotation.Config;
 
 @Ignore("This is base class for Robolectric tests")
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class /*, sdk = 21*/)
+@Config(constants = BuildConfig.class, sdk = 21)
 public class RobolectricUnitSpec {
     @Before
     public void initMocks() {

@@ -23,8 +23,8 @@
             android:name="com.rakuten.tech.mobile.perf.debug"
             android:value="false" />
 
-        <meta-data android:name="com.rakuten.tech.mobile.perf.SubscriptionKey"
-            android:value="8775d40c7cf94ecb80d90ec5d4afe1c8" />
+        <meta-data android:name="com.rakuten.tech.mobile.relay.SubscriptionKey"
+          android:value="8775d40c7cf94ecb80d90ec5d4afe1c8" />
 
     </application>
 

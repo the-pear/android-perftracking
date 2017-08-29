@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.HurlStack;
@@ -19,7 +18,7 @@ import com.android.volley.toolbox.NoCache;
 import com.rakuten.tech.mobile.perf.core.Config;
 import com.rakuten.tech.mobile.perf.runtime.Metric;
 import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
-
+import com.rakuten.tech.mobile.relay.RelayUtil;
 import java.util.Random;
 
 
@@ -39,7 +38,9 @@ public class RuntimeContentProvider extends ContentProvider {
         RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
         queue.start();
 
-        String subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
+        String subscriptionKey = RelayUtil.getSubscriptionKey(context);
+        // TODO: remove backwards compatibility before we release 1.0
+        if(subscriptionKey == null) subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
         String urlPrefix = getMetaData("com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix");
         ConfigStore configStore = new ConfigStore(context, queue, subscriptionKey, urlPrefix);
         LocationStore locationStore = new LocationStore(context, queue, subscriptionKey, urlPrefix);
