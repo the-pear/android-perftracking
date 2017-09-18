@@ -9,7 +9,6 @@ import android.os.Bundle;
 import com.android.volley.Request;
 import com.google.gson.Gson;
 import com.rakuten.tech.mobile.perf.runtime.RobolectricUnitSpec;
-import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
 import com.rakuten.tech.mobile.perf.runtime.TestData;
 import com.rakuten.tech.mobile.perf.runtime.shadow.RequestQueueShadow;
 import com.rakuten.tech.mobile.perf.runtime.shadow.TrackerShadow;
@@ -81,7 +80,7 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
         provider.onCreate();
 
         assertThat(TrackingManager.INSTANCE).isNotNull();
-        verify(TrackerShadow.mockTracker).startMetric(StandardMetric.LAUNCH.getValue());
+        verify(TrackerShadow.mockTracker).startMetric("_launch");
     }
 
     @Test public void shouldNotFailOnMissingPackageInfo() throws PackageManager.NameNotFoundException {
@@ -103,7 +102,7 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
         provider.onCreate();
 
         assertThat(TrackingManager.INSTANCE).isNotNull();
-        verify(TrackerShadow.mockTracker).startMetric(StandardMetric.LAUNCH.getValue());
+        verify(TrackerShadow.mockTracker).startMetric("_launch");
     }
 
 

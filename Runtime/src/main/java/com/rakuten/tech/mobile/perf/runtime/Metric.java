@@ -28,4 +28,14 @@ public final class Metric {
             Log.d(TAG, "Tracking manager not initialized");
         }
     }
+    /**
+     * Prolongs current metric.
+     */
+    public static void prolong() {
+        if (TrackingManager.INSTANCE != null) {
+            TrackingManager.INSTANCE.prolongMetric();
+        } else {
+            Log.d(TAG, "Tracking manager not initialized");
+        }
+    }
 }

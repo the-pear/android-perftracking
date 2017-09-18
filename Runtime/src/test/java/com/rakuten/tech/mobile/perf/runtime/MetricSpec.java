@@ -64,4 +64,17 @@ public class MetricSpec extends RobolectricUnitSpec {
         Metric.start("appQ1_- .");
         verify(trackingManager).startMetric("appQ1_- .");
     }
+
+    @Test public void shouldRelayProlongToTrackingManager() {
+        Metric.prolong();
+        verify(trackingManager).prolongMetric();
+    }
+
+    @Test public void prolongShouldNotFailOnNullTrackingManager() {
+        TrackingManager.INSTANCE = null;
+
+        Metric.prolong();
+
+        // no exception thrown
+    }
 }

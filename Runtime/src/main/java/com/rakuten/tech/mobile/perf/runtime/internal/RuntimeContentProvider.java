@@ -17,7 +17,6 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.NoCache;
 import com.rakuten.tech.mobile.perf.core.Config;
 import com.rakuten.tech.mobile.perf.runtime.Metric;
-import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
 import com.rakuten.tech.mobile.relay.RelayUtil;
 import java.util.Random;
 
@@ -50,7 +49,7 @@ public class RuntimeContentProvider extends ContentProvider {
         if (config != null) {
             // Initialise Tracking Manager
             TrackingManager.initialize(context, config, locationStore.getObservable());
-            Metric.start(StandardMetric.LAUNCH.getValue());
+            Metric.start("_launch");
         }
         return false;
     }

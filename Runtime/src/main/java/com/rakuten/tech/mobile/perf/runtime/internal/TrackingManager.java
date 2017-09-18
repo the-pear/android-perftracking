@@ -99,4 +99,12 @@ public class TrackingManager {
         Tracker.startMetric(metricId);
     }
 
+    /**
+     * Prolongs current metric.
+     *
+     */
+    public void prolongMetric() {
+        Tracker.prolongMetric();
+    }
+
 }
