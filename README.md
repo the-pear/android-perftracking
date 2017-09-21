@@ -83,15 +83,15 @@ To start a metric use the `Metric` API:
 
 ```java
 @Override public void onCreate(Bundle savedInstanceState) {
-    Metric.start("_item");
+    Metric.start("item");
 }
 ```
 
 Currently there can only be one active metric at any given point of time, so if you start another metric the first metric will be considered done.
 
 ```java
-Metric.start("_item");
-Metric.start("_search"); // at this point the `_item` metric is considered done
+Metric.start("item");
+Metric.start("search"); // at this point the `item` metric is considered done
 ```
 
 **NOTE:** The launch metric is started automatically by the SDK.
@@ -107,7 +107,7 @@ Metrics terminate automatically according to a set of rules described below. Tha
 
 **What makes a metric start:**
 
-* The `LAUNCH` metric is started automatically by the SDK
+* The Launch metric is started automatically by the SDK
 * Other metrics are started by the app by calling `Metric#start(String)`
 
 **What makes a metric keep going:**
@@ -115,7 +115,11 @@ Metrics terminate automatically according to a set of rules described below. Tha
 * Activity life cycle changes
 * Fragment life cycle and visibility changes
 * Loading a page in WebView
-**NOTE:** The metrics which are started by the user has to be manually prolonged by calling `Metric#prolong()` if it is not followed by any of above 3 cases.
+**NOTE:**
+
+By default the current metric will be prolonged and it keeps going by above mentioned life cycle events, in case once after you start a metric there is no lifecycle event happened then your metric will not be recorded (As of know the minimum duration for a metric to be recorded is 5 secs).
+So all metrics which are started by the user has to be manually prolonged by calling `Metric#prolong()`.
+In parallel execution scenarios(Eg: mulitple image download) Metric should be prolonged in each individual execution so as to capture exact download time.
 
 **What makes a metric terminate:**
 
@@ -182,7 +186,7 @@ You can verify this by enabling debug logs as shown in [Enable Debug Logs](#debu
 
 ### 0.2.0 (In Progress)
 
-- Add Metric.prolong() to public api and demote StandardMetric class [REM-23396](https://jira.rakuten-it.com/jira/browse/REM-23396) 
+- Add Metric.prolong() to public api and remove StandardMetric class [REM-23396](https://jira.rakuten-it.com/jira/browse/REM-23396) 
 - Send OS name and OS version information in tracking data [REM-23143](https://jira.rakuten-it.com/jira/browse/REM-23143) 
 - Send measurement start timestamp in tracking data [REM-22694](https://jira.rakuten-it.com/jira/browse/REM-22694) 
 - Changes Subscription Key Manifest namespace from `com.rakuten.tech.mobile.perf` to `com.rakuten.tech.mobile.relay`
