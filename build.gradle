@@ -26,10 +26,6 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
-
 task preReleaseCheck(type: CheckGradleFilesForSnapshotDependencies) {
      exclude = [
         ~/.*\/Example\/.*\.gradle/,

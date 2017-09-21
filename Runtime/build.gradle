@@ -27,8 +27,6 @@ android {
             }
         }
     }
-
-    resourcePrefix 'perftracking_'
 }
 
 // --- DEPENDENCIES ---
@@ -40,44 +38,36 @@ task copyJar(type: Copy) {
 }
 
 android.libraryVariants.all {
-    project.tasks["prepare${it.buildType.name.capitalize()}Dependencies"].dependsOn copyJar
+    project.tasks["generate${it.buildType.name.capitalize()}Sources"].dependsOn copyJar
 }
 
 dependencies {
-    // --- COMPILE ---
     copyJar project(':Core')
-
     compile files('libs/Core.jar')
+
     compile "com.android.support:support-annotations:$CONFIG.versions.android.libraries.support"
     compile 'jp.co.rakuten.api:core:1.2.0'
     compile 'com.rakuten.tech.mobile.relay:relay-util:0.0.1'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.assertj:assertj-core:2.6.0'
+    testCompile 'org.skyscreamer:jsonassert:1.2.3'
+    testCompile "org.mockito:mockito-core:2.7.22"
+    testCompile "org.robolectric:shadows-support-v4:3.3.2"
+    testCompile 'org.robolectric:shadows-httpclient:3.3.2'
+    testCompile('org.robolectric:robolectric:3.3.2') {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
+    testCompile 'org.robolectric:shadow-api:3.3.2'
+    testCompile 'com.squareup.okio:okio:1.12.0'
+    testCompile 'jp.co.rakuten.api:test:1.0.0'
 }
 
-apply from: "test.gradle"
+apply from: "../config/jacoco.gradle"
 
-// -- JAVADOC --
-
-apply plugin: 'jp.co.rakuten.sdtd.javadoc'
-
-javadoc {
-    name = project.MODULE_NAME
-    version = project.MODULE_VERSION
-    title = project.MODULE_DESCRIPTION
-    exclude = ['**/Measurement.java']
-}
-
-
-// -- ARTIFACTORY --
-
-apply plugin: 'jp.co.rakuten.sdtd.artifactory'
-
-artifactory {
-    group =         project.MODULE_GROUP
-    artifact =      project.MODULE_NAME
-    version =       project.MODULE_VERSION
-    description =   project.MODULE_DESCRIPTION
-    sourceUrl =     project.MODULE_REPOSITORY
-}
+apply from: '../config-internal/javadoc.gradle'
+javadoc { exclude = ['**/Measurement.java'] }
+apply from: '../config-internal/artifactory.gradle'
 
 // -- LOCAL MAVEN --
 
