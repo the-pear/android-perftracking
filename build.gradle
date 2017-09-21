@@ -2,6 +2,7 @@ import com.rakuten.tech.tool.CheckGradleFilesForSnapshotDependencies
 
 buildscript {
     apply from: "config/index.gradle"
+    apply from: "config-internal/index.gradle"
     repositories {
         artifactoryRelease()
         jcenter()
