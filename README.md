@@ -115,6 +115,7 @@ Metrics terminate automatically according to a set of rules described below. Tha
 * Activity life cycle changes
 * Fragment life cycle and visibility changes
 * Loading a page in WebView
+
 **NOTE:**
 
 By default the current metric will be prolonged and it keeps going by above mentioned life cycle events, in case once after you start a metric there is no lifecycle event happened then your metric will not be recorded (As of know the minimum duration for a metric to be recorded is 5 secs).
