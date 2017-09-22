@@ -5,21 +5,19 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
-import java.io.BufferedInputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import com.rakuten.tech.mobile.perf.example.databinding.ActivityMainBinding;
 import com.rakuten.tech.mobile.perf.runtime.Measurement;
 import com.rakuten.tech.mobile.perf.runtime.Metric;
-import com.rakuten.tech.mobile.perf.runtime.StandardMetric;
+
+import java.io.BufferedInputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * MainActivity of the Example Application
@@ -44,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
                 final String imageUrl1 = "imageUrl1";
                 final String imageUrl2 = "imageUrl2";
-                Metric.start(StandardMetric.ITEM.getValue());
+                Metric.start("_item");
                 Measurement.startAggregated("testAggregatedMeasurement",imageUrl1);
                 Measurement.startAggregated("testAggregatedMeasurement",imageUrl2);
 
@@ -76,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 final String originalText = (String) activityMainBinding.testMeasurement.getText();
                 activityMainBinding.testMeasurement.setText("RUNNING");
-                Metric.start(StandardMetric.ITEM.getValue());
+                Metric.start("_item");
                 Measurement.start("testMeasurement");
                 new Thread(new Runnable() {
                     @Override
@@ -106,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 final String originalText = (String) activityMainBinding.testNetwork.getText();
                 activityMainBinding.testNetwork.setText("RUNNING");
-                Metric.start(StandardMetric.ITEM.getValue());
+                Metric.start("_item");
                 new Thread(new Runnable() {
                     @Override
                     public void run () {
@@ -114,7 +112,6 @@ public class MainActivity extends AppCompatActivity {
                             URL url = new URL("https://www.google.com/");
                             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                             try {
-                                //InputStream input = conn.getInputStream();
                                 BufferedInputStream input = new BufferedInputStream(conn.getInputStream());
                                 byte[] buffer = new byte[1024];
                                 while (input.read(buffer) > 0) {
@@ -146,6 +143,39 @@ public class MainActivity extends AppCompatActivity {
                 }).start();
             }
         });
+
+        activityMainBinding.testMetricProlong.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final String originalText = (String) activityMainBinding.testMetricProlong.getText();
+                activityMainBinding.testMetricProlong.setText("RUNNING");
+                Metric.start("_search");
+                Measurement.start("testMetricMeasurement");
+                new Thread(new Runnable() {
+                    @Override
+                    public void run () {
+                        try {
+                            Thread.sleep(5000);
+                            // Prolong the metric as there are no UI events or lifecycle callbacks followed by Metric start.
+                            Metric.prolong();
+
+                            Measurement.end("testMetricMeasurement");
+                        } catch (InterruptedException e) {
+                            Thread.interrupted();
+                        }
+
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run () {
+                                activityMainBinding.testMetricProlong.setText(originalText);
+                            }
+                        });
+                    }
+                }).start();
+
+            }
+        });
+
     }
 
     private void showDialog(String message) {

@@ -1,3 +1,8 @@
 <resources>
     <string name="perftracking_app_name">PerfTracking</string>
+    <string name="test_measurement">Test Measurement</string>
+    <string name="test_aggregated_measurement">Test Aggregated Measurement</string>
+    <string name="test_network">Test Network</string>
+    <string name="test_metric">Test Metric</string>
+    <string name="test_metric_desc">On Test Metric Button click a new metric is started, prolonged and recorded data with out any associated UI.</string>
 </resources>
