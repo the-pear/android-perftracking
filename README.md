@@ -118,9 +118,11 @@ Metrics terminate automatically according to a set of rules described below. Tha
 
 **NOTE:**
 
-By default the current metric will be prolonged and it keeps going by above mentioned life cycle events, in case once after you start a metric there is no lifecycle event happened then your metric will not be recorded (As of know the minimum duration for a metric to be recorded is 5 secs).
-So all metrics which are started by the user has to be manually prolonged by calling `Metric#prolong()`.
-In parallel execution scenarios(Eg: mulitple image download) Metric should be prolonged in each individual execution so as to capture exact download time.
+By default the current metric is prolonged by UI life cycle events (Activity, Fragment and Webview). In case you start a metric and there are no lifecycle events after starting it your metric will not be recorded (the minimum duration for a metric is 5 milliseconds).
+
+So all metrics which are started after `Activity#OnCreate` or `Fragment#onCreateView` and end before the respective `onDestroy` lifecycle events need to be prolonged by calling `Metric#prolong`.
+
+In parallel execution scenarios (e.g. multiple image download) the metric should be prolonged in each individual execution in order to measure the total download time.
 
 **What makes a metric terminate:**
 
