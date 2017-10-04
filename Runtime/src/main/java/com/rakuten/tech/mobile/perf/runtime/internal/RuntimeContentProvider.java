@@ -42,11 +42,11 @@ public class RuntimeContentProvider extends ContentProvider {
         if(subscriptionKey == null) subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
         String urlPrefix = getMetaData("com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix");
         ConfigStore configStore = new ConfigStore(context, queue, subscriptionKey, urlPrefix);
-        LocationStore locationStore = new LocationStore(context, queue, subscriptionKey, urlPrefix);
 
         // Read last config from cache
         Config config = createConfig(context, configStore.getObservable().getCachedValue());
         if (config != null) {
+            LocationStore locationStore = new LocationStore(context, queue, subscriptionKey, urlPrefix);
             // Initialise Tracking Manager
             TrackingManager.initialize(context, config, locationStore.getObservable());
             Metric.start("_launch");
