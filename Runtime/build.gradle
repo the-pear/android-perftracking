@@ -9,6 +9,13 @@ android {
         targetSdkVersion CONFIG.versions.android.sdk.target
         versionName project.MODULE_VERSION
         resValue 'string', 'perftracking__version', project.MODULE_VERSION
+
+        def property = { name ->
+            project.hasProperty(name) ? project."${name}" : "";
+        }
+
+        buildConfigField("String", "DEFAULT_CONFIG_URL_PREFIX", "\"${property('DEFAULT_CONFIG_URL_PREFIX')}\"")
+        buildConfigField("String", "DEFAULT_LOCATION_URL_PREFIX", "\"${property('DEFAULT_LOCATION_URL_PREFIX')}\"")
     }
 
     compileOptions {
@@ -69,18 +76,19 @@ apply from: '../config-internal/javadoc.gradle'
 javadoc { exclude = ['**/Measurement.java'] }
 apply from: '../config-internal/artifactory.gradle'
 
-// -- LOCAL MAVEN --
-
-apply plugin: 'maven-publish'
-publishing {
-    publications {
-        local(MavenPublication) {
-            groupId     project.MODULE_GROUP
-            artifactId  project.MODULE_NAME
-            version     project.MODULE_VERSION
-            artifact("$buildDir/outputs/aar/Runtime-release.aar")
+task checkUrlPrefixes {
+    doLast {
+        if (!project.hasProperty('DEFAULT_CONFIG_URL_PREFIX') ||
+                !project.hasProperty('DEFAULT_LOCATION_URL_PREFIX')) {
+            throw new GradleException("Cannot Bulid Runtime without default config & location API" +
+                    " prexfixes.\nConfigure 'DEFAULT_CONFIG_URL_PREFIX' and " +
+                    "'DEFAULT_LOCATION_URL_PREFIX' in your environment's global gradle.properties")
         }
     }
 }
 
-tasks.publishToMavenLocal.dependsOn(tasks.assemble)
+tasks.whenTaskAdded { task ->
+    if (task.name.contains("assemble")) {
+        task.dependsOn checkUrlPrefixes
+    }
+}

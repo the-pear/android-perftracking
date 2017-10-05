@@ -7,6 +7,7 @@ import com.android.volley.VolleyError;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
+import com.rakuten.tech.mobile.perf.BuildConfig;
 import jp.co.rakuten.api.core.BaseRequest;
 
 /**
@@ -14,7 +15,7 @@ import jp.co.rakuten.api.core.BaseRequest;
  */
 
 class GeoLocationRequest extends BaseRequest<GeoLocationResult> {
-    private static final String DEFAULT_URL_PREFIX = "https://api.apps.global.rakuten.com/relay/location/v1";
+    private static final String DEFAULT_URL_PREFIX = BuildConfig.DEFAULT_LOCATION_URL_PREFIX;
 
     GeoLocationRequest(@Nullable String urlPrefix, String subscriptionKey, @Nullable Response.Listener<GeoLocationResult> listener, @Nullable Response.ErrorListener errorListener) {
         super(listener, errorListener);

@@ -1,15 +1,15 @@
 package com.rakuten.tech.mobile.perf.runtime.internal;
 
-import com.android.volley.Request;
-import com.android.volley.VolleyError;
-import com.rakuten.tech.mobile.perf.runtime.RobolectricUnitSpec;
-import com.rakuten.tech.mobile.perf.runtime.TestData;
-
-import org.junit.Rule;
-import org.junit.Test;
-
 import static com.rakuten.tech.mobile.perf.runtime.TestCondition.keyValue;
 import static org.assertj.core.api.Java6Assertions.assertThat;
+
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.rakuten.tech.mobile.perf.BuildConfig;
+import com.rakuten.tech.mobile.perf.runtime.RobolectricUnitSpec;
+import com.rakuten.tech.mobile.perf.runtime.TestData;
+import org.junit.Rule;
+import org.junit.Test;
 
 public class GeoLocationRequestSpec extends RobolectricUnitSpec {
 
@@ -24,16 +24,16 @@ public class GeoLocationRequestSpec extends RobolectricUnitSpec {
     public void shouldBuildUrlWithDefaultUrlPrefix() {
         GeoLocationRequest request = new GeoLocationRequest(null, "", null, null);
         assertThat(request.getUrl())
-                .isEqualTo("https://api.apps.global.rakuten.com/relay/location/v1");
+                .isEqualTo(BuildConfig.DEFAULT_LOCATION_URL_PREFIX);
     }
 
     @Test
     public void shouldBuildUrlWithCustomPrefix() {
         GeoLocationRequest request =
-                new GeoLocationRequest("https://api.apps.global.rakuten.com/stg/relay/location/v1",
+                new GeoLocationRequest("https://other.prefix.com/abc/xyz/v1",
                         "", null, null);
         assertThat(request.getUrl())
-                .isEqualTo("https://api.apps.global.rakuten.com/stg/relay/location/v1");
+                .isEqualTo("https://other.prefix.com/abc/xyz/v1");
     }
 
     @Test
