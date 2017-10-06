@@ -1,17 +1,23 @@
 package com.rakuten.tech.mobile.perf.runtime.internal;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-
 import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.rakuten.tech.mobile.perf.core.LocationData;
+import com.rakuten.tech.mobile.perf.runtime.MockedQueue;
 import com.rakuten.tech.mobile.perf.runtime.RobolectricUnitSpec;
 import com.rakuten.tech.mobile.perf.runtime.TestData;
 import com.rakuten.tech.mobile.perf.runtime.shadow.RequestQueueShadow;
-
 import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -19,15 +25,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
-
-import jp.co.rakuten.api.test.MockedQueue;
-
-import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.clearInvocations;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 @Config(shadows = {
         RequestQueueShadow.class, // prevent network requests from runtime side
@@ -39,7 +36,7 @@ public class LocationStoreSpec extends RobolectricUnitSpec {
     @Mock PackageManager packageManager;
     /* Spy */ private SharedPreferences prefs;
     /* Spy */ private Context context;
-    /* Spy */private MockedQueue queue;
+    /* Spy */ private MockedQueue queue;
 
     private LocationStore locationStore;
 

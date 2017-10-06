@@ -8,7 +8,6 @@ import com.android.volley.Response;
 import com.google.gson.Gson;
 
 import com.rakuten.tech.mobile.perf.BuildConfig;
-import jp.co.rakuten.api.core.BaseRequest;
 
 /**
  * ConfigurationRequest

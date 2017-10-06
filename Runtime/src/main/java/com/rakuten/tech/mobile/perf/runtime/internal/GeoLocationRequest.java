@@ -8,7 +8,6 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 import com.rakuten.tech.mobile.perf.BuildConfig;
-import jp.co.rakuten.api.core.BaseRequest;
 
 /**
  * GeoLocationRequest
