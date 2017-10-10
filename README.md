@@ -128,8 +128,8 @@ In parallel execution scenarios (e.g. multiple image download) the metric should
 
 * User interactions like clicks, back button presses, etc.
 * WebView finishes loading a page
-* Timeout of 10 seconds
-* A new metric is started start
+* Metric is getting prolonged for more than 10 seconds
+* A new metric is started
 
 ## <a name="debug"></a> Enable Debug Logs
 
