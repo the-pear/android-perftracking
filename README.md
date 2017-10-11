@@ -189,6 +189,7 @@ You can verify this by enabling debug logs as shown in [Enable Debug Logs](#debu
 
 ### 0.2.0 (In Progress)
 
+- Always update metric's end time when metric prolong is called [REM-23429](https://jira.rakuten-it.com/jira/browse/REM-23429) 
 - Add Metric.prolong() to public api and remove StandardMetric class [REM-23396](https://jira.rakuten-it.com/jira/browse/REM-23396) 
 - Send OS name and OS version information in tracking data [REM-23143](https://jira.rakuten-it.com/jira/browse/REM-23143) 
 - Send measurement start timestamp in tracking data [REM-22694](https://jira.rakuten-it.com/jira/browse/REM-22694) 
