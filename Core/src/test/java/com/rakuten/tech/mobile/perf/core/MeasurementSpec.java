@@ -13,10 +13,12 @@ public class MeasurementSpec {
         measurement.endTime = 54321L;
         measurement.trackingId = 9; // the best number
         measurement.type = Measurement.METRIC;
+        measurement.activityName = "TestActivity";
 
         measurement.clear();
         assertThat(measurement.a).isNull();
         assertThat(measurement.b).isNull();
+        assertThat(measurement.activityName).isNull();
         assertThat(measurement.type).isEqualTo((byte) 0);
         assertThat(measurement.trackingId).isEqualTo(0);
         assertThat(measurement.startTime).isEqualTo(0L);
@@ -31,11 +33,13 @@ public class MeasurementSpec {
         measurement.endTime = 54321L;
         measurement.trackingId = 9; // the best number
         measurement.type = Measurement.METRIC;
+        measurement.activityName = "TestActivity";
 
         measurement.clear();
         measurement.clear();
         assertThat(measurement.a).isNull();
         assertThat(measurement.b).isNull();
+        assertThat(measurement.activityName).isNull();
         assertThat(measurement.type).isEqualTo((byte) 0);
         assertThat(measurement.trackingId).isEqualTo(0);
         assertThat(measurement.startTime).isEqualTo(0L);

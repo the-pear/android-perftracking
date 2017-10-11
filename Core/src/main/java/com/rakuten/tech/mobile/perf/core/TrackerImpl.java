@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.perf.core;
 
-class TrackerImpl {
+public class TrackerImpl {
+    public static String activityName;
     private final MeasurementBuffer _measurementBuffer;
     private final Current _current;
     private final Debug _debug;
@@ -147,6 +148,7 @@ class TrackerImpl {
         m.a = a;
         m.b = b;
         m.startTime = System.currentTimeMillis();
+        m.activityName = activityName;
 
         return m;
     }

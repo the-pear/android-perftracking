@@ -8,6 +8,7 @@
   "measurements": [
     {
       "custom": "custom-measurement",
+      "screen": "test-activity",
       "metric": "test-metric",
       "start": 0,
       "time": 999
