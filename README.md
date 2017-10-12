@@ -17,7 +17,7 @@ Each scenario/metric lists various method, network call measurements. Performanc
 
 Your app must be registered in the [Relay Portal](https://rs-portal-web-prd-japaneast-wa.azurewebsites.net/) to use the App Performance Tracking feature.
 Request for an App Performance Tracking Subscription Key through the [API Portal](https://remsapijapaneast.portal.azure-api.net) with your application's package name.
-If you have any questions, please visit our [Developer Portal](https://developers.rakuten.com/hc/en-us/categories/115001441467-Relay) or you may contact us through the [Inquiry Form](https://developers.rakuten.com/hc/en-us/requests/new?ticket_form_id=399907)
+If you have any questions, please visit our [Developer Portal](https://developers.rakuten.net/hc/en-us/categories/115001441467-Relay) or you may contact us through the [Inquiry Form](https://developers.rakuten.net/hc/en-us/requests/new?ticket_form_id=399907)
 
 ### #1 Add dependency to buildscript
 
@@ -169,7 +169,7 @@ performanceTracking {
 ### Check for Build
 
 * Confirm `transformClassesWithPerfTrackingXXX` tasks are successful without any error during build process.
-* If your build fails because of any error in `transformClassesWithPerfTrackingXXX` tasks please contact us through [Inquiry Form](https://developers.rakuten.com/hc/en-us/requests/new?ticket_form_id=399907).
+* If your build fails because of any error in `transformClassesWithPerfTrackingXXX` tasks please contact us through [Inquiry Form](https://developers.rakuten.net/hc/en-us/requests/new?ticket_form_id=399907).
 * You can disable tracking as shown in [Configure Tracking](#configure).
 
 ### Run your App
