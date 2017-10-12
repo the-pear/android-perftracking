@@ -199,4 +199,11 @@ public class Tracker {
             Tracker.off();
         }
 	}
+
+    public static void updateActivityName(String name) {
+        TrackerImpl t = _tracker;
+        if (t != null) {
+            t.setActivityName(name);
+        }
+    }
 }

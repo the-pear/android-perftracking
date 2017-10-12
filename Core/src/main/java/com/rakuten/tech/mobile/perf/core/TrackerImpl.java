@@ -1,7 +1,8 @@
 package com.rakuten.tech.mobile.perf.core;
 
-public class TrackerImpl {
-    public static String activityName;
+class TrackerImpl {
+
+    private String activityName = null;
     private final MeasurementBuffer _measurementBuffer;
     private final Current _current;
     private final Debug _debug;
@@ -10,6 +11,10 @@ public class TrackerImpl {
         _measurementBuffer = measurementBuffer;
         _current = current;
         _debug = debug;
+    }
+
+    public void setActivityName(String activityName) {
+        this.activityName = activityName;
     }
 
     void startMetric(String metricId) {

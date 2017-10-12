@@ -8,7 +8,6 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.rakuten.tech.mobile.perf.core.Tracker;
-import com.rakuten.tech.mobile.perf.core.TrackerImpl;
 import com.rakuten.tech.mobile.perf.core.annotations.MinCompileSdkVersion;
 
 public class ActivityBase extends Activity {
@@ -17,33 +16,31 @@ public class ActivityBase extends Activity {
 	private final String activityName = this.getClass().getName();
 
 	protected void onCreate (Bundle savedInstanceState) {
-		TrackerImpl.activityName = activityName;
+		Tracker.updateActivityName(activityName);
 		Tracker.prolongMetric();
 		super.onCreate(savedInstanceState);
 	}
 
 	@MinCompileSdkVersion(21)
 	public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-		TrackerImpl.activityName = activityName;
+		Tracker.updateActivityName(activityName);
 		Tracker.prolongMetric();
 		super.onCreate(savedInstanceState, persistentState);
 	}
 
 	public View onCreateView(String name, Context context, AttributeSet attrs) {
-		TrackerImpl.activityName = activityName;
 		Tracker.prolongMetric();
 		return super.onCreateView(name, context, attrs);
 	}
 
 	@MinCompileSdkVersion(11)
 	public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
-		TrackerImpl.activityName = activityName;
 		Tracker.prolongMetric();
 		return super.onCreateView(parent, name, context, attrs);
 	}
 
 	protected void onStart () {
-		TrackerImpl.activityName = activityName;
+		Tracker.updateActivityName(activityName);
 		Tracker.prolongMetric();
 		super.onStart();
 	}
@@ -54,7 +51,7 @@ public class ActivityBase extends Activity {
 	}
 
 	protected void onResume () {
-		TrackerImpl.activityName = activityName;
+		Tracker.updateActivityName(activityName);
 		Tracker.prolongMetric();
 		super.onResume();
 	}
@@ -65,7 +62,6 @@ public class ActivityBase extends Activity {
 	}
 
 	protected void onRestart () {
-		TrackerImpl.activityName = activityName;
 		Tracker.prolongMetric();
 		super.onRestart();
 	}
