@@ -198,20 +198,22 @@ public class Tracker {
         } catch (Throwable t) {
             Tracker.off();
         }
-	}
+    }
 
-    public static void updateActivityName(String name) {
+    /**
+     * Updates current activity name.
+     * @param activityName activity name
+     * @param isStopCallback true if it is called from Activity#onStop() lifecycle event
+     */
+    public static void updateActivityName(String activityName, boolean isStopCallback) {
         TrackerImpl t = _tracker;
         if (t != null) {
-            t.setActivityName(name);
+            if (isStopCallback && _tracker.getActivityName() != null && _tracker.getActivityName().equals(activityName)) {
+                t.setActivityName(null);
+            } else {
+                t.setActivityName(activityName);
+            }
         }
     }
 
-    public static String getCurrentActivityName() {
-        TrackerImpl t = _tracker;
-        if (t != null) {
-            return t.getActivityName();
-        }
-        return null;
-    }
 }

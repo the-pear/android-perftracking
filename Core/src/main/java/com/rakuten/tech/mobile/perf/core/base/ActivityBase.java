@@ -15,16 +15,16 @@ public class ActivityBase extends Activity {
 	public boolean com_rakuten_tech_mobile_perf_onCreate_tracking;
 	private final String activityName = this.getClass().getName();
 
-	protected void onCreate (Bundle savedInstanceState) {
-		Tracker.updateActivityName(activityName);
-		Tracker.prolongMetric();
+	protected void onCreate(Bundle savedInstanceState) {
+        Tracker.updateActivityName(activityName, false);
+        Tracker.prolongMetric();
 		super.onCreate(savedInstanceState);
 	}
 
 	@MinCompileSdkVersion(21)
 	public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-		Tracker.updateActivityName(activityName);
-		Tracker.prolongMetric();
+        Tracker.updateActivityName(activityName, false);
+        Tracker.prolongMetric();
 		super.onCreate(savedInstanceState, persistentState);
 	}
 
@@ -40,22 +40,20 @@ public class ActivityBase extends Activity {
 	}
 
 	protected void onStart () {
-		Tracker.updateActivityName(activityName);
-		Tracker.prolongMetric();
+        Tracker.updateActivityName(activityName, false);
+        Tracker.prolongMetric();
 		super.onStart();
 	}
 
 	protected void onStop () {
-		if (Tracker.getCurrentActivityName().equals(activityName)) {
-			Tracker.updateActivityName(null);
-		}
-		Tracker.prolongMetric();
+        Tracker.updateActivityName(activityName, true);
+        Tracker.prolongMetric();
 		super.onStop();
 	}
 
 	protected void onResume () {
-		Tracker.updateActivityName(activityName);
-		Tracker.prolongMetric();
+        Tracker.updateActivityName(activityName, false);
+        Tracker.prolongMetric();
 		super.onResume();
 	}
 
