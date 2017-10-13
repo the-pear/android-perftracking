@@ -7,14 +7,14 @@ import android.util.Log;
 import com.android.volley.Response;
 import com.google.gson.Gson;
 
-import jp.co.rakuten.api.core.BaseRequest;
+import com.rakuten.tech.mobile.perf.BuildConfig;
 
 /**
  * ConfigurationRequest
  */
 
 class ConfigurationRequest extends BaseRequest<ConfigurationResult> {
-    private static final String DEFAULT_URL_PREFIX = "https://api.apps.global.rakuten.com/performance/config/v1";
+    private static final String DEFAULT_URL_PREFIX = BuildConfig.DEFAULT_CONFIG_URL_PREFIX;
 
     ConfigurationRequest(@Nullable String urlPrefix, String subscriptionKey, ConfigurationParam param, @Nullable Response.Listener<ConfigurationResult> listener, @Nullable Response.ErrorListener errorListener) {
         super(listener, errorListener);

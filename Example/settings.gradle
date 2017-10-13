@@ -1,7 +1,0 @@
-includeBuild('..') {
-    dependencySubstitution {
-        substitute module('com.rakuten.tech.mobile.perf:plugin')  with project(':Plugin')
-        substitute module('com.rakuten.tech.mobile.perf:performance-tracking') with project(':Runtime')
-    }
-}
-

@@ -1,16 +1,16 @@
 package com.rakuten.tech.mobile.perf.runtime.internal;
 
+import static com.rakuten.tech.mobile.perf.runtime.TestCondition.keyValue;
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
 import com.android.volley.Request;
+import com.rakuten.tech.mobile.perf.BuildConfig;
 import com.rakuten.tech.mobile.perf.runtime.RobolectricUnitSpec;
 import com.rakuten.tech.mobile.perf.runtime.TestData;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-
-import static com.rakuten.tech.mobile.perf.runtime.TestCondition.keyValue;
-import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class ConfigurationRequestSpec extends RobolectricUnitSpec {
     @Mock ConfigurationRequest testMock;
@@ -34,7 +34,8 @@ public class ConfigurationRequestSpec extends RobolectricUnitSpec {
     @Test public void shouldBuildUrlWithDefaultUrlPrefix() {
         ConfigurationRequest request = new ConfigurationRequest(null, "", builder.build(), null, null);
         assertThat(request.getUrl())
-                .isEqualTo("https://api.apps.global.rakuten.com/performance/config/v1/platform/testPlatform/app/testId/version/testVersion/?sdk=testSdkVersion&country=testCountryCode");
+                .isEqualTo(BuildConfig.DEFAULT_CONFIG_URL_PREFIX +
+                    "/platform/testPlatform/app/testId/version/testVersion/?sdk=testSdkVersion&country=testCountryCode");
     }
 
     @Test public void shouldBuildUrlWithCustomDomain() {
@@ -46,10 +47,10 @@ public class ConfigurationRequestSpec extends RobolectricUnitSpec {
 
     @Test public void shouldBuildUrlWithCustomPrefix() {
         ConfigurationRequest request =
-                new ConfigurationRequest("https://api.apps.global.rakuten.com/stg/performance/config/v1",
+                new ConfigurationRequest("https://other.prefix.com/abc/xyz/v1",
                         "", builder.build(), null, null);
         assertThat(request.getUrl())
-                .isEqualTo("https://api.apps.global.rakuten.com/stg/performance/config/v1/platform/testPlatform/app/testId/version/testVersion/?sdk=testSdkVersion&country=testCountryCode");
+                .isEqualTo("https://other.prefix.com/abc/xyz/v1/platform/testPlatform/app/testId/version/testVersion/?sdk=testSdkVersion&country=testCountryCode");
     }
 
     @Test public void shouldSetSubscriptionKeyHeader() {

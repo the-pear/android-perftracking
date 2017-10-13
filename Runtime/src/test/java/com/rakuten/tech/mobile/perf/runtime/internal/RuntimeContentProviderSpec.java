@@ -1,27 +1,5 @@
 package com.rakuten.tech.mobile.perf.runtime.internal;
 
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-
-import com.android.volley.Request;
-import com.google.gson.Gson;
-import com.rakuten.tech.mobile.perf.runtime.RobolectricUnitSpec;
-import com.rakuten.tech.mobile.perf.runtime.TestData;
-import com.rakuten.tech.mobile.perf.runtime.shadow.RequestQueueShadow;
-import com.rakuten.tech.mobile.perf.runtime.shadow.TrackerShadow;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.robolectric.RuntimeEnvironment;
-import org.robolectric.annotation.Config;
-
-import jp.co.rakuten.api.test.MockedQueue;
-
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -33,6 +11,25 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import com.android.volley.Request;
+import com.google.gson.Gson;
+import com.rakuten.tech.mobile.perf.runtime.MockedQueue;
+import com.rakuten.tech.mobile.perf.runtime.RobolectricUnitSpec;
+import com.rakuten.tech.mobile.perf.runtime.TestData;
+import com.rakuten.tech.mobile.perf.runtime.shadow.RequestQueueShadow;
+import com.rakuten.tech.mobile.perf.runtime.shadow.TrackerShadow;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.annotation.Config;
+
 @Config(shadows = {
         RequestQueueShadow.class, // prevent network requests from runtime side
         TrackerShadow.class, // prevent network requests from core side
@@ -43,7 +40,7 @@ public class RuntimeContentProviderSpec extends RobolectricUnitSpec {
     @Rule public TestData config = new TestData("configuration-api-response.json");
 
     @Mock PackageManager packageManager;
-    /* Spy */private MockedQueue queue;
+    /* Spy */ private MockedQueue queue;
 
     private RuntimeContentProvider provider;
 

@@ -2,6 +2,7 @@ import com.rakuten.tech.tool.CheckGradleFilesForSnapshotDependencies
 
 buildscript {
     apply from: "config/index.gradle"
+    apply from: "config-internal/index.gradle"
     repositories {
         artifactoryRelease()
         jcenter()
@@ -18,15 +19,9 @@ buildscript {
 
 allprojects {
     repositories {
-        artifactoryRelease()
-        artifactorySnapshot()
         maven { url 'https://maven.google.com' }
         jcenter()
     }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
 }
 
 task preReleaseCheck(type: CheckGradleFilesForSnapshotDependencies) {

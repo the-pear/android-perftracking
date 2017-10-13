@@ -17,12 +17,12 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.NoCache;
 import com.rakuten.tech.mobile.perf.core.Config;
 import com.rakuten.tech.mobile.perf.runtime.Metric;
-import com.rakuten.tech.mobile.relay.RelayUtil;
 import java.util.Random;
 
 
 /**
- * RuntimeContentProvider - a custom high-priority ContentProvider, to start tracking early in the process launch phase.
+ * RuntimeContentProvider - a custom high-priority ContentProvider, to start tracking early in the
+ * process launch phase.
  */
 
 public class RuntimeContentProvider extends ContentProvider {
@@ -37,10 +37,14 @@ public class RuntimeContentProvider extends ContentProvider {
         RequestQueue queue = new RequestQueue(new NoCache(), new BasicNetwork(new HurlStack()));
         queue.start();
 
-        String subscriptionKey = RelayUtil.getSubscriptionKey(context);
+        String subscriptionKey = Util.getSubscriptionKey(context);
+
         // TODO: remove backwards compatibility before we release 1.0
-        if(subscriptionKey == null) subscriptionKey = getMetaData("com.rakuten.tech.mobile.perf.SubscriptionKey");
-        String urlPrefix = getMetaData("com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix");
+        if(subscriptionKey == null) {
+            subscriptionKey = Util.getMeta(context, "com.rakuten.tech.mobile.perf.SubscriptionKey");
+        }
+        String urlPrefix = Util.getMeta(context,
+            "com.rakuten.tech.mobile.perf.ConfigurationUrlPrefix");
         ConfigStore configStore = new ConfigStore(context, queue, subscriptionKey, urlPrefix);
 
         // Read last config from cache
@@ -121,18 +125,4 @@ public class RuntimeContentProvider extends ContentProvider {
     public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         return 0;
     }
-
-    private String getMetaData(String key) {
-        try {
-            Context ctx = getContext();
-            if (ctx == null) return null;
-            Bundle metaData = ctx.getPackageManager().getApplicationInfo(ctx.getPackageName(), PackageManager
-                    .GET_META_DATA).metaData;
-            return metaData != null ? metaData.getString(key) : null;
-        } catch (PackageManager.NameNotFoundException e) {
-            return null;
-        }
-
-    }
-
 }
