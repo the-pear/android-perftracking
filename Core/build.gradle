@@ -25,6 +25,3 @@ task copyTestResources(type: Copy) {
 }
 
 test.dependsOn copyTestResources
-
-
-
