@@ -46,6 +46,9 @@ public class ActivityBase extends Activity {
 	}
 
 	protected void onStop () {
+		if (Tracker.getCurrentActivityName().equals(activityName)) {
+			Tracker.updateActivityName(null);
+		}
 		Tracker.prolongMetric();
 		super.onStop();
 	}

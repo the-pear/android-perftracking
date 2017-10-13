@@ -206,4 +206,12 @@ public class Tracker {
             t.setActivityName(name);
         }
     }
+
+    public static String getCurrentActivityName() {
+        TrackerImpl t = _tracker;
+        if (t != null) {
+            return t.getActivityName();
+        }
+        return null;
+    }
 }
