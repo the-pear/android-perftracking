@@ -34,13 +34,10 @@ class TrackerImpl {
 
         if (metric != null) {
             long now = System.currentTimeMillis();
-
+            metric.endTime = now;
             if (now - metric.startTime > Metric.MAX_TIME) {
                 _current.metric.compareAndSet(metric, null);
-                return;
             }
-
-            metric.endTime = now;
 
             if (_debug != null) {
                 _debug.log("METRIC_PROLONG", metric);
