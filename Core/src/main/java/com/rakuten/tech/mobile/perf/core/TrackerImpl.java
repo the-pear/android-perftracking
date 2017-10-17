@@ -13,12 +13,16 @@ class TrackerImpl {
         _debug = debug;
     }
 
-    void setActivityName(String activityName) {
-        this.activityName = activityName;
+    void updateActivityName(String name) {
+        this.activityName = name;
     }
 
-    String getActivityName() {
-        return activityName;
+    void clearActivityName(String name) {
+        if (activityName != null && activityName.equals(name)) {
+            updateActivityName(null);
+        } else {
+            updateActivityName(name);
+        }
     }
 
     void startMetric(String metricId) {

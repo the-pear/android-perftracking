@@ -202,18 +202,31 @@ public class Tracker {
 
     /**
      * Updates current activity name.
-     * @param activityName activity name
-     * @param isStopCallback true if it is called from Activity#onStop() lifecycle event
+     * @param name activity name
      */
-    public static void updateActivityName(String activityName, boolean isStopCallback) {
-        TrackerImpl t = _tracker;
-        if (t != null) {
-            if (isStopCallback && _tracker.getActivityName() != null && _tracker.getActivityName().equals(activityName)) {
-                t.setActivityName(null);
-            } else {
-                t.setActivityName(activityName);
+    public static void updateActivityName(String name) {
+        try {
+            TrackerImpl t = _tracker;
+            if (t != null) {
+                t.updateActivityName(name);
             }
+        } catch (Throwable t) {
+            Tracker.off();
         }
     }
 
+    /**
+     * Clears current activity name when we are in same activity else updates the current activity name with given name.
+     * @param name activity name
+     */
+    public static void clearActivityName(String name) {
+        try {
+            TrackerImpl t = _tracker;
+            if (t != null) {
+                t.clearActivityName(name);
+            }
+        } catch (Throwable t) {
+            Tracker.off();
+        }
+    }
 }
