@@ -48,22 +48,6 @@ artifactory {
     sourceUrl = project.MODULE_REPOSITORY
 }
 
-// -- LOCAL MAVEN --
-
-apply plugin: 'maven-publish'
-publishing {
-    publications {
-        local(MavenPublication) {
-            groupId     project.MODULE_GROUP
-            artifactId  project.MODULE_NAME
-            version     project.MODULE_VERSION
-            artifact("$buildDir/libs/Plugin-${project.MODULE_VERSION}.jar")
-        }
-    }
-}
-
-tasks.publishToMavenLocal.dependsOn(tasks.assemble)
-
 // testing
 dependencies {
     testCompile gradleTestKit()
@@ -76,20 +60,34 @@ task sourcesJar(type: Jar, dependsOn: classes) {
     from sourceSets.main.allSource
 }
 
-// local jar and sources jar to debug local code changes
-tasks.test.dependsOn(tasks.assemble)
-tasks.test.dependsOn(tasks.sourcesJar)
-
-tasks.test.doFirst {
-    def tempDir = new File("${project.projectDir}${File.separator}tmp")
-    println "creating temporary test directory $tempDir.absolutePath"
-    if(!tempDir.exists()) tempDir.mkdir()
+task unitTest(type: Test){
+    useJUnit {
+        includeCategories 'com.rakuten.tech.mobile.perf.UnitSpec'
+        excludeCategories 'com.rakuten.tech.mobile.perf.IntegrationSpec'
+    }
 }
 
-tasks.test.doLast {
-    def tempDir = new File("${project.projectDir}${File.separator}tmp")
-    println "deleting temporary test directory $tempDir.absolutePath"
-    if(tempDir.exists()) tempDir.deleteDir()
+task integrationTest(type: Test){
+    useJUnit {
+        excludeCategories 'com.rakuten.tech.mobile.perf.UnitSpec'
+        includeCategories 'com.rakuten.tech.mobile.perf.IntegrationSpec'
+    }
+}
+
+['test', 'unitTest', 'integrationTest'].each {
+    tasks."$it".doFirst {
+        def tempDir = new File("${project.projectDir}${File.separator}tmp")
+        println "creating temporary test directory $tempDir.absolutePath"
+        if(!tempDir.exists()) tempDir.mkdir()
+    }
+    tasks."$it".doLast {
+        def tempDir = new File("${project.projectDir}${File.separator}tmp")
+        println "deleting temporary test directory $tempDir.absolutePath"
+        if(tempDir.exists()) tempDir.deleteDir()
+    }
+    // local jar and sources jar to debug local code changes
+    tasks."$it".dependsOn(tasks.assemble)
+    tasks."$it".dependsOn(tasks.sourcesJar)
 }
 
 apply plugin: 'net.saliman.cobertura'

@@ -1,9 +1,10 @@
 package com.rakuten.tech.mobile.perf.rewriter.classes
 
+import com.rakuten.tech.mobile.perf.UnitSpec
 import org.junit.Before
 import org.junit.Test
 
-public class ClassFilterSpec {
+public class ClassFilterSpec extends UnitSpec {
 
     ClassFilter classFilter
 

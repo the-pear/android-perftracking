@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.perf.rewriter
 
+import com.rakuten.tech.mobile.perf.UnitSpec
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJar
 import org.junit.Before
 import org.junit.Rule
@@ -9,7 +10,7 @@ import org.objectweb.asm.tree.ClassNode
 
 import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
 
-public class DummyRewriterSpec {
+public class DummyRewriterSpec extends UnitSpec {
     @Rule public final TemporaryFolder projectDir = new TemporaryFolder()
     DummyRewriter dummyRewriter
 

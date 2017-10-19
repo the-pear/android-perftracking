@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.perf.rewriter.base
 
+import com.rakuten.tech.mobile.perf.UnitSpec
 import com.rakuten.tech.mobile.perf.core.base.ActivityBase
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJar
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJarMaker
@@ -15,7 +16,7 @@ import static com.rakuten.tech.mobile.perf.TestUtil.testLogger
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.*
 
-class RebaserSpec {
+class RebaserSpec extends UnitSpec {
     Rebaser rebaser
     ClassJar jar
     ClassProvider classProvider

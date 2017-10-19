@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.perf.rewriter.detours
 
+import com.rakuten.tech.mobile.perf.UnitSpec
 import org.junit.Before
 import org.junit.Test
 import org.objectweb.asm.MethodVisitor
@@ -10,7 +11,7 @@ import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.verify
 
-public class CallDetourSpec {
+public class CallDetourSpec extends UnitSpec {
     CallDetour callDetour
 
     @Before void setUp() {

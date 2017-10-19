@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.perf.rewriter.classes
 
+import com.rakuten.tech.mobile.perf.UnitSpec
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -7,22 +8,19 @@ import org.junit.rules.TemporaryFolder
 
 import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
 
-class ClassJarMakerSpec {
+class ClassJarMakerSpec extends UnitSpec {
 
-    @Rule
-    public final TemporaryFolder projectDir = new TemporaryFolder(new File("tmp"))
+    @Rule public final TemporaryFolder projectDir = new TemporaryFolder(new File("tmp"))
 
     ClassJarMaker jar
     File jarTemp
 
-    @Before
-    void setup() {
+    @Before void setup() {
         jarTemp = projectDir.newFile("test.jar")
         jar = new ClassJarMaker(jarTemp)
     }
 
-    @Test
-    void "should populate jar file with valid filepath"() {
+    @Test void "should populate jar file with valid filepath"() {
         jar.populate(resourceFile("user-TestUI.jar").absolutePath)
         jar.Close()
         ClassProvider classProvider = new ClassProvider(jarTemp.absolutePath)
@@ -47,8 +45,7 @@ class ClassJarMakerSpec {
         jar.populate(null)
     }
 
-    @Test
-    void "should add class to ClassJarMaker"() {
+    @Test void "should add class to ClassJarMaker"() {
         jar.add("com.rakuten.test", new byte[2])
         jar.Close()
         ClassJar classJar = new ClassJar(jarTemp)
