@@ -11,48 +11,58 @@ import org.gradle.api.logging.Logging
 class PerfTrackingTransform extends Transform {
 
     private final Project project
-    boolean enableRewrite;
+    private final Logger log
+    boolean enableRewrite
 
     PerfTrackingTransform(Project project) {
         this.project = project
+        this.log = Logging.getLogger(PerfTrackingTransform.simpleName)
     }
 
-    @Override
-    String getName() {
+    @Override String getName() {
         'PerfTracking'
     }
 
-    @Override
-    Set<QualifiedContent.ContentType> getInputTypes() {
+    @Override Set<QualifiedContent.ContentType> getInputTypes() {
         return Collections.singleton(QualifiedContent.DefaultContentType.CLASSES)
     }
 
-    @Override
-    Set<QualifiedContent.ContentType> getOutputTypes() {
+    @Override Set<QualifiedContent.ContentType> getOutputTypes() {
         return EnumSet.of(QualifiedContent.DefaultContentType.CLASSES)
     }
 
-    @Override
-    Set<QualifiedContent.Scope> getScopes() {
-        return EnumSet.of(
+    @Override Set<QualifiedContent.Scope> getScopes() {
+        def allClasspathDeps = project.buildscript.configurations.classpath.dependencies +
+                project.rootProject.buildscript.configurations.classpath.dependencies
+
+        def agp = allClasspathDeps.find {
+            it.group == 'com.android.tools.build' && it.name == 'gradle'
+        }
+
+        def majorVersion = (agp ? agp.version : '3').tokenize('.')*.toInteger().head();
+
+        log.info("Detected android gradle plugin version ${agp ? agp.version : '[unknown]'}, " +
+                "adjusting transformations scopes.")
+        def scopes = EnumSet.of(
                 QualifiedContent.Scope.PROJECT,
-                QualifiedContent.Scope.PROJECT_LOCAL_DEPS,
                 QualifiedContent.Scope.SUB_PROJECTS,
-                QualifiedContent.Scope.SUB_PROJECTS_LOCAL_DEPS,
-                QualifiedContent.Scope.EXTERNAL_LIBRARIES
-        )
+                QualifiedContent.Scope.EXTERNAL_LIBRARIES)
+
+        if(majorVersion < 3) {
+            scopes.add(QualifiedContent.Scope.PROJECT_LOCAL_DEPS)
+            scopes.add(QualifiedContent.Scope.SUB_PROJECTS_LOCAL_DEPS)
+        }
+        return scopes
     }
 
-    @Override
-    boolean isIncremental() {
+    @Override boolean isIncremental() {
         return false
     }
 
     /* expose for test */
     Rewriter rewriter;
 
-    @Override
-    void transform(
+    @Override void transform(
             Context context,
             Collection<TransformInput> inputs,
             Collection<TransformInput> referencedInputs,
@@ -65,7 +75,6 @@ class PerfTrackingTransform extends Transform {
             [it.jarInputs, it.directoryInputs]*.each { input << "$it.file" }
         }
 
-        Logger log = Logging.getLogger(PerfTrackingTransform.simpleName)
         rewriter = enableRewrite ? new PerformanceTrackingRewriter() : new DummyRewriter();
 
         rewriter.input = input.join(File.pathSeparator)

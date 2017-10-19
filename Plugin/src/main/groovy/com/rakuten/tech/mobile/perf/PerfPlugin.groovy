@@ -4,9 +4,9 @@ import com.android.build.gradle.AppExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
+
 /**
  * Gradle plugin
- *
  */
 class PerfPlugin implements Plugin<Project> {
     PerfTrackingTransform perfTrackingTransform;
@@ -38,7 +38,7 @@ class PerfPlugin implements Plugin<Project> {
                 def strings = task.name.split("(?=\\p{Lu})")
                 def buildType = strings[strings.length - 1].toLowerCase()
                 def enable = buildType != "debug" // default value
-                if(perfConfig.hasProperty(buildType)) enable = perfConfig."$buildType".enable
+                if (perfConfig.hasProperty(buildType)) enable = perfConfig."$buildType".enable
                 perfTrackingTransform.enableRewrite = enable
             }
         }
