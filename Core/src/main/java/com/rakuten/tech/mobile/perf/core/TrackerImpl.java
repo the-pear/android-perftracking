@@ -20,8 +20,6 @@ class TrackerImpl {
     void clearActivityName(String name) {
         if (activityName != null && activityName.equals(name)) {
             updateActivityName(null);
-        } else {
-            updateActivityName(name);
         }
     }
 
