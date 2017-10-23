@@ -216,7 +216,7 @@ public class Tracker {
     }
 
     /**
-     * Clears current activity name when we are in same activity else updates the current activity name with given name.
+     * Clears current activity name when we are in same activity.
      * @param name activity name
      */
     public static void clearActivityName(String name) {
