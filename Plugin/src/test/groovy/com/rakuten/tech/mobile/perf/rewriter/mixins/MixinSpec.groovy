@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.perf.rewriter.mixins
 
+import com.rakuten.tech.mobile.perf.UnitSpec
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJar
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassProvider
 import org.junit.Before
@@ -12,7 +13,7 @@ import org.objectweb.asm.tree.ClassNode
 import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
 import static com.rakuten.tech.mobile.perf.TestUtil.testLogger
 
-class MixinSpec {
+class MixinSpec extends UnitSpec {
 
     Mixin mixin
 
@@ -27,13 +28,11 @@ class MixinSpec {
     }
 
     @RunWith(Parameterized)
-    static class MixinMatcherPositiveSpec {
+    static class MixinMatcherPositiveSpec extends UnitSpec {
         private String mixinInput
         private String classInput
 
-        @Parameters
-        static Collection<Object[]> data() {
-
+        @Parameters static Collection<Object[]> data() {
             def data = [["com.rakuten.tech.mobile.perf.core.mixins.AdapterViewOnItemClickListenerMixin", "com.rakuten.tech.mobile.perf.core.mixins.TestTargetImplementationOf"],
                         ["com.rakuten.tech.mobile.perf.core.mixins.ActivityMixin", "com.rakuten.tech.mobile.perf.core.mixins.TestTargetSubClassOf"],
                         ["com.rakuten.tech.mobile.perf.core.mixins.VolleyHurlStackMixin", "com.android.volley.toolbox.HurlStack"]]
@@ -60,12 +59,11 @@ class MixinSpec {
     }
 
     @RunWith(Parameterized)
-    static class MixinMatcherNegativeSpec {
+    static class MixinMatcherNegativeSpec extends UnitSpec {
         private String mixinInput
         private String classInput
 
-        @Parameters
-        static Collection<Object[]> data() {
+        @Parameters static Collection<Object[]> data() {
 
             def data = [["com.rakuten.tech.mobile.perf.core.mixins.AdapterViewOnItemClickListenerMixin", "java.lang.Thread"],
                         ["com.rakuten.tech.mobile.perf.core.mixins.ActivityMixin", "android.webkit.WebChromeClient"],

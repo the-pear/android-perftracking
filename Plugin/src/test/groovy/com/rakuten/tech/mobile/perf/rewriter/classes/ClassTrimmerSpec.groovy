@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.perf.rewriter.classes
 
+import com.rakuten.tech.mobile.perf.UnitSpec
 import org.gradle.api.logging.Logging
 import org.junit.Before
 import org.junit.Test
@@ -11,16 +12,14 @@ import org.objectweb.asm.tree.ClassNode
 import static com.rakuten.tech.mobile.perf.TestUtil.resourceFile
 
 
-class ClassTrimmerSpec {
+class ClassTrimmerSpec extends UnitSpec {
     ClassTrimmer classTrimmer
 
-
     @RunWith(Parameterized)
-    static class ClassTrimmerSpecParameterized {
+    static class ClassTrimmerSpecParameterized extends UnitSpec {
         private String input
 
-        @Parameters
-        static Collection<Object[]> data() {
+        @Parameters static Collection<Object[]> data() {
             def data = ["", "test", null]
             return data.collect { [it] as Object[] }
         }
@@ -37,14 +36,12 @@ class ClassTrimmerSpec {
     }
 
 
-    @Before
-    void setup() {
+    @Before void setup() {
         ClassProvider provider = new ClassProvider(resourceFile("user-TestUI.jar").absolutePath)
         classTrimmer = new ClassTrimmer("android-23", provider, Logging.getLogger(ClassTrimmerSpec.class.getName()))
     }
 
-    @Test
-    void "should trim methods which has annotation"() {
+    @Test void "should trim methods which has annotation"() {
         ClassJar classJar = new ClassJar(resourceFile("user-TestUI.jar"))
         ClassNode classNode = classJar.getClassNode("com.rakuten.tech.mobile.perf.core.base.FragmentBase")
         int originalMethodSize = classNode.methods.size()
@@ -52,8 +49,7 @@ class ClassTrimmerSpec {
         assert classNode.methods.size() != originalMethodSize
     }
 
-    @Test
-    void "should not trim methods which does not have annotation"() {
+    @Test void "should not trim methods which does not have annotation"() {
         ClassJar classJar = new ClassJar(resourceFile("user-TestUI.jar"))
         ClassNode classNode = classJar.getClassNode("com.rakuten.tech.mobile.perf.core.base.WebChromeClientBase")
         int originalMethodSize = classNode.methods.size()
@@ -61,8 +57,7 @@ class ClassTrimmerSpec {
         assert classNode.methods.size() == originalMethodSize
     }
 
-    @Test
-    void "should trim methods which has annotation MaxCompileSdkVersion"() {
+    @Test void "should trim methods which has annotation MaxCompileSdkVersion"() {
         ClassJar classJar = new ClassJar(resourceFile("user-TestUI.jar"))
         ClassNode classNode = classJar.getClassNode("com.rakuten.tech.mobile.perf.core.base.SupportV4FragmentBase")
         int originalMethodSize = classNode.methods.size()

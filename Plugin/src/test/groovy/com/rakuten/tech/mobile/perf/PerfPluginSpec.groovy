@@ -11,7 +11,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-class PerfPluginSpec {
+class PerfPluginSpec extends UnitSpec {
     PerfPlugin plugin
     Project project
     Stubs stubs
@@ -52,7 +52,7 @@ class PerfPluginSpec {
 }
 
 @RunWith(Parameterized)
-class PluginConfigurationSpec {
+class PluginConfigurationSpec extends UnitSpec {
     PerfPlugin plugin
     Project project
     Stubs stubs

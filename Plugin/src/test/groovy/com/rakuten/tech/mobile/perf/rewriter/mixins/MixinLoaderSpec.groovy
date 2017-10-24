@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.perf.rewriter.mixins
 
+import com.rakuten.tech.mobile.perf.UnitSpec
 import com.rakuten.tech.mobile.perf.rewriter.classes.ClassJar
 import org.junit.Before
 import org.junit.Test
@@ -10,7 +11,7 @@ import org.objectweb.asm.tree.MethodNode
 
 import static com.rakuten.tech.mobile.perf.TestUtil.*
 
-public class MixinLoaderSpec {
+public class MixinLoaderSpec extends UnitSpec {
     MixinLoader mixinLoader
     ClassJar jar
     ClassNode classNode
