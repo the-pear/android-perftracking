@@ -159,6 +159,10 @@ class EventWriter {
                         return;
                 }
 
+                if (m.activityName != null && m.activityName.length() > 0) {
+                    _writer.append(",\"screen\":\"").append(m.activityName).append('"');
+                }
+
                 if (metricId != null) {
                     _writer.append(",\"metric\":\"").append(metricId).append('"');
                 }

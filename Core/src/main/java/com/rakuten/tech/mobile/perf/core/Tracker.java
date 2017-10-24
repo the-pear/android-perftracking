@@ -198,5 +198,35 @@ public class Tracker {
         } catch (Throwable t) {
             Tracker.off();
         }
-	}
+    }
+
+    /**
+     * Updates current activity name.
+     * @param name activity name
+     */
+    public static void updateActivityName(String name) {
+        try {
+            TrackerImpl t = _tracker;
+            if (t != null) {
+                t.updateActivityName(name);
+            }
+        } catch (Throwable t) {
+            Tracker.off();
+        }
+    }
+
+    /**
+     * Clears current activity name when we are in same activity.
+     * @param name activity name
+     */
+    public static void clearActivityName(String name) {
+        try {
+            TrackerImpl t = _tracker;
+            if (t != null) {
+                t.clearActivityName(name);
+            }
+        } catch (Throwable t) {
+            Tracker.off();
+        }
+    }
 }

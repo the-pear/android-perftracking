@@ -12,69 +12,75 @@ import com.rakuten.tech.mobile.perf.core.annotations.MinCompileSdkVersion;
 
 public class ActivityBase extends Activity {
 
-	public boolean com_rakuten_tech_mobile_perf_onCreate_tracking;
+    public boolean com_rakuten_tech_mobile_perf_onCreate_tracking;
+    private final String activityName = this.getClass().getName();
 
-	protected void onCreate (Bundle savedInstanceState) {
-		Tracker.prolongMetric();
-		super.onCreate(savedInstanceState);
-	}
+    protected void onCreate(Bundle savedInstanceState) {
+        Tracker.updateActivityName(activityName);
+        Tracker.prolongMetric();
+        super.onCreate(savedInstanceState);
+    }
 
-	@MinCompileSdkVersion(21)
-	public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-		Tracker.prolongMetric();
-		super.onCreate(savedInstanceState, persistentState);
-	}
+    @MinCompileSdkVersion(21)
+    public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
+        Tracker.updateActivityName(activityName);
+        Tracker.prolongMetric();
+        super.onCreate(savedInstanceState, persistentState);
+    }
 
-	public View onCreateView(String name, Context context, AttributeSet attrs) {
-		Tracker.prolongMetric();
-		return super.onCreateView(name, context, attrs);
-	}
+    public View onCreateView(String name, Context context, AttributeSet attrs) {
+        Tracker.prolongMetric();
+        return super.onCreateView(name, context, attrs);
+    }
 
-	@MinCompileSdkVersion(11)
-	public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
-		Tracker.prolongMetric();
-		return super.onCreateView(parent, name, context, attrs);
-	}
+    @MinCompileSdkVersion(11)
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+        Tracker.prolongMetric();
+        return super.onCreateView(parent, name, context, attrs);
+    }
 
-	protected void onStart () {
-		Tracker.prolongMetric();
-		super.onStart();
-	}
+    protected void onStart() {
+        Tracker.updateActivityName(activityName);
+        Tracker.prolongMetric();
+        super.onStart();
+    }
 
-	protected void onStop () {
-		Tracker.prolongMetric();
-		super.onStop();
-	}
+    protected void onStop() {
+        Tracker.clearActivityName(activityName);
+        Tracker.prolongMetric();
+        super.onStop();
+    }
 
-	protected void onResume () {
-		Tracker.prolongMetric();
-		super.onResume();
-	}
+    protected void onResume() {
+        Tracker.updateActivityName(activityName);
+        Tracker.prolongMetric();
+        super.onResume();
+    }
 
-	protected void onPause () {
-		Tracker.prolongMetric();
-		super.onPause();
-	}
+    protected void onPause() {
+        Tracker.prolongMetric();
+        super.onPause();
+    }
 
-	protected void onRestart () {
-		Tracker.prolongMetric();
-		super.onRestart();
-	}
+    protected void onRestart() {
+        Tracker.prolongMetric();
+        super.onRestart();
+    }
 
-	protected void onDestroy () {
-		Tracker.prolongMetric();
-		super.onDestroy();
-	}
+    protected void onDestroy() {
+        Tracker.prolongMetric();
+        super.onDestroy();
+    }
 
-	@MinCompileSdkVersion(5)
-	public void onBackPressed () {
-		Tracker.endMetric();
-		super.onBackPressed();
-	}
+    @MinCompileSdkVersion(5)
+    public void onBackPressed() {
+        Tracker.endMetric();
+        super.onBackPressed();
+    }
 
-	@MinCompileSdkVersion(3)
-	public void onUserInteraction () {
-		Tracker.endMetric();
-		super.onUserInteraction();
-	}
+    @MinCompileSdkVersion(3)
+    public void onUserInteraction() {
+        Tracker.endMetric();
+        super.onUserInteraction();
+    }
 }

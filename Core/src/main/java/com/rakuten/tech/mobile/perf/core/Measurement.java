@@ -15,6 +15,7 @@ public class Measurement {
     Object b;
     long startTime;
     long endTime;
+    String activityName;
 
     void clear() {
         trackingId = 0;
@@ -23,5 +24,6 @@ public class Measurement {
         b = null;
         startTime = 0;
         endTime = 0;
+        activityName = null;
     }
 }

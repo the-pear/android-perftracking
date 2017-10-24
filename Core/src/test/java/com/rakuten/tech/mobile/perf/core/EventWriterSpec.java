@@ -189,6 +189,7 @@ public class EventWriterSpec {
         measurement.a = "custom-measurement";
         measurement.startTime = 0L;
         measurement.endTime = 999;
+        measurement.activityName = "test-activity";
 
         writer.begin();
         writer.write(measurement, "test-metric");
