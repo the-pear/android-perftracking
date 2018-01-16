@@ -84,10 +84,13 @@ public class RuntimeContentProvider extends ContentProvider {
     }
     Config config = null; // configuration for TrackingManager
 
-    double enablePercent = lastConfig.getEnablePercent();
-
-    double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
-    if (randomNumber <= enablePercent) {
+    boolean enable = Util.isAppDebuggable(context);
+    if (enable == false) {
+      double enablePercent = lastConfig.getEnablePercent();
+      double randomNumber = new Random(System.currentTimeMillis()).nextDouble() * 100.0;
+      enable = (randomNumber <= enablePercent);
+    }
+    if (enable) {
       config = new Config();
       config.app = packageName;
       config.relayAppId = appId;
