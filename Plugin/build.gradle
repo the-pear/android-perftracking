@@ -50,11 +50,6 @@ dependencies {
   compile 'org.ow2.asm:asm-all:5.1'
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-  classifier = 'sources'
-  from sourceSets.main.allSource
-}
-
 apply from: '../config-internal/publish/java.gradle'
 publishing {
   publications {
@@ -81,6 +76,11 @@ task integrationTest(type: Test) {
     excludeCategories 'com.rakuten.tech.mobile.perf.UnitSpec'
     includeCategories 'com.rakuten.tech.mobile.perf.IntegrationSpec'
   }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+  classifier = 'sources'
+  from sourceSets.main.allSource
 }
 
 ['test', 'unitTest', 'integrationTest'].each {
