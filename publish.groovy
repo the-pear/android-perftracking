@@ -4,17 +4,29 @@
 def config() {
   return [
       build: [
-        tasks: ['preReleaseCheck', 'Plugin:assemble', 'Runtime:assemble'],
-        artifacts: ['Plugin/build/libs/Plugin-*.jar', 'Runtime/build/outputs/aar/Runtime-*.jar']
+        tasks: [
+          'preReleaseCheck',
+          'currentVersion',
+          'Plugin:assemble', 
+          'Runtime:assemble',
+        ],
+        artifacts: [
+          'Plugin/build/libs/Plugin-*.jar', 
+          'Runtime/build/outputs/aar/Runtime-*.jar',
+        ]
       ],
       test: [
-        tasks: ['Plugin:check', 'Runtime:check', 'Core:check'],
+        tasks: [
+          'Plugin:check', 
+          'Runtime:check', 
+          'Core:check',
+        ],
       ],
       deploy: [
         tasks: [
         'Plugin:publish',
         'Runtime:publish',
-        'Runtime:uploadJavadoc'
+        'Runtime:uploadJavadoc',
         ],
       ]
     ]
