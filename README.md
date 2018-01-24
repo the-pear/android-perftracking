@@ -182,6 +182,7 @@ If you have already integrated the Performance Tracking SDK in a 0.x version (0.
 
 ## <a name="changelog"></a> Changelog
 ### 1.1.0 (In Progress)
+- **[REM-25137](https://jira.rakuten-it.com/jira/browse/REM-25137)**: Enable tracking for 100% of users in debug builds (if instrumentation is enabled)
 - **[REM-25012](https://jira.rakuten-it.com/jira/browse/REM-25012)**: Send AppID in tracking data
 
 ### 1.0.0 (2017-12-01)
