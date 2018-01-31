@@ -28,7 +28,7 @@ buildscript {
         maven { url 'http://artifactory.raksdtd.com/artifactory/libs-release' }
     }
     dependencies {
-        classpath 'com.rakuten.tech.mobile.perf:plugin:1.0.0'
+        classpath 'com.rakuten.tech.mobile.perf:plugin:1.1.0'
     }
 }
 
@@ -181,9 +181,10 @@ If you have already integrated the Performance Tracking SDK in a 0.x version (0.
 * Subscription key meta in manifest changed from `com.rakuten.tech.mobile.perf.SubscriptionKey` to `com.rakuten.tech.mobile.relay.SubscriptionKey`. If you still use the former meta key in your manifest replace it with the later, [refer to the section on configuring the subscription key](#subscription-key).
 
 ## <a name="changelog"></a> Changelog
-### 1.1.0 (In Progress)
+### 1.1.0 (2018-01-31)
 - **[REM-25137](https://jira.rakuten-it.com/jira/browse/REM-25137)**: Enable tracking for 100% of users in debug builds (if instrumentation is enabled)
 - **[REM-25012](https://jira.rakuten-it.com/jira/browse/REM-25012)**: Send AppID in tracking data
+- **[REM-25622](https://jira.rakuten-it.com/jira/browse/REM-25622)**: Fix for crash on API 15 device.
 
 ### 1.0.0 (2017-12-01)
 - **[REM-23958](https://jira.rakuten-it.com/jira/browse/REM-23958)**: Send device Memory and Battery information in tracking data
