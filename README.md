@@ -7,8 +7,8 @@ Each scenario/metric lists various method, network call measurements. Performanc
 * [Customize Tracking](#customize)
 * [Configure Tracking](#configure)
 * [Enable Debug Logs](#debug)
-* [Confirm Performance Tracking SDK Integration](#integration)
 * [Migrate from 0.x to 1.x](#migration-guide-1.0)
+* [Frequently Asked Questions](#faq)
 * [Changelog](#changelog)
 
 ##  <a name="install"></a> Installation procedure
@@ -159,26 +159,38 @@ performanceTracking {
 }
 ```
 
-## <a name="integration"></a> Confirm the Performance Tracking integration
-### Check for Build
-* Confirm `transformClassesWithPerfTrackingXXX` tasks are successful without any error during build process.
-* If your build fails because of any error in `transformClassesWithPerfTrackingXXX` tasks please contact us through [Inquiry Form](https://developers.rakuten.net/hc/en-us/requests/new?ticket_form_id=399907).
-* You can disable tracking as shown in [Configure Tracking](#configure).
-
-### Run your App
-On first run of your app after integrating Performance Tracking the module will fetch and store its configuration data, it **will not** send metric data yet. On subsequent runs the module will track performance and send metrics and measurements if the previously received configuration is valid and the enable percentage check succeeds.
-
-### Check Configuration
-You can verify this by enabling debug logs as shown in [Enable Debug Logs](#debug). You will see "Error loading configuration" log in failure scenario.
-
-### Check Sending data to eventhub
-* Performance Tracking data of your app will reflect in the Rakuten App Studio portal after few hours.
-* You can even verify this by enabling debug logs as shown in [Enable Debug Logs](#debug). You will see "SEND_METRIC" AND "SEND" in logs.
-
 ## <a name="migration-guide-1.0"></a> Migrating from 0.x to 1.x
 If you have already integrated the Performance Tracking SDK in a 0.x version (0.1.0, 0.1.1 or 0.2.0) you need to follow these steps to migrate to 1.0.0 and newer.
 
 * Subscription key meta in manifest changed from `com.rakuten.tech.mobile.perf.SubscriptionKey` to `com.rakuten.tech.mobile.relay.SubscriptionKey`. If you still use the former meta key in your manifest replace it with the later, [refer to the section on configuring the subscription key](#subscription-key).
+
+## <a name="faq"></a> Frequently Asked Questions
+### <a name="instant-run"></a> My build fails in Android Studio 😞 what to do?
+
+First try to build your app from the commandline
+
+```bash
+$ ./gradlew clean assemble
+```
+
+If that fails run it again with the `--stacktrace` flag and check if the build fails during `transformClassesWithPerfTrackingXxx` task. If so please raise an [inquiry here](https://developers.rakuten.net/hc/en-us/requests/new?ticket_form_id=399907). 
+
+If it succeeds on the commandline but fails on in Android Studio check if your build fails during the `transformClassesWithExtractJarsForXxx` task. If yes you are using instant run, which may cause issues with the performance tracking SDK. [Disable instant run](https://developer.android.com/studio/run/index.html#disable-ir) and try building in Android Studio again. 
+
+### <a name="check-integration"></a> How can I confirm the Performance Tracking integration?
+#### 1. Confirm successful build
+* Confirm `transformClassesWithPerfTrackingXXX` tasks are successful without any error during build process.
+* If your build fails because of any error in `transformClassesWithPerfTrackingXXX` tasks please contact us through [inquiry form](https://developers.rakuten.net/hc/en-us/requests/new?ticket_form_id=399907).
+* You can enable/disable tracking as shown in [Configure Tracking](#configure).
+
+#### 2. Run your app - twice 😉
+On first run of your app after integrating Performance Tracking the module will fetch and store its configuration data, it **will not** send metric data yet. On subsequent runs the module will track performance and send metrics and measurements if the previously received configuration is valid and the enable percentage check succeeds.
+
+#### 3. Confirm the app receives a valid configuration & is sending performance tracking data
+Enabling debug logs as shown [above](#debug). If there is an error fetching the configuration you will "Error loading configuration" in the adb logcat. If there is no error you should see "SEND_METRIC" AND "SEND" in logs (on second app start).
+
+### 3. Confirm data is shown in the portal
+Performance Tracking data of your app will reflect in the Rakuten App Studio portal after 15 mins.
 
 ## <a name="changelog"></a> Changelog
 ### 1.1.0 (2018-01-31)
